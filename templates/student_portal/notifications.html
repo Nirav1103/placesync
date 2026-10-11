@@ -1,0 +1,54 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Notifications | PlaceSync{% endblock %}
+{% block topbar_title %}Notifications{% endblock %}
+{% block nav_notif %}active{% endblock %}
+
+{% block content %}
+
+<div class="sp-page-header">
+  <div>
+    <h1 class="sp-page-title">Notifications</h1>
+    <p class="sp-page-subtitle">
+      {% if unread_count %}{{ unread_count }} unread notification{{ unread_count|pluralize }}{% else %}All caught up!{% endif %}
+    </p>
+  </div>
+</div>
+
+{% if notifications %}
+<div class="sp-card" style="background:#FFFFFF !important; border:1.5px solid #475569 !important; border-radius:8px; overflow:hidden;">
+  {% for notif in notifications %}
+  <div class="sp-notif-item {% if not notif.is_read %}unread{% endif %}" style="display:flex; gap:1rem; padding:1.25rem; border-bottom:1px solid #E2E8F0; {% if not notif.is_read %}background:#F8FAFC !important;{% else %}background:#FFFFFF !important;{% endif %}">
+    {% if not notif.is_read %}
+      <div class="sp-notif-dot-indicator" style="width:10px; height:10px; border-radius:50%; background:#32867D !important; flex-shrink:0; margin-top:0.4rem;"></div>
+    {% else %}
+      <div style="width:10px; flex-shrink:0;"></div>
+    {% endif %}
+    <div style="flex:1;">
+      <div class="sp-notif-title" style="font-size:1rem; color:#0F172A !important; font-weight:800; margin-bottom:0.35rem;">{{ notif.title }}</div>
+      <div class="sp-notif-msg" style="font-size:0.9rem; color:#1E293B !important; font-weight:600; line-height:1.6; white-space:pre-line;">{{ notif.message }}</div>
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-top:0.75rem; flex-wrap:wrap; gap:0.5rem;">
+        <div class="sp-notif-time" style="font-size:0.78rem; color:#334155 !important; font-weight:700;">📅 {{ notif.created_at|date:"M d, Y · H:i" }}</div>
+        {% if not notif.is_read %}
+        <form method="post" action="{% url 'student_portal:notification_read' notif.pk %}" style="margin:0;">
+          {% csrf_token %}
+          <button type="submit" class="sp-btn sp-btn-secondary sp-btn-xs" style="border:1.5px solid #475569 !important; font-weight:800; padding:0.3rem 0.75rem;">Mark Read</button>
+        </form>
+        {% else %}
+          <span class="sp-badge sp-badge-gray" style="font-size:0.72rem; font-weight:700;">Read</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% else %}
+<div class="sp-card" style="background:#FFFFFF !important; border:1.5px solid #475569 !important; padding:4rem 2rem; text-align:center; max-width:600px; margin:2rem auto;">
+  <div class="sp-empty-icon" style="font-size:3.5rem; margin-bottom:1rem;">🔔</div>
+  <h3 class="sp-empty-text" style="font-family:'Space Grotesk',sans-serif; color:#0F172A !important; font-size:1.25rem; font-weight:800; margin-bottom:0.5rem;">No notifications yet</h3>
+  <p class="sp-empty-sub" style="font-size:0.9rem; color:#334155 !important; font-weight:600; margin-bottom:0;">Your TPO will send notifications about placement drives and updates here.</p>
+</div>
+{% endif %}
+
+{% endblock %}

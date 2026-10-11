@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PlaceSync — Training &amp; Placement Cell Management Portal Login">
+    <title>Admin Sign In | PlaceSync</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=10.0">
+</head>
+<body>
+
+<div class="auth-container">
+    <div class="auth-card">
+
+        <div class="auth-logo">
+            <div class="auth-logo-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+            <div class="auth-logo-text">Place<span>Sync</span></div>
+        </div>
+
+        <a href="{% url 'home' %}" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+
+        <h1 class="auth-title">Welcome back</h1>
+        <p class="auth-subtitle">Sign in to your Placement Cell Admin Portal</p>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert">
+                    {% for error in form.non_field_errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="sp-form-group" style="margin-bottom:1.25rem;">
+                    <label class="sp-form-label" for="{{ field.id_for_label }}" style="color:#ffffff; font-weight:600; font-size:0.82rem; display:block; margin-bottom:0.4rem;">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <ul class="form-error">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div style="text-align:right; margin-top:-0.25rem; margin-bottom:1.5rem;">
+                <a href="{% url 'accounts:password_reset' %}" class="forgot-link">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="auth-btn-primary">
+                Sign In <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </form>
+
+        <div class="auth-divider"><span>New to PlaceSync?</span></div>
+
+        <a href="{% url 'accounts:register' %}" class="auth-btn-secondary">
+            Register Your College
+        </a>
+
+    </div>
+</div>
+
+</body>
+</html>

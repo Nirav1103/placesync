@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Company | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem; max-width: 800px;">
+    
+    <!-- Header -->
+    <div class="dashboard-header" style="border-bottom: none; margin-bottom: 1.5rem;">
+        <div>
+            <h1 class="dashboard-title">{{ action }} Company Profile</h1>
+            <p class="dashboard-welcome">
+                {% if action == 'Edit' %}
+                    Updating profile details for <strong style="color: #fff;">{{ company.name }}</strong>
+                {% else %}
+                    Register a new partner recruiting company in the university portal.
+                {% endif %}
+            </p>
+        </div>
+        <div>
+            <a href="{% url 'companies:list' %}" class="btn btn-secondary">&larr; Back to Directory</a>
+        </div>
+    </div>
+
+    <!-- Form Panel -->
+    <div class="card-panel" style="margin-top: 0;">
+        <form method="post" enctype="multipart/form-data" novalidate style="display: flex; flex-direction: column; gap: 1.75rem;">
+            {% csrf_token %}
+
+            <!-- Form Validation Global Errors -->
+            {% if form.non_field_errors %}
+                <div style="background: rgba(244, 63, 94, 0.15); border-left: 4px solid var(--danger); border-radius: var(--radius-sm); padding: 0.75rem 1rem;">
+                    {% for error in form.non_field_errors %}
+                        <p style="color: #fda4af; font-size: 0.85rem; margin: 0;">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Section 1: Company Profile Info -->
+            <div>
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;">🏢 Company Details</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <!-- Company Name -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_name">Company Name *</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.name.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Industry -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_industry">Industry Verticals</label>
+                        {{ form.industry }}
+                        {% if form.industry.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.industry.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                    <!-- Company Size -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_company_size">Company Size</label>
+                        {{ form.company_size }}
+                        {% if form.company_size.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.company_size.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Location -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_location">Head Office Location</label>
+                        {{ form.location }}
+                        {% if form.location.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.location.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                    <!-- Website URL -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_website">Website URL</label>
+                        {{ form.website }}
+                        {% if form.website.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.website.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- LinkedIn URL -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_linkedin_url">LinkedIn Company Page</label>
+                        {{ form.linkedin_url }}
+                        {% if form.linkedin_url.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.linkedin_url.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                    <!-- Career Page -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_career_page">Career Page URL</label>
+                        {{ form.career_page }}
+                        {% if form.career_page.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.career_page.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Registration Number -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_registration_number">Company Registration Number <span style="font-size: 0.7rem; color: var(--text-muted);">(Optional)</span></label>
+                        {{ form.registration_number }}
+                        {% if form.registration_number.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.registration_number.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Logo Upload -->
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label class="form-label" for="id_logo">Upload Company Logo</label>
+                    {{ form.logo }}
+                    {% if form.logo.errors %}
+                        <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.logo.errors.0 }}</span>
+                    {% endif %}
+                    <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">
+                        Image file (PNG, JPG, JPEG) to display in lists and dashboard.
+                    </span>
+                </div>
+
+                <!-- About Company -->
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label class="form-label" for="id_about_company">About Company</label>
+                    {{ form.about_company }}
+                    {% if form.about_company.errors %}
+                        <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.about_company.errors.0 }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Section 2: Contact Details -->
+            <div>
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;">📞 HR Contact Details</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                    <!-- HR Name -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_hr_name">HR Coordinator Name</label>
+                        {{ form.hr_name }}
+                        {% if form.hr_name.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.hr_name.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- HR Email -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_hr_email">HR Email</label>
+                        {{ form.hr_email }}
+                        {% if form.hr_email.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.hr_email.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- HR Phone -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_hr_phone">HR Phone Number</label>
+                        {{ form.hr_phone }}
+                        {% if form.hr_phone.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.hr_phone.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- HR Notes -->
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label class="form-label" for="id_hr_notes">Contact Notes / Interview Logs</label>
+                    {{ form.hr_notes }}
+                    {% if form.hr_notes.errors %}
+                        <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.hr_notes.errors.0 }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Section 3: Recruitment Terms & History -->
+            <div>
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;">💼 Recruitment Details</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                    <!-- Job Mode -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_job_mode">Job Mode</label>
+                        {{ form.job_mode }}
+                        {% if form.job_mode.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.job_mode.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Package Amount -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_package_amount">CTC Package Offered (LPA)</label>
+                        {{ form.package_amount }}
+                        {% if form.package_amount.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.package_amount.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Stipend Amount -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_stipend_amount">Monthly Stipend Offered</label>
+                        {{ form.stipend_amount }}
+                        {% if form.stipend_amount.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.stipend_amount.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Placement History -->
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label class="form-label" for="id_placement_history">Placement History & Notes</label>
+                    {{ form.placement_history }}
+                    {% if form.placement_history.errors %}
+                        <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.placement_history.errors.0 }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Submit Console -->
+            <div style="display: flex; gap: 1rem; border-top: 1px solid var(--card-border); padding-top: 1.5rem; margin-top: 1rem;">
+                <button type="submit" class="btn btn-primary" style="padding: 0.85rem 2rem;">🚀 Save Profile</button>
+                <a href="{% url 'companies:list' %}" class="btn btn-secondary" style="padding: 0.85rem 1.5rem;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

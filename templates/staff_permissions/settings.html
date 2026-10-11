@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Settings | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding: 2rem 1.5rem; max-width: 900px;">
+    
+    <div class="dashboard-header" style="border-bottom: none; margin-bottom: 2rem;">
+        <div>
+            <h1 class="dashboard-title">⚙️ Settings</h1>
+            <p class="dashboard-welcome">Manage your account profile and configurations.</p>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+        
+        <!-- Account Profile Setting -->
+        <div class="card-panel" style="margin-top: 0; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">👤</div>
+                <h3 style="color: #fff; font-size: 1.1rem; font-weight: 600; margin: 0 0 0.5rem 0;">My Profile</h3>
+                <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5; margin: 0 0 1rem 0;">
+                    Update your account details, email address, first and last name details.
+                </p>
+            </div>
+            <a href="{% url 'colleges:profile_detail' %}" class="btn btn-secondary" style="width: 100%; text-align: center; font-size: 0.85rem;">View Profile</a>
+        </div>
+
+        <!-- Change Password Setting -->
+        <div class="card-panel" style="margin-top: 0; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🔑</div>
+                <h3 style="color: #fff; font-size: 1.1rem; font-weight: 600; margin: 0 0 0.5rem 0;">Change Password</h3>
+                <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5; margin: 0 0 1rem 0;">
+                    Update your password to keep your college administration portal account secure.
+                </p>
+            </div>
+            <a href="{% url 'staff_permissions:change_password' %}" class="btn btn-secondary" style="width: 100%; text-align: center; font-size: 0.85rem;">Change Password</a>
+        </div>
+
+        <!-- Staff Management Card -->
+        <div class="card-panel" style="margin-top: 0; border: 1px solid rgba(var(--primary-rgb), 0.3); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🛡️</div>
+                <h3 style="color: #fff; font-size: 1.1rem; font-weight: 600; margin: 0 0 0.5rem 0;">Staff Management</h3>
+                <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5; margin: 0 0 1rem 0;">
+                    Manage staff member accounts and restrict access roles between Editors and View Only users.
+                </p>
+            </div>
+            <a href="{% url 'staff_permissions:staff_list' %}" class="btn btn-primary" style="width: 100%; text-align: center; font-size: 0.85rem;">Manage Staff</a>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

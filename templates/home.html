@@ -1,0 +1,502 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlaceSync — Next-Gen Campus Placement &amp; Hiring Platform</title>
+    
+    <!-- Google Fonts & FontAwesome 6 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <!-- Custom Landing Page Styling -->
+    <link rel="stylesheet" href="{% static 'css/home.css' %}?v=10.0">
+</head>
+<body>
+
+    <!-- ══════════════════════════════════════════════════
+         1. Sticky Glassmorphism Header
+         ══════════════════════════════════════════════════ -->
+    <nav class="navbar-wrapper">
+        <div class="container navbar">
+            <a href="#home" class="logo-wrapper">
+                <div class="logo-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                <span class="logo-text">PlaceSync</span>
+            </a>
+            
+            <!-- Mobile Menu Checkbox Toggle -->
+            <input type="checkbox" id="menu-toggle" class="menu-toggle-checkbox">
+            <label for="menu-toggle" class="menu-toggle-label">
+                <i class="fa-solid fa-bars"></i>
+            </label>
+            
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#ecosystem" class="nav-link">Portals</a></li>
+                <li><a href="#features" class="nav-link">Features</a></li>
+                <li><a href="#workflow" class="nav-link">How It Works</a></li>
+                <li><a href="#faq" class="nav-link">FAQ</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+            
+            <div class="nav-actions">
+                <a href="{% url 'accounts:student_login' %}" class="btn btn-secondary"><i class="fa-solid fa-user-graduate"></i> Student Login</a>
+                <a href="{% url 'accounts:login' %}" class="btn btn-primary"><i class="fa-solid fa-building-columns"></i> College Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ══════════════════════════════════════════════════
+         2. Hero Section
+         ══════════════════════════════════════════════════ -->
+    <header id="home" class="hero-section">
+        <div class="container hero-grid">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="badge-pulse"></span> Next-Gen Campus Recruitment Platform
+                </div>
+                <h1 class="hero-title">
+                    Empowering Colleges, Students &amp; Recruiters on <span>One Unified Hiring OS</span>
+                </h1>
+                <p class="hero-desc">
+                    PlaceSync automates institutional student management, Python ATS resume analysis, placement drive scheduling, and hiring analytics with zero spreadsheet hassle.
+                </p>
+                
+                <div class="hero-buttons">
+                    <a href="{% url 'accounts:register' %}" class="btn btn-primary"><i class="fa-solid fa-rocket"></i> Get Started Free</a>
+                    <a href="#ecosystem" class="btn btn-secondary"><i class="fa-solid fa-compass"></i> Explore Portals</a>
+                </div>
+                
+                <!-- Social Proof Metrics Row -->
+                <div class="hero-stats-row">
+                    <div class="hero-stat-item">
+                        <div class="hero-stat-num">50k+</div>
+                        <div class="hero-stat-label">Active Students</div>
+                    </div>
+                    <div class="hero-stat-item">
+                        <div class="hero-stat-num">100+</div>
+                        <div class="hero-stat-label">Partner Colleges</div>
+                    </div>
+                    <div class="hero-stat-item">
+                        <div class="hero-stat-num">98%</div>
+                        <div class="hero-stat-label">Placement Efficiency</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hero-illustration">
+                <!-- SaaS Hub Illustration graphic -->
+                <svg class="floating-svg" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="250" cy="250" r="160" fill="#32867D" opacity="0.04" />
+                    <circle cx="250" cy="250" r="220" stroke="#32867D" stroke-width="1.5" stroke-dasharray="8 8" opacity="0.2" />
+                    
+                    <!-- Center Hub Node -->
+                    <circle cx="250" cy="250" r="45" fill="#32867D" />
+                    <circle cx="250" cy="250" r="55" stroke="#32867D" stroke-width="2" opacity="0.4" />
+                    <path d="M238 250H262M250 238V262" stroke="#fff" stroke-width="3.5" stroke-linecap="round" />
+                    
+                    <!-- Network Lines -->
+                    <line x1="250" y1="250" x2="110" y2="130" stroke="#32867D" stroke-width="2" opacity="0.3" />
+                    <line x1="250" y1="250" x2="390" y2="130" stroke="#32867D" stroke-width="2" opacity="0.3" />
+                    <line x1="250" y1="250" x2="390" y2="370" stroke="#32867D" stroke-width="2" opacity="0.3" />
+                    <line x1="250" y1="250" x2="110" y2="370" stroke="#32867D" stroke-width="2" opacity="0.3" />
+                    
+                    <!-- Floating Card 1: Student Profile -->
+                    <g transform="translate(40, 60)">
+                        <rect width="140" height="90" rx="10" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5" />
+                        <circle cx="30" cy="35" r="14" fill="#32867D" />
+                        <circle cx="30" cy="32" r="6" fill="#fff" />
+                        <path d="M20 44C20 40 24 38 30 38C36 38 40 40 40 44" fill="#fff" />
+                        <rect x="54" y="24" width="70" height="6" rx="3" fill="#0F172A" />
+                        <rect x="54" y="36" width="50" height="5" rx="2.5" fill="#32867D" />
+                        <rect x="54" y="46" width="35" height="4" rx="2" fill="#64748B" />
+                        <rect x="16" y="66" width="45" height="12" rx="4" fill="#ECFDF5" stroke="#6EE7B7" />
+                        <rect x="68" y="66" width="56" height="12" rx="4" fill="#F0FDFF" stroke="#A5F3FC" />
+                    </g>
+                    
+                    <!-- Floating Card 2: Drive Outcome -->
+                    <g transform="translate(320, 60)">
+                        <rect width="140" height="90" rx="10" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5" />
+                        <rect x="16" y="18" width="80" height="8" rx="4" fill="#0F172A" />
+                        <rect x="16" y="32" width="108" height="5" rx="2.5" fill="#475569" />
+                        <rect x="16" y="42" width="90" height="5" rx="2.5" fill="#64748B" />
+                        <rect x="16" y="60" width="50" height="16" rx="4" fill="#ECFDF5" stroke="#6EE7B7" />
+                        <text x="24" y="72" fill="#059669" font-size="8" font-weight="700">HIRED</text>
+                        <text x="78" y="72" fill="#0F172A" font-size="9" font-weight="800">18.5 LPA</text>
+                    </g>
+                    
+                    <!-- Floating Card 3: Interview Timeline -->
+                    <g transform="translate(40, 310)">
+                        <rect width="140" height="90" rx="10" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5" />
+                        <rect x="16" y="18" width="22" height="22" rx="4" fill="#32867D" />
+                        <rect x="20" y="26" width="4" height="4" fill="#fff" />
+                        <rect x="28" y="26" width="4" height="4" fill="#fff" />
+                        <rect x="46" y="20" width="75" height="7" rx="3.5" fill="#0F172A" />
+                        <rect x="46" y="32" width="55" height="5" rx="2.5" fill="#475569" />
+                        <rect x="16" y="58" width="108" height="18" rx="4" fill="#F0FDFA" stroke="#CCFBF1" />
+                        <text x="22" y="70" fill="#32867D" font-size="8" font-weight="700">Interview Scheduled</text>
+                    </g>
+                    
+                    <!-- Floating Card 4: ATS Score Meter -->
+                    <g transform="translate(320, 310)">
+                        <rect width="140" height="90" rx="10" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5" />
+                        <text x="16" y="24" fill="#0F172A" font-size="9" font-weight="700">ATS Score Match</text>
+                        <path d="M20 70 L45 55 L70 62 L95 40 L120 28" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="120" cy="28" r="3.5" fill="#fff" stroke="#059669" stroke-width="2" />
+                        <text x="102" y="22" fill="#059669" font-size="9" font-weight="800">+94%</text>
+                    </g>
+                </svg>
+            </div>
+        </div>
+    </header>
+
+    <!-- ══════════════════════════════════════════════════
+         3. Partner Recruiter Logos Banner
+         ══════════════════════════════════════════════════ -->
+    <div class="logos-banner">
+        <div class="container">
+            <div class="logos-title">Trusted By Leading Corporate Recruiters &amp; Tech Giants</div>
+            <div class="logos-grid">
+                <div class="logo-badge-item"><i class="fa-brands fa-google" style="color:#EA4335;"></i> Google</div>
+                <div class="logo-badge-item"><i class="fa-brands fa-microsoft" style="color:#00A4EF;"></i> Microsoft</div>
+                <div class="logo-badge-item"><i class="fa-brands fa-amazon" style="color:#FF9900;"></i> Amazon</div>
+                <div class="logo-badge-item"><i class="fa-solid fa-code" style="color:#32867D;"></i> TCS</div>
+                <div class="logo-badge-item"><i class="fa-solid fa-building" style="color:#0284C7;"></i> Infosys</div>
+                <div class="logo-badge-item"><i class="fa-solid fa-laptop-code" style="color:#6366F1;"></i> Wipro</div>
+                <div class="logo-badge-item"><i class="fa-solid fa-chart-line" style="color:#059669;"></i> Deloitte</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+         4. Ecosystem Portals Showcase
+         ══════════════════════════════════════════════════ -->
+    <section id="ecosystem" class="ecosystem-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fa-solid fa-layer-group"></i> Ecosystem</span>
+                <h2 class="section-title">Tailored Portals for Every <span>Stakeholder</span></h2>
+                <p class="section-desc">
+                    PlaceSync connects Colleges, Students, and Corporate Recruiters onto one synchronized recruitment architecture.
+                </p>
+            </div>
+            
+            <div class="ecosystem-grid">
+                <!-- Portal 1: College Admin -->
+                <div class="ecosystem-card">
+                    <div class="ecosystem-icon"><i class="fa-solid fa-building-columns"></i></div>
+                    <div class="ecosystem-role">University &amp; TPO Cell</div>
+                    <h3 class="ecosystem-title">College Admin Hub</h3>
+                    <p class="ecosystem-desc">
+                        Full control over academic batches, bulk CSV student imports, verified corporate listings, and live analytical placement reports.
+                    </p>
+                    <ul class="ecosystem-bullets">
+                        <li class="ecosystem-bullet"><i class="fa-solid fa-check"></i> Bulk Excel/CSV Student Roster Import</li>
+                        <li class="ecosystem-bullet"><i class="fa-solid fa-check"></i> Department &amp; Batch Management</li>
+                        <li class="ecosystem-bullet"><i class="fa-solid fa-check"></i> Recruiter Credibility Audit Tools</li>
+                        <li class="ecosystem-bullet"><i class="fa-solid fa-check"></i> Automated Analytical Export Reports</li>
+                    </ul>
+                    <a href="{% url 'accounts:login' %}" class="btn btn-primary" style="margin-top:auto;"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login as Admin</a>
+                </div>
+
+                <!-- Portal 2: Student Candidate -->
+                <div class="ecosystem-card">
+                    <div class="ecosystem-icon"><i class="fa-solid fa-user-graduate"></i></div>
+                    <div class="ecosystem-role">Graduating Students</div>
+                    <h3 class="ecosystem-title">Student Portal</h3>
+                    <p class="ecosystem-desc">
+                        Personalized candidate dashboard with Python ATS resume scoring, missing skill suggestions, customized calendar reminders, and 1-click drive applications.
+                    </p>
+                    <ul class="ecosystem-bullets">
+                        <li class="ecosystem-bullet"><i class="fa-solid fa-check"></i> Integrated Python ATS Resume Parsing</li>
+                        <li class="ecosystem-bullet"><i class="fa-solid fa-check"></i> Career Skill Gap Recommendations</li>
+                        <li class="ecosystem-bullet"><i class="fa-solid fa-check"></i> Personalized Placement Calendar</li>
+                        <li class="ecosystem-bullet"><i class="fa-solid fa-check"></i> Instant Drive Application Status</li>
+                    </ul>
+                    <a href="{% url 'accounts:student_login' %}" class="btn btn-primary" style="margin-top:auto;"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login as Student</a>
+                </div>
+
+                <!-- Portal 3: Corporate Recruiters -->
+                <div class="ecosystem-card">
+                    <div class="ecosystem-icon"><i class="fa-solid fa-building"></i></div>
+                    <div class="ecosystem-role">Recruiting Partners</div>
+                    <h3 class="ecosystem-title">Recruiter Engine</h3>
+                    <p class="ecosystem-desc">
+                        Publish hiring drives, screen eligible student profiles based on CGPA criteria, coordinate technical interviews, and output hiring statistics.
+                    </p>
+                    <ul class="ecosystem-bullets">
+                        <li class="ecosystem-bullet"><i class="fa-solid fa-check"></i> Direct Campus Drive Publishing</li>
+                        <li class="ecosystem-bullet"><i class="fa-solid fa-check"></i> Automated Criteria Screening</li>
+                        <li class="ecosystem-bullet"><i class="fa-solid fa-check"></i> Interview Pipeline Management</li>
+                        <li class="ecosystem-bullet"><i class="fa-solid fa-check"></i> Verified Employer Credibility Badges</li>
+                    </ul>
+                    <a href="{% url 'accounts:login' %}" class="btn btn-secondary" style="margin-top:auto;"><i class="fa-solid fa-shield-halved"></i> Partner Verification</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         5. Key Platform Features Grid
+         ══════════════════════════════════════════════════ -->
+    <section id="features" class="features-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fa-solid fa-wand-magic-sparkles"></i> Feature Suite</span>
+                <h2 class="section-title">Engineered for <span>Modern Campus Hiring</span></h2>
+                <p class="section-desc">
+                    Discover the powerful features that eliminate manual tracking and accelerate campus recruitment drives.
+                </p>
+            </div>
+            
+            <div class="features-grid">
+                <!-- Feature 1 -->
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon-box"><i class="fa-solid fa-file-csv"></i></div>
+                        <h4 class="feature-title">Bulk Student Roster Import</h4>
+                    </div>
+                    <p class="feature-desc">Import student rosters directly from Excel/CSV files. Auto-creates authenticated accounts with auto password reset prompts.</p>
+                </div>
+                <!-- Feature 2 -->
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon-box"><i class="fa-solid fa-brain"></i></div>
+                        <h4 class="feature-title">Python ATS Resume Parser</h4>
+                    </div>
+                    <p class="feature-desc">Built-in Python parser reads resume text, evaluating formatting, structure, and keyword density scores.</p>
+                </div>
+                <!-- Feature 3 -->
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon-box"><i class="fa-solid fa-shield-halved"></i></div>
+                        <h4 class="feature-title">Company Verification Audit</h4>
+                    </div>
+                    <p class="feature-desc">Multi-factor company verification tools allow TPO cells to inspect recruiter credentials and prevent fake listings.</p>
+                </div>
+                <!-- Feature 4 -->
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon-box"><i class="fa-solid fa-chart-line"></i></div>
+                        <h4 class="feature-title">Placement Analytics &amp; Reports</h4>
+                    </div>
+                    <p class="feature-desc">Real-time placement dashboards tracking department hiring rates, package CTC averages, and exportable reports.</p>
+                </div>
+                <!-- Feature 5 -->
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon-box"><i class="fa-solid fa-spider"></i></div>
+                        <h4 class="feature-title">Opportunity Discovery Scraper</h4>
+                    </div>
+                    <p class="feature-desc">Automated python scraping utilities discover active off-campus career openings and external hiring drives.</p>
+                </div>
+                <!-- Feature 6 -->
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon-box"><i class="fa-solid fa-bell"></i></div>
+                        <h4 class="feature-title">Real-Time Comm &amp; Alerts</h4>
+                    </div>
+                    <p class="feature-desc">Instant drive notification center, broadcast alerts, and direct messaging between admins and candidates.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         6. Step-by-Step Execution Workflow
+         ══════════════════════════════════════════════════ -->
+    <section id="workflow" class="workflow-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fa-solid fa-route"></i> Execution Lifecycle</span>
+                <h2 class="section-title">How PlaceSync Works in <span>4 Simple Steps</span></h2>
+                <p class="section-desc">
+                    Follow the streamlined end-to-end workflow connecting colleges, candidates, and recruiters.
+                </p>
+            </div>
+            
+            <div class="workflow-grid">
+                <!-- Step 1 -->
+                <div class="workflow-card">
+                    <span class="workflow-step-badge">Step 01</span>
+                    <h4 class="workflow-title">Onboard &amp; Import</h4>
+                    <p class="workflow-desc">The university TPO cell sets up academic batches, departments, and imports student lists via bulk CSV.</p>
+                </div>
+                <!-- Step 2 -->
+                <div class="workflow-card">
+                    <span class="workflow-step-badge">Step 02</span>
+                    <h4 class="workflow-title">Build &amp; Score Resumes</h4>
+                    <p class="workflow-desc">Students activate accounts, complete career profiles, and analyze resumes with the Python ATS engine.</p>
+                </div>
+                <!-- Step 3 -->
+                <div class="workflow-card">
+                    <span class="workflow-step-badge">Step 03</span>
+                    <h4 class="workflow-title">Publish &amp; Match Drives</h4>
+                    <p class="workflow-desc">Verified placement drives are published with explicit CGPA and department eligibility filters.</p>
+                </div>
+                <!-- Step 4 -->
+                <div class="workflow-card">
+                    <span class="workflow-step-badge">Step 04</span>
+                    <h4 class="workflow-title">Track &amp; Finalize Hires</h4>
+                    <p class="workflow-desc">Candidates apply, interview stages progress, offers are issued, and placement reports generate instantly.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         7. ROI & Impact Statistics
+         ══════════════════════════════════════════════════ -->
+    <section class="roi-section">
+        <div class="container">
+            <div class="roi-card">
+                <div class="roi-stat-box">
+                    <div class="roi-val">98%</div>
+                    <div class="roi-label">Placement Efficiency</div>
+                </div>
+                <div class="roi-stat-box">
+                    <div class="roi-val">75%</div>
+                    <div class="roi-label">Less Admin Workload</div>
+                </div>
+                <div class="roi-stat-box">
+                    <div class="roi-val">18.5 LPA</div>
+                    <div class="roi-label">Highest Package CTC</div>
+                </div>
+                <div class="roi-stat-box">
+                    <div class="roi-val">2.4x</div>
+                    <div class="roi-label">Faster Hiring Cycle</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         8. FAQ Accordion
+         ══════════════════════════════════════════════════ -->
+    <section id="faq" class="faq-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"><i class="fa-solid fa-circle-question"></i> FAQ</span>
+                <h2 class="section-title">Frequently Asked Questions</h2>
+                <p class="section-desc">
+                    Find quick answers regarding accounts, Python ATS scoring, and corporate verification.
+                </p>
+            </div>
+            
+            <div class="faq-accordion">
+                <!-- Q1 -->
+                <details class="faq-item">
+                    <summary class="faq-summary">What is PlaceSync?</summary>
+                    <div class="faq-content">
+                        PlaceSync is a modern Training and Placement Cell (TPO) management platform that connects educational institutions, graduating students, and corporate recruiters to streamline campus placement drives, ATS resumes, and scheduling.
+                    </div>
+                </details>
+                <!-- Q2 -->
+                <details class="faq-item">
+                    <summary class="faq-summary">How are student accounts initialized?</summary>
+                    <div class="faq-content">
+                        Colleges import student datasets via Excel/CSV spreadsheets. Once imported, students receive instant access credentials tied to their university enrollment numbers, with a forced password update prompt on first login.
+                    </div>
+                </details>
+                <!-- Q3 -->
+                <details class="faq-item">
+                    <summary class="faq-summary">How does the Python ATS Resume Score work?</summary>
+                    <div class="faq-content">
+                        Our integrated Python ATS parsing engine extracts text from PDF resumes, cross-referencing it against industry hiring standards to score formatting, section completeness, and keyword density.
+                    </div>
+                </details>
+                <!-- Q4 -->
+                <details class="faq-item">
+                    <summary class="faq-summary">How do placement drive eligibility filters work?</summary>
+                    <div class="faq-content">
+                        Colleges specify minimum CGPA thresholds, active backlog limits, and eligible engineering departments. Only candidates meeting all criteria can apply directly from their portal.
+                    </div>
+                </details>
+                <!-- Q5 -->
+                <details class="faq-item">
+                    <summary class="faq-summary">Is the platform secure and verified?</summary>
+                    <div class="faq-content">
+                        Yes. PlaceSync uses strict role-validated permissions. Recruiter company credentials are audited by college admins before placement drives go live.
+                    </div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         9. Call to Action Section
+         ══════════════════════════════════════════════════ -->
+    <section id="contact" class="cta-section">
+        <div class="container">
+            <div class="cta-box">
+                <h2 class="cta-title">Ready to Automate Your Campus Placement Cell?</h2>
+                <p class="cta-desc">
+                    Join leading universities and top recruiters on PlaceSync. Onboard your college today for zero spreadsheet hassle.
+                </p>
+                <div class="cta-buttons">
+                    <a href="{% url 'accounts:register' %}" class="btn btn-primary"><i class="fa-solid fa-graduation-cap"></i> Onboard University</a>
+                    <a href="{% url 'accounts:student_login' %}" class="btn btn-secondary"><i class="fa-solid fa-user"></i> Student Login</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         10. Footer
+         ══════════════════════════════════════════════════ -->
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div>
+                <div class="logo-wrapper">
+                    <div class="logo-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                    <span class="logo-text">PlaceSync</span>
+                </div>
+                <p class="footer-desc">Connecting colleges, students, and corporate recruiters through intelligent campus recruitment solutions.</p>
+                <div class="footer-socials">
+                    <a href="#" class="social-icon-box"><i class="fa-brands fa-linkedin-in"></i></a>
+                    <a href="#" class="social-icon-box"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#" class="social-icon-box"><i class="fa-brands fa-github"></i></a>
+                </div>
+            </div>
+            
+            <div>
+                <h4 class="footer-title">Platform</h4>
+                <ul class="footer-links">
+                    <li><a href="#home" class="footer-link">Home</a></li>
+                    <li><a href="#ecosystem" class="footer-link">Portals</a></li>
+                    <li><a href="#features" class="footer-link">Features</a></li>
+                    <li><a href="#workflow" class="footer-link">How It Works</a></li>
+                </ul>
+            </div>
+            
+            <div>
+                <h4 class="footer-title">Support</h4>
+                <ul class="footer-links">
+                    <li><a href="#faq" class="footer-link">FAQ</a></li>
+                    <li><a href="#contact" class="footer-link">Contact Support</a></li>
+                    <li><a href="{% url 'accounts:login' %}" class="footer-link">Admin Portal</a></li>
+                    <li><a href="{% url 'accounts:student_login' %}" class="footer-link">Student Portal</a></li>
+                </ul>
+            </div>
+            
+            <div>
+                <h4 class="footer-title">College Admin</h4>
+                <p class="footer-desc" style="margin-bottom:1rem;">Onboard your university placement cell to manage student rosters and drive analytics.</p>
+                <a href="{% url 'accounts:register' %}" class="btn btn-outline" style="font-size:0.82rem; padding:0.45rem 0.9rem;">College Onboarding</a>
+            </div>
+        </div>
+        
+        <div class="container footer-bottom">
+            <div>&copy; 2026 PlaceSync. All Rights Reserved.</div>
+            <div class="footer-bottom-links">
+                <a href="#" class="footer-bottom-link">Privacy Policy</a>
+                <a href="#" class="footer-bottom-link">Terms &amp; Conditions</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

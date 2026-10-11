@@ -1,0 +1,41 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Delete Log Entry | PlaceSync{% endblock %}
+{% block topbar_title %}Confirm Delete{% endblock %}
+{% block nav_coding %}active{% endblock %}
+
+{% block content %}
+
+<div class="sp-page-header">
+  <div>
+    <h1 class="sp-page-title">⚠️ Confirm Deletion</h1>
+    <p class="sp-page-subtitle">Are you sure you want to remove this log entry from your Developer Journey?</p>
+  </div>
+</div>
+
+<div style="max-width: 540px; margin: 2rem auto 4rem;">
+  <form method="post" class="sp-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+    {% csrf_token %}
+
+    <div class="sp-card-body" style="padding: 2.25rem; text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: 1rem;">🗑️</div>
+      <h3 style="font-family:'Space Grotesk',sans-serif; color:#0F172A !important; font-size:1.25rem; font-weight:800; margin-bottom:0.75rem;">
+        Delete Entry?
+      </h3>
+      <p style="font-size: 0.9rem; color: #1E293B !important; font-weight: 600; line-height: 1.6; margin-bottom: 1.75rem;">
+        You are about to delete the entry: <strong style="color:#0F172A !important;">"{{ object.title|default:object.get_activity_title|default:'this entry' }}"</strong>.<br>
+        This action cannot be undone and will update your activity streaks and consistency metrics.
+      </p>
+
+      <div style="display: flex; gap: 1rem; justify-content: center;">
+        <a href="{% url 'student_portal:journey' %}" class="sp-btn sp-btn-secondary" style="padding: 0.65rem 2rem; border:1.5px solid #475569 !important;">No, Cancel</a>
+        <button type="submit" class="sp-btn sp-btn-danger" style="padding: 0.65rem 2.5rem; background:#FEF2F2 !important; color:#DC2626 !important; border:1.5px solid #DC2626 !important; font-weight:800;">
+          Yes, Delete Entry
+        </button>
+      </div>
+
+    </div>
+  </form>
+</div>
+
+{% endblock %}

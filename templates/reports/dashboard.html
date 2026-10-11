@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Report Center | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem;">
+
+    <!-- Header -->
+    <div class="sp-page-header" style="margin-bottom: 2rem;">
+        <div>
+            <h1 class="sp-page-title">Report Center</h1>
+            <p class="sp-page-subtitle">Generate analytical stats, review metrics, and export data spreadsheets to PDF or CSV format.</p>
+        </div>
+    </div>
+
+    <!-- Reports Cards Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
+        
+        <!-- Report 1: Placement -->
+        <div class="sp-card" style="margin-top: 0; display: flex; flex-direction: column; height: 100%; background:#FFFFFF !important; border:1.5px solid #475569 !important; padding:1.5rem; border-radius:8px;">
+            <div style="font-size: 2.25rem; margin-bottom: 0.75rem; color:#0284C7;"><i class="fa-solid fa-chart-pie"></i></div>
+            <h3 style="font-family:'Space Grotesk',sans-serif; font-size: 1.15rem; font-weight: 800; color: #0F172A !important; margin-bottom: 0.5rem;">Overall Placement Report</h3>
+            <p style="font-size: 0.85rem; color: #334155 !important; font-weight:600; line-height: 1.5; flex: 1; margin-bottom: 1.5rem;">
+                Summarized recruiting statistics, drive outcomes, student counts, average package levels, and overall hiring rates.
+            </p>
+            <a href="{% url 'reports:view_report' report_type='placement' %}" class="sp-btn sp-btn-primary" style="text-align: center; font-weight:800;">View &amp; Export</a>
+        </div>
+
+        <!-- Report 2: Student -->
+        <div class="sp-card" style="margin-top: 0; display: flex; flex-direction: column; height: 100%; background:#FFFFFF !important; border:1.5px solid #475569 !important; padding:1.5rem; border-radius:8px;">
+            <div style="font-size: 2.25rem; margin-bottom: 0.75rem; color:#32867D;"><i class="fa-solid fa-user-graduate"></i></div>
+            <h3 style="font-family:'Space Grotesk',sans-serif; font-size: 1.15rem; font-weight: 800; color: #0F172A !important; margin-bottom: 0.5rem;">Student Report</h3>
+            <p style="font-size: 0.85rem; color: #334155 !important; font-weight:600; line-height: 1.5; flex: 1; margin-bottom: 1.5rem;">
+                Detailed academic scores, CGPA parameters, active backlogs, branches, and placement logs per student.
+            </p>
+            <a href="{% url 'reports:view_report' report_type='student' %}" class="sp-btn sp-btn-primary" style="text-align: center; font-weight:800;">View &amp; Export</a>
+        </div>
+
+        <!-- Report 3: Batch -->
+        <div class="sp-card" style="margin-top: 0; display: flex; flex-direction: column; height: 100%; background:#FFFFFF !important; border:1.5px solid #475569 !important; padding:1.5rem; border-radius:8px;">
+            <div style="font-size: 2.25rem; margin-bottom: 0.75rem; color:#6366F1;"><i class="fa-solid fa-graduation-cap"></i></div>
+            <h3 style="font-family:'Space Grotesk',sans-serif; font-size: 1.15rem; font-weight: 800; color: #0F172A !important; margin-bottom: 0.5rem;">Batch Report</h3>
+            <p style="font-size: 0.85rem; color: #334155 !important; font-weight:600; line-height: 1.5; flex: 1; margin-bottom: 1.5rem;">
+                Aggregated statistics sorted by graduation classes, department segments, average grades, and batch hires counts.
+            </p>
+            <a href="{% url 'reports:view_report' report_type='batch' %}" class="sp-btn sp-btn-primary" style="text-align: center; font-weight:800;">View &amp; Export</a>
+        </div>
+
+        <!-- Report 4: Company -->
+        <div class="sp-card" style="margin-top: 0; display: flex; flex-direction: column; height: 100%; background:#FFFFFF !important; border:1.5px solid #475569 !important; padding:1.5rem; border-radius:8px;">
+            <div style="font-size: 2.25rem; margin-bottom: 0.75rem; color:#059669;"><i class="fa-solid fa-building"></i></div>
+            <h3 style="font-family:'Space Grotesk',sans-serif; font-size: 1.15rem; font-weight: 800; color: #0F172A !important; margin-bottom: 0.5rem;">Company Recruiter Report</h3>
+            <p style="font-size: 0.85rem; color: #334155 !important; font-weight:600; line-height: 1.5; flex: 1; margin-bottom: 1.5rem;">
+                Background credentials verification logs, trust score audits, drives count, and total hires per corporate partner.
+            </p>
+            <a href="{% url 'reports:view_report' report_type='company' %}" class="sp-btn sp-btn-primary" style="text-align: center; font-weight:800;">View &amp; Export</a>
+        </div>
+
+        <!-- Report 5: Salary -->
+        <div class="sp-card" style="margin-top: 0; display: flex; flex-direction: column; height: 100%; background:#FFFFFF !important; border:1.5px solid #475569 !important; padding:1.5rem; border-radius:8px;">
+            <div style="font-size: 2.25rem; margin-bottom: 0.75rem; color:#D97706;"><i class="fa-solid fa-money-bill-wave"></i></div>
+            <h3 style="font-family:'Space Grotesk',sans-serif; font-size: 1.15rem; font-weight: 800; color: #0F172A !important; margin-bottom: 0.5rem;">Salary Distribution Report</h3>
+            <p style="font-size: 0.85rem; color: #334155 !important; font-weight:600; line-height: 1.5; flex: 1; margin-bottom: 1.5rem;">
+                Compensation packages analysis, lowest/highest salary ranges, and averages grouped by engineering branches.
+            </p>
+            <a href="{% url 'reports:view_report' report_type='salary' %}" class="sp-btn sp-btn-primary" style="text-align: center; font-weight:800;">View &amp; Export</a>
+        </div>
+
+        <!-- Report 6: Internship -->
+        <div class="sp-card" style="margin-top: 0; display: flex; flex-direction: column; height: 100%; background:#FFFFFF !important; border:1.5px solid #475569 !important; padding:1.5rem; border-radius:8px;">
+            <div style="font-size: 2.25rem; margin-bottom: 0.75rem; color:#E11D48;"><i class="fa-solid fa-coins"></i></div>
+            <h3 style="font-family:'Space Grotesk',sans-serif; font-size: 1.15rem; font-weight: 800; color: #0F172A !important; margin-bottom: 0.5rem;">Internship Report</h3>
+            <p style="font-size: 0.85rem; color: #334155 !important; font-weight:600; line-height: 1.5; flex: 1; margin-bottom: 1.5rem;">
+                Internship-specific drives overview, monthly stipends offered, work mode distribution, and candidate hires.
+            </p>
+            <a href="{% url 'reports:view_report' report_type='internship' %}" class="sp-btn sp-btn-primary" style="text-align: center; font-weight:800;">View &amp; Export</a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,197 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Resume Comparison | PlaceSync{% endblock %}
+{% block topbar_title %}Resume Comparison{% endblock %}
+{% block nav_ats %}active{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════════════
+     Page Header
+════════════════════════════════════════════════════ -->
+<div class="sp-page-header">
+  <div>
+    <h1 class="sp-page-title">⚖️ Resume Comparison</h1>
+    <p class="sp-page-subtitle">Analyze structural differences, ATS score variations, and keyword matches side-by-side.</p>
+  </div>
+  <div class="sp-page-actions">
+    <a href="{% url 'student_portal:ats_analysis' %}" class="sp-btn sp-btn-secondary">🤖 ATS Analysis</a>
+    <a href="{% url 'student_portal:resume_dashboard' %}" class="sp-btn sp-btn-secondary">📄 Manage Resumes</a>
+  </div>
+</div>
+
+<!-- Selector Form -->
+<div class="sp-card" style="margin-bottom:1.75rem;padding:1.25rem 1.5rem;">
+  <form method="get" action="{% url 'student_portal:resume_compare' %}" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:1.25rem;align-items:end;">
+    <div>
+      <label for="version1" class="sp-form-label">Resume A:</label>
+      <select name="version1" id="version1" class="sp-form-input" style="margin-bottom:0;" required>
+        <option value="">Select Resume A...</option>
+        {% for r in all_resumes %}
+          <option value="{{ r.pk }}" {% if ver1 and ver1.pk == r.pk %}selected{% endif %}>{{ r.display_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div>
+      <label for="version2" class="sp-form-label">Resume B:</label>
+      <select name="version2" id="version2" class="sp-form-input" style="margin-bottom:0;" required>
+        <option value="">Select Resume B...</option>
+        {% for r in all_resumes %}
+          <option value="{{ r.pk }}" {% if ver2 and ver2.pk == r.pk %}selected{% endif %}>{{ r.display_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div>
+      <button type="submit" class="sp-btn sp-btn-primary" style="width:100%;">⚖️ Compare Resumes</button>
+    </div>
+  </form>
+</div>
+
+{% if ver1 and ver2 %}
+
+<!-- 🏆 Winner Recommendation Banner -->
+{% if recommendation %}
+<div style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:var(--r-md);padding:1.25rem 1.5rem;margin-bottom:1.75rem;display:flex;align-items:center;gap:1.25rem;">
+  <div style="font-size:2.2rem;">🏆</div>
+  <div>
+    <div style="font-size:1.1rem;font-weight:700;color:#10b981;">Recommended Resume: Resume {{ recommendation.winner_key }} ({{ recommendation.winner.display_name }})</div>
+    <div style="font-size:.875rem;color:var(--txt-1);margin-top:.25rem;">{{ recommendation.explanation }}</div>
+  </div>
+</div>
+{% endif %}
+
+<!-- ══════════════════════════════════════════════════
+     Side-by-Side Comparison Container
+════════════════════════════════════════════════════ -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start;">
+
+  <!-- ─── VERSION A COLUMN ─── -->
+  <div>
+    <div class="sp-card" style="border-top:3px solid #0ea5e9;">
+      <div class="sp-card-header" style="background:rgba(14,165,233,.06);">
+        <span class="sp-card-title" style="color:#0ea5e9;">Resume A: {{ ver1.display_name }}</span>
+        {% if ver1.is_default %}<span class="sp-badge sp-badge-amber">⭐ Default</span>{% else %}<span class="sp-badge sp-badge-sky">{{ ver1.get_resume_type_display }}</span>{% endif %}
+      </div>
+      <div class="sp-card-body" style="padding:1.25rem;">
+        
+        <!-- Document meta -->
+        <div style="margin-bottom:1.25rem;border-bottom:1px solid rgba(255,255,255,.04);padding-bottom:.75rem;">
+          <div style="font-weight:700;color:#fff;font-size:.9rem;word-break:break-all;">{{ ver1.filename }}</div>
+          <div style="font-size:.76rem;color:var(--txt-3);margin-top:.2rem;">Uploaded on {{ ver1.uploaded_at|date:"M d, Y · H:i" }} · {{ ver1.formatted_file_size }}</div>
+        </div>
+
+        <!-- Scores Breakdown -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.625rem;margin-bottom:1.5rem;text-align:center;">
+          <div style="background:rgba(255,255,255,.015);border:1px solid var(--border);border-radius:var(--r-md);padding:.625rem;">
+            <div style="font-size:.65rem;color:var(--txt-3);text-transform:uppercase;font-weight:700;">ATS Score</div>
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:1.4rem;font-weight:800;color:#38bdf8;margin:.15rem 0;">{{ ver1.ats_score }}</div>
+            <div class="sp-bar-wrap" style="height:3px;"><div class="sp-bar-fill bar-sky" style="width:{{ ver1.ats_score }}%"></div></div>
+          </div>
+          <div style="background:rgba(255,255,255,.015);border:1px solid var(--border);border-radius:var(--r-md);padding:.625rem;">
+            <div style="font-size:.65rem;color:var(--txt-3);text-transform:uppercase;font-weight:700;">Completion</div>
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:1.4rem;font-weight:800;color:#34d399;margin:.15rem 0;">{{ ver1.completion_score }}</div>
+            <div class="sp-bar-wrap" style="height:3px;"><div class="sp-bar-fill bar-green" style="width:{{ ver1.completion_score }}%"></div></div>
+          </div>
+          <div style="background:rgba(255,255,255,.015);border:1px solid var(--border);border-radius:var(--r-md);padding:.625rem;">
+            <div style="font-size:.65rem;color:var(--txt-3);text-transform:uppercase;font-weight:700;">Formatting</div>
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:1.4rem;font-weight:800;color:#fbbf24;margin:.15rem 0;">{{ ver1.formatting_score }}</div>
+            <div class="sp-bar-wrap" style="height:3px;"><div class="sp-bar-fill bar-amber" style="width:{{ ver1.formatting_score }}%"></div></div>
+          </div>
+        </div>
+
+        <!-- Skills Parsed -->
+        <div style="margin-bottom:1.25rem;">
+          <div style="font-size:.78rem;font-weight:700;color:var(--txt-2);margin-bottom:.5rem;">TECHNICAL SKILLS DETECTED ({{ analysis1.skills|length }})</div>
+          <div style="display:flex;flex-wrap:wrap;gap:.35rem;">
+            {% for sk in analysis1.skills %}
+              <span class="sp-badge sp-badge-sky" style="font-size:.7rem;">{{ sk }}</span>
+            {% empty %}
+              <span style="font-size:.75rem;color:var(--txt-3);">No skills detected</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Projects Parsed -->
+        <div style="margin-bottom:1.25rem;">
+          <div style="font-size:.78rem;font-weight:700;color:var(--txt-2);margin-bottom:.5rem;">PROJECTS DETECTED ({{ analysis1.projects|length }})</div>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.35rem;">
+            {% for p in analysis1.projects %}
+              <li style="font-size:.76rem;color:var(--txt-1);background:rgba(255,255,255,.02);padding:.35rem .6rem;border-radius:var(--r-sm);">• {{ p }}</li>
+            {% empty %}
+              <li style="font-size:.75rem;color:var(--txt-3);">No explicit project headers detected</li>
+            {% endfor %}
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── VERSION B COLUMN ─── -->
+  <div>
+    <div class="sp-card" style="border-top:3px solid #10b981;">
+      <div class="sp-card-header" style="background:rgba(16,185,129,.06);">
+        <span class="sp-card-title" style="color:#10b981;">Resume B: {{ ver2.display_name }}</span>
+        {% if ver2.is_default %}<span class="sp-badge sp-badge-amber">⭐ Default</span>{% else %}<span class="sp-badge sp-badge-green">{{ ver2.get_resume_type_display }}</span>{% endif %}
+      </div>
+      <div class="sp-card-body" style="padding:1.25rem;">
+        
+        <!-- Document meta -->
+        <div style="margin-bottom:1.25rem;border-bottom:1px solid rgba(255,255,255,.04);padding-bottom:.75rem;">
+          <div style="font-weight:700;color:#fff;font-size:.9rem;word-break:break-all;">{{ ver2.filename }}</div>
+          <div style="font-size:.76rem;color:var(--txt-3);margin-top:.2rem;">Uploaded on {{ ver2.uploaded_at|date:"M d, Y · H:i" }} · {{ ver2.formatted_file_size }}</div>
+        </div>
+
+        <!-- Scores Breakdown -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.625rem;margin-bottom:1.5rem;text-align:center;">
+          <div style="background:rgba(255,255,255,.015);border:1px solid var(--border);border-radius:var(--r-md);padding:.625rem;">
+            <div style="font-size:.65rem;color:var(--txt-3);text-transform:uppercase;font-weight:700;">ATS Score</div>
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:1.4rem;font-weight:800;color:#34d399;margin:.15rem 0;">{{ ver2.ats_score }}</div>
+            <div class="sp-bar-wrap" style="height:3px;"><div class="sp-bar-fill bar-green" style="width:{{ ver2.ats_score }}%"></div></div>
+          </div>
+          <div style="background:rgba(255,255,255,.015);border:1px solid var(--border);border-radius:var(--r-md);padding:.625rem;">
+            <div style="font-size:.65rem;color:var(--txt-3);text-transform:uppercase;font-weight:700;">Completion</div>
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:1.4rem;font-weight:800;color:#34d399;margin:.15rem 0;">{{ ver2.completion_score }}</div>
+            <div class="sp-bar-wrap" style="height:3px;"><div class="sp-bar-fill bar-green" style="width:{{ ver2.completion_score }}%"></div></div>
+          </div>
+          <div style="background:rgba(255,255,255,.015);border:1px solid var(--border);border-radius:var(--r-md);padding:.625rem;">
+            <div style="font-size:.65rem;color:var(--txt-3);text-transform:uppercase;font-weight:700;">Formatting</div>
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:1.4rem;font-weight:800;color:#fbbf24;margin:.15rem 0;">{{ ver2.formatting_score }}</div>
+            <div class="sp-bar-wrap" style="height:3px;"><div class="sp-bar-fill bar-amber" style="width:{{ ver2.formatting_score }}%"></div></div>
+          </div>
+        </div>
+
+        <!-- Skills Parsed -->
+        <div style="margin-bottom:1.25rem;">
+          <div style="font-size:.78rem;font-weight:700;color:var(--txt-2);margin-bottom:.5rem;">TECHNICAL SKILLS DETECTED ({{ analysis2.skills|length }})</div>
+          <div style="display:flex;flex-wrap:wrap;gap:.35rem;">
+            {% for sk in analysis2.skills %}
+              <span class="sp-badge sp-badge-green" style="font-size:.7rem;">{{ sk }}</span>
+            {% empty %}
+              <span style="font-size:.75rem;color:var(--txt-3);">No skills detected</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Projects Parsed -->
+        <div style="margin-bottom:1.25rem;">
+          <div style="font-size:.78rem;font-weight:700;color:var(--txt-2);margin-bottom:.5rem;">PROJECTS DETECTED ({{ analysis2.projects|length }})</div>
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.35rem;">
+            {% for p in analysis2.projects %}
+              <li style="font-size:.76rem;color:var(--txt-1);background:rgba(255,255,255,.02);padding:.35rem .6rem;border-radius:var(--r-sm);">• {{ p }}</li>
+            {% empty %}
+              <li style="font-size:.75rem;color:var(--txt-3);">No explicit project headers detected</li>
+            {% endfor %}
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endif %}
+
+{% endblock %}

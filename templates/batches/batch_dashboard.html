@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ batch.name }} Dashboard | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem;">
+
+    <!-- Dashboard Header -->
+    <div class="dashboard-header" style="border-bottom: none; margin-bottom: 1.5rem;">
+        <div>
+            <h1 class="dashboard-title">{{ batch.name }} Dashboard</h1>
+            <p class="dashboard-welcome">
+                Department: <strong style="color: #fff;">{{ batch.department.name }} ({{ batch.department.code }})</strong> | 
+                Passing Year: <strong style="color: var(--primary);">{{ batch.graduation_year }}</strong> | 
+                Semester: <strong style="color: var(--info);">{{ batch.semester }}</strong> | 
+                Division: <strong style="color: var(--warning);">{% if batch.division %}{{ batch.division }}{% else %}—{% endif %}</strong>
+            </p>
+            {% if batch.description %}
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem; max-width: 800px; line-height: 1.5;">
+                {{ batch.description }}
+            </p>
+            {% endif %}
+        </div>
+        <div>
+            <a href="{% url 'batches:import_students' pk=batch.pk %}" class="btn btn-primary" style="margin-right: 0.5rem; background: var(--info); border-color: var(--info);">Import Students</a>
+            <a href="{% url 'batches:list' %}" class="btn btn-secondary">&larr; Back to Batches</a>
+        </div>
+    </div>
+
+    <!-- Statistics Grid (2x4 row block) -->
+    <div class="dashboard-grid" style="margin-bottom: 3.5rem;">
+        <!-- Card 1 -->
+        <div class="stats-card">
+            <p class="stats-label">Total Students</p>
+            <h2 class="stats-value">{{ stats.total_students }}</h2>
+            <p class="stats-desc">Total registered in batch</p>
+        </div>
+        <!-- Card 2 -->
+        <div class="stats-card">
+            <p class="stats-label">Placed Students</p>
+            <h2 class="stats-value" style="color: var(--success);">{{ stats.placed_students }}</h2>
+            <p class="stats-desc">Students holding job offers</p>
+        </div>
+        <!-- Card 3 -->
+        <div class="stats-card">
+            <p class="stats-label">Internship Offers</p>
+            <h2 class="stats-value" style="color: var(--info);">{{ stats.internship_students }}</h2>
+            <p class="stats-desc">Students secured internships</p>
+        </div>
+        <!-- Card 4 -->
+        <div class="stats-card">
+            <p class="stats-label">Placement Ratio</p>
+            <h2 class="stats-value" style="background: linear-gradient(to right, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">{{ stats.placement_percentage }}%</h2>
+            <p class="stats-desc">Aggregate success percentage</p>
+        </div>
+        <!-- Card 5 -->
+        <div class="stats-card">
+            <p class="stats-label">Highest Package</p>
+            <h2 class="stats-value">{{ stats.highest_package }} <span style="font-size: 1rem; color: var(--text-secondary);">LPA</span></h2>
+            <p class="stats-desc">Highest full-time offer CTC</p>
+        </div>
+        <!-- Card 6 -->
+        <div class="stats-card">
+            <p class="stats-label">Average Package</p>
+            <h2 class="stats-value">{{ stats.average_package }} <span style="font-size: 1rem; color: var(--text-secondary);">LPA</span></h2>
+            <p class="stats-desc">Mean package of placed students</p>
+        </div>
+        <!-- Card 7 -->
+        <div class="stats-card">
+            <p class="stats-label">Highest Stipend</p>
+            <h2 class="stats-value">{{ stats.highest_stipend }} <span style="font-size: 1rem; color: var(--text-secondary);">/mo</span></h2>
+            <p class="stats-desc">Highest internship stipend</p>
+        </div>
+        <!-- Card 8 -->
+        <div class="stats-card">
+            <p class="stats-label">Average Stipend</p>
+            <h2 class="stats-value">{{ stats.average_stipend }} <span style="font-size: 1rem; color: var(--text-secondary);">/mo</span></h2>
+            <p class="stats-desc">Mean monthly stipend amount</p>
+        </div>
+    </div>
+
+    <!-- Students Console Panel -->
+    <div class="card-panel" style="margin-top: 0;">
+        <h3 class="panel-title" style="border-bottom: 1px solid var(--card-border); padding-bottom: 0.75rem; margin-bottom: 1.5rem;">Student Records</h3>
+
+        <!-- Student Search Form -->
+        <form method="get" class="search-bar">
+            <input type="text" name="q" value="{{ q }}" placeholder="Search students by name, roll number, or status..." class="form-input search-input">
+            <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.25rem;">Filter</button>
+            {% if q %}
+                <a href="{% url 'batches:dashboard' pk=batch.pk %}" class="btn btn-secondary" style="padding: 0.75rem 1.25rem;">Clear</a>
+            {% endif %}
+        </form>
+
+        {% if students %}
+            <div class="table-wrapper" style="margin-top: 1rem;">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 15%;">Roll Number</th>
+                                <th style="width: 25%;">Student Name</th>
+                                <th style="width: 20%;">Email</th>
+                                <th style="width: 15%;">Placement Status</th>
+                                <th style="width: 12%;">Package (LPA)</th>
+                                <th style="width: 13%;">Stipend (/mo)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in students %}
+                                <tr>
+                                    <td>
+                                        <span class="badge" style="background: rgba(255,255,255,0.03); color: #fff;">{{ student.roll_number }}</span>
+                                    </td>
+                                    <td style="color: #fff; font-weight: 600;">
+                                        {{ student.name }}
+                                    </td>
+                                    <td style="font-size: 0.9rem;">
+                                        {{ student.email }}
+                                    </td>
+                                    <td>
+                                        {% if student.placement_status == 'PLACED' %}
+                                            <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.25);">Placed</span>
+                                        {% elif student.placement_status == 'INTERN' %}
+                                            <span class="badge" style="background: rgba(59, 130, 246, 0.1); color: var(--info); border-color: rgba(59, 130, 246, 0.25);">Internship</span>
+                                        {% elif student.placement_status == 'PLACED_AND_INTERN' %}
+                                            <span class="badge" style="background: rgba(139, 92, 246, 0.1); color: #a78bfa; border-color: rgba(139, 92, 246, 0.25);">Placed & Intern</span>
+                                        {% else %}
+                                            <span class="badge" style="background: rgba(245, 158, 11, 0.1); color: var(--warning); border-color: rgba(245, 158, 11, 0.25);">Unplaced</span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="font-weight: 600; color: #fff;">
+                                        {% if student.package_amount %}
+                                            {{ student.package_amount }}
+                                        {% else %}
+                                            <span style="color: var(--text-muted); font-weight: normal;">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="font-weight: 600; color: #fff;">
+                                        {% if student.stipend_amount %}
+                                            {{ student.stipend_amount }}
+                                        {% else %}
+                                            <span style="color: var(--text-muted); font-weight: normal;">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <!-- Student Empty State -->
+            <div style="text-align: center; padding: 3rem 0; border: 1.5px dashed var(--card-border); border-radius: var(--radius-md); background: rgba(255,255,255,0.01); margin-top: 1rem;">
+                <p style="color: var(--text-secondary); font-size: 0.95rem; font-style: italic;">
+                    {% if q %}
+                        No student records match search filter "{{ q }}".
+                    {% else %}
+                        No students enrolled in this batch yet.
+                    {% endif %}
+                </p>
+                {% if q %}
+                    <a href="{% url 'batches:dashboard' pk=batch.pk %}" class="btn btn-secondary" style="font-size: 0.85rem; margin-top: 1rem;">Clear Filter</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

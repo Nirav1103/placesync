@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% load staff_tags %}
+
+{% block title %}Student Directory | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem;">
+
+    <!-- Header -->
+    <div class="sp-page-header" style="margin-bottom: 1.5rem;">
+        <div>
+            <h1 class="sp-page-title">Student Directory</h1>
+            <p class="sp-page-subtitle">View and manage enrolled university students and login accounts</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+            <!-- Export CSV button preserving current filters -->
+            <a href="{% url 'students:export' %}?q={{ q }}&department={{ selected_dept }}&batch={{ selected_batch }}&cgpa={{ selected_cgpa }}&placement_status={{ selected_status }}" class="sp-btn sp-btn-secondary" style="background: #F0FDF4 !important; color: #059669 !important; border: 1.5px solid #059669 !important; font-weight:800;">
+                <i class="fa-solid fa-file-csv"></i> Export CSV List
+            </a>
+        </div>
+    </div>
+
+    <!-- Layout Grid -->
+    <div style="display: grid; grid-template-columns: 280px 1fr; gap: 1.5rem; align-items: start;">
+        
+        <!-- Left: Filters Panel Form (No JS) -->
+        <div class="sp-card" style="margin-top: 0; padding: 1.25rem; background:#FFFFFF !important; border:1.5px solid #475569 !important;">
+            <h3 style="font-family:'Space Grotesk',sans-serif; font-size: 1.05rem; font-weight: 800; color: #0F172A !important; margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 1.5px solid #475569;">Filters Console</h3>
+            
+            <form method="get" novalidate style="display: flex; flex-direction: column; gap: 1.25rem;">
+                
+                <!-- Keyword Search -->
+                <div class="sp-form-group" style="margin-bottom: 0;">
+                    <label class="sp-form-label" style="font-size: 0.82rem; color:#1E293B !important; font-weight:800;">Search Query</label>
+                    <input type="text" name="q" value="{{ q }}" placeholder="Name, Roll No, Email..." class="sp-form-control" style="font-size: 0.85rem; font-weight:600;">
+                </div>
+
+                <!-- Department Filter -->
+                <div class="sp-form-group" style="margin-bottom: 0;">
+                    <label class="sp-form-label" style="font-size: 0.82rem; color:#1E293B !important; font-weight:800;">Department</label>
+                    <select name="department" class="sp-form-control" style="font-size: 0.85rem; font-weight:600;">
+                        <option value="">-- All Departments --</option>
+                        {% for dept in departments %}
+                            <option value="{{ dept.pk }}" {% if selected_dept == dept.pk|stringformat:"s" %}selected{% endif %}>
+                                {{ dept.code }} - {{ dept.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Batch Filter -->
+                <div class="sp-form-group" style="margin-bottom: 0;">
+                    <label class="sp-form-label" style="font-size: 0.82rem; color:#1E293B !important; font-weight:800;">Batch</label>
+                    <select name="batch" class="sp-form-control" style="font-size: 0.85rem; font-weight:600;">
+                        <option value="">-- All Batches --</option>
+                        {% for batch in batches %}
+                            <option value="{{ batch.pk }}" {% if selected_batch == batch.pk|stringformat:"s" %}selected{% endif %}>
+                                {{ batch.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- CGPA Filter -->
+                <div class="sp-form-group" style="margin-bottom: 0;">
+                    <label class="sp-form-label" style="font-size: 0.82rem; color:#1E293B !important; font-weight:800;">CGPA Criteria</label>
+                    <select name="cgpa" class="sp-form-control" style="font-size: 0.85rem; font-weight:600;">
+                        <option value="">-- All CGPA --</option>
+                        <option value="9.0" {% if selected_cgpa == "9.0" %}selected{% endif %}>&ge; 9.0 CGPA</option>
+                        <option value="8.0" {% if selected_cgpa == "8.0" %}selected{% endif %}>&ge; 8.0 CGPA</option>
+                        <option value="7.0" {% if selected_cgpa == "7.0" %}selected{% endif %}>&ge; 7.0 CGPA</option>
+                        <option value="6.0" {% if selected_cgpa == "6.0" %}selected{% endif %}>&ge; 6.0 CGPA</option>
+                    </select>
+                </div>
+
+                <!-- Placement Status Filter -->
+                <div class="sp-form-group" style="margin-bottom: 0;">
+                    <label class="sp-form-label" style="font-size: 0.82rem; color:#1E293B !important; font-weight:800;">Placement Status</label>
+                    <select name="placement_status" class="sp-form-control" style="font-size: 0.85rem; font-weight:600;">
+                        <option value="">-- All Statuses --</option>
+                        {% for code, label in placement_statuses %}
+                            <option value="{{ code }}" {% if selected_status == code %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Buttons -->
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+                    <button type="submit" class="sp-btn sp-btn-primary" style="padding: 0.65rem; font-weight:800;">Apply Filters</button>
+                    {% if q or selected_dept or selected_batch or selected_cgpa or selected_status %}
+                        <a href="{% url 'students:list' %}" class="sp-btn sp-btn-secondary" style="padding: 0.65rem; text-align: center; border:1.5px solid #475569 !important; font-weight:800;">Reset Form</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        <!-- Right: Students Table Grid -->
+        <div class="sp-card" style="margin-top: 0; background:#FFFFFF !important; border:1.5px solid #475569 !important; padding:1.25rem;">
+            <h3 class="sp-card-title" style="border-bottom: 1.5px solid #475569; padding-bottom: 0.75rem; margin-bottom: 1.5rem; color:#0F172A !important; font-weight:800;">Student Listing (Count: {{ students|length }})</h3>
+
+            {% if students %}
+                <div class="table-wrapper">
+                    <div class="table-responsive">
+                        <table class="sp-table" style="width:100%; border-collapse:collapse;">
+                            <thead>
+                                <tr style="background:#F8FAFC; border-bottom:1.5px solid #475569;">
+                                    <th style="width: 15%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align:left;">Roll Number</th>
+                                    <th style="width: 20%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align:left;">Student Details</th>
+                                    <th style="width: 20%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align:left;">Batch &amp; Dept</th>
+                                    <th style="width: 12%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align:left;">CGPA</th>
+                                    <th style="width: 18%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align:left;">Status / Package</th>
+                                    <th style="width: 15%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align: right;">Directory Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in students %}
+                                    <tr style="border-bottom:1px solid #CBD5E1; {% if not student.user.is_active %}background:#FEF2F2 !important;{% endif %}">
+                                        <td style="padding:0.75rem;">
+                                            <span class="sp-badge sp-badge-gray" style="font-weight:800;">{{ student.roll_number }}</span>
+                                        </td>
+                                        <td style="padding:0.75rem;">
+                                            <strong style="color: #0F172A !important; font-weight:800;">{{ student.name }}</strong>
+                                            <div style="font-size: 0.8rem; color: #1E293B !important; font-weight:600; margin-top: 0.15rem;">{{ student.email }}</div>
+                                            {% if student.phone %}
+                                                <div style="font-size: 0.78rem; color: #334155 !important; font-weight:600;"><i class="fa-solid fa-phone" style="font-size:0.72rem;"></i> {{ student.phone }}</div>
+                                            {% endif %}
+                                        </td>
+                                        <td style="padding:0.75rem;">
+                                            <div style="color: #0F172A !important; font-size: 0.85rem; font-weight: 800;">{{ student.batch.name }}</div>
+                                            <div style="font-size: 0.78rem; color: #334155 !important; font-weight:600; margin-top: 0.15rem;">Dept: {{ student.department.code }}</div>
+                                        </td>
+                                        <td style="padding:0.75rem;">
+                                            <strong style="color: #0284C7 !important; font-size: 1rem; font-weight:800;">{{ student.cgpa }}</strong>
+                                        </td>
+                                        <td style="padding:0.75rem;">
+                                            <!-- Status Tag -->
+                                            {% if student.placement_status == 'PLACED' %}
+                                                <span class="sp-badge sp-badge-green">Placed</span>
+                                            {% elif student.placement_status == 'INTERN' %}
+                                                <span class="sp-badge sp-badge-sky">Internship</span>
+                                            {% elif student.placement_status == 'PLACED_AND_INTERN' %}
+                                                <span class="sp-badge sp-badge-violet">Placed &amp; Intern</span>
+                                            {% else %}
+                                                <span class="sp-badge sp-badge-amber">Unplaced</span>
+                                            {% endif %}
+
+                                            <!-- Salary Package CTC Details -->
+                                            {% if student.package_amount %}
+                                                <div style="font-size: 0.82rem; color: #0F172A !important; font-weight: 800; margin-top: 0.25rem;"><i class="fa-solid fa-money-bill-wave" style="color:#059669; font-size:0.78rem;"></i> {{ student.package_amount }} LPA</div>
+                                            {% endif %}
+                                            {% if student.stipend_amount %}
+                                                <div style="font-size: 0.78rem; color: #334155 !important; font-weight:600; margin-top: 0.1rem;"><i class="fa-solid fa-coins" style="color:#D97706; font-size:0.75rem;"></i> Stipend: {{ student.stipend_amount }}/mo</div>
+                                            {% endif %}
+
+                                            <!-- Suspension Status Badge -->
+                                            {% if not student.user.is_active %}
+                                                <div style="margin-top: 0.35rem;">
+                                                    <span class="sp-badge sp-badge-rose" style="font-size: 0.72rem;">Suspended</span>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                        <td style="padding:0.75rem;">
+                                            <!-- Action Console Links -->
+                                            <div class="table-actions" style="display:flex; justify-content: flex-end; flex-wrap: wrap; gap: 0.35rem;">
+                                                {% if request.user|can_edit_filter %}
+                                                <a href="{% url 'students:edit' pk=student.pk %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="border:1.5px solid #475569 !important; font-weight:800;" title="Edit Student">Edit</a>
+                                                <a href="{% url 'students:move' pk=student.pk %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="border:1.5px solid #475569 !important; font-weight:800;" title="Move Batch">Move</a>
+                                                <a href="{% url 'students:reset_password' pk=student.pk %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="border:1.5px solid #475569 !important; font-weight:800;" title="Reset Password">Keys</a>
+                                                
+                                                <!-- Suspend Form (POST) -->
+                                                <form action="{% url 'students:suspend' pk=student.pk %}" method="post" style="display: inline-block; margin: 0;">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="sp-btn sp-btn-secondary sp-btn-xs" style="border:1.5px solid #DC2626 !important; color:#DC2626 !important; font-weight:800; padding: 0.15rem 0.35rem;">
+                                                        {% if student.user.is_active %}Suspend{% else %}Enable{% endif %}
+                                                    </button>
+                                                </form>
+
+                                                <a href="{% url 'students:delete' pk=student.pk %}" class="sp-btn sp-btn-danger sp-btn-xs" style="background:#FEF2F2 !important; color:#DC2626 !important; border:1.5px solid #DC2626 !important; font-weight:800;" title="Delete Student">Delete</a>
+                                                {% else %}
+                                                <span style="color: #334155 !important; font-size: 0.75rem; font-style: italic; font-weight:600;">View Only</span>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 4rem 2rem; border: 1.5px solid #475569 !important; border-radius: 8px; background: #FFFFFF !important; margin-top: 1.5rem;">
+                    <p style="color: #334155 !important; font-size: 0.95rem; font-weight:600;">
+                        No student records matched the current filter conditions.
+                    </p>
+                    {% if q or selected_dept or selected_batch or selected_cgpa or selected_status %}
+                        <a href="{% url 'students:list' %}" class="sp-btn sp-btn-secondary" style="font-size: 0.85rem; margin-top: 1rem; border:1.5px solid #475569 !important; font-weight:800;">Clear Search Filters</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

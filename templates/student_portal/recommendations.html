@@ -1,0 +1,442 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Career Blueprint & Growth Opportunities | PlaceSync{% endblock %}
+{% block topbar_title %}Career Blueprint{% endblock %}
+{% block nav_recommendations %}active{% endblock %}
+
+{% block extra_head %}
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  .sp-chart-container {
+    position: relative;
+    height: 240px;
+    width: 100%;
+  }
+  .sp-card-gradient {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════════════
+     Page Header
+════════════════════════════════════════════════════ -->
+<div class="sp-page-header">
+  <div>
+    <h1 class="sp-page-title">🎯 Career Blueprint &amp; Growth Opportunities</h1>
+    <p class="sp-page-subtitle">Real-time Placement Readiness, Salary Forecast, and Growth Opportunities generated for your portfolio.</p>
+  </div>
+  <div style="display:flex;gap:.75rem;">
+    <a href="{% url 'student_portal:resume_parser' %}" class="sp-btn sp-btn-secondary">⚡ Resume Intelligence</a>
+    <a href="{% url 'student_portal:ats_analysis' %}" class="sp-btn sp-btn-secondary">🤖 ATS Intelligence</a>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     SUMMARY METRICS GRID (7 Key Indicators)
+════════════════════════════════════════════════════ -->
+<div class="sp-stats" style="grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:1rem;margin-bottom:1.75rem;">
+  
+  <!-- Career Intelligence Score -->
+  <div class="sp-stat">
+    <div class="sp-stat-icon si-v">⚡</div>
+    <div class="sp-stat-label">Career Intel Score</div>
+    <div class="sp-stat-value" style="color:#c4b5fd;">{{ career_intel_score }}<span style="font-size:.8rem;color:var(--txt-3);">/100</span></div>
+    <div class="sp-stat-sub good">master AI index</div>
+  </div>
+
+  <!-- Placement Probability -->
+  <div class="sp-stat">
+    <div class="sp-stat-icon si-g">📈</div>
+    <div class="sp-stat-label">Placement Probability</div>
+    <div class="sp-stat-value" style="color:#34d399;">{{ overall_readiness }}%</div>
+    <div style="margin-top:.2rem;"><span class="sp-badge {{ overall_status_class }}">{{ overall_status }}</span></div>
+  </div>
+
+  <!-- Expected Salary -->
+  <div class="sp-stat">
+    <div class="sp-stat-icon si-s">💰</div>
+    <div class="sp-stat-label">Predicted Salary</div>
+    <div class="sp-stat-value" style="color:#38bdf8;">₹{{ predicted_salary_lpa }} <span style="font-size:.8rem;color:var(--txt-3);">LPA</span></div>
+    <div class="sp-stat-sub good">ML Regressor estimate</div>
+  </div>
+
+  <!-- ATS Score -->
+  <div class="sp-stat">
+    <div class="sp-stat-icon si-a">📄</div>
+    <div class="sp-stat-label">Resume ATS Score</div>
+    <div class="sp-stat-value" style="color:#f472b6;">{{ resume_score }}<span style="font-size:.8rem;color:var(--txt-3);">/100</span></div>
+    <div class="sp-stat-sub">active CV quality</div>
+  </div>
+
+  <!-- Profile Completion -->
+  <div class="sp-stat">
+    <div class="sp-stat-icon si-v">👤</div>
+    <div class="sp-stat-label">Profile Completion</div>
+    <div class="sp-stat-value">{{ profile_comp_score }}%</div>
+    <div class="sp-bar-wrap" style="height:4px;margin-top:.4rem;"><div class="sp-bar-fill bar-violet" style="width:{{ profile_comp_score }}%;"></div></div>
+  </div>
+
+  <!-- Projects Summary -->
+  <div class="sp-stat">
+    <div class="sp-stat-icon si-g">🔨</div>
+    <div class="sp-stat-label">Projects Summary</div>
+    <div class="sp-stat-value">{{ projects_count }} <span style="font-size:.8rem;color:var(--txt-3);">Total</span></div>
+    <div class="sp-stat-sub good">{{ featured_projects }} ⭐ Featured</div>
+  </div>
+
+  <!-- Certificates Summary -->
+  <div class="sp-stat">
+    <div class="sp-stat-icon si-s">🏆</div>
+    <div class="sp-stat-label">Certificates</div>
+    <div class="sp-stat-value">{{ certs_count }} <span style="font-size:.8rem;color:var(--txt-3);">Verified</span></div>
+    <div class="sp-stat-sub good">course credentials</div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     6 CHART.JS VISUALIZATIONS GRID
+════════════════════════════════════════════════════ -->
+<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(340px, 1fr));gap:1.5rem;margin-bottom:2.25rem;">
+  
+  <!-- Chart 1: Placement Readiness -->
+  <div class="sp-card sp-card-gradient">
+    <div class="sp-card-header">
+      <span class="sp-card-title">📊 1. Placement Readiness Breakdown</span>
+      <span class="sp-badge sp-badge-violet">ML Classifier</span>
+    </div>
+    <div class="sp-card-body">
+      <div class="sp-chart-container">
+        <canvas id="chartReadiness"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart 2: Skill Distribution -->
+  <div class="sp-card sp-card-gradient">
+    <div class="sp-card-header">
+      <span class="sp-card-title">💡 2. Skill Inventory Distribution</span>
+      <span class="sp-badge sp-badge-sky">Categorized</span>
+    </div>
+    <div class="sp-card-body">
+      <div class="sp-chart-container">
+        <canvas id="chartSkills"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart 3: Technology Usage -->
+  <div class="sp-card sp-card-gradient">
+    <div class="sp-card-header">
+      <span class="sp-card-title">⚙️ 3. Top Technology Stack Usage</span>
+      <span class="sp-badge sp-badge-green">Projects &amp; Experience</span>
+    </div>
+    <div class="sp-card-body">
+      <div class="sp-chart-container">
+        <canvas id="chartTech"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart 4: Salary Prediction & Benchmarks -->
+  <div class="sp-card sp-card-gradient">
+    <div class="sp-card-header">
+      <span class="sp-card-title">💰 4. Salary Prediction &amp; Industry CTC Benchmarks</span>
+      <span class="sp-badge sp-badge-amber">ML Regressor</span>
+    </div>
+    <div class="sp-card-body">
+      <div class="sp-chart-container">
+        <canvas id="chartSalary"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart 5: Career Growth Matrix -->
+  <div class="sp-card sp-card-gradient">
+    <div class="sp-card-header">
+      <span class="sp-card-title">📈 5. Career Growth Projection (6 Months)</span>
+      <span class="sp-badge sp-badge-sky">Predictive Trend</span>
+    </div>
+    <div class="sp-card-body">
+      <div class="sp-chart-container">
+        <canvas id="chartGrowth"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart 6: Learning Progress -->
+  <div class="sp-card sp-card-gradient">
+    <div class="sp-card-header">
+      <span class="sp-card-title">🚀 6. Developer Learning Activity Progress</span>
+      <span class="sp-badge sp-badge-violet">Journey Log</span>
+    </div>
+    <div class="sp-card-body">
+      <div class="sp-chart-container">
+        <canvas id="chartLearning"></canvas>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     CAREER RECOMMENDATIONS GRID (ML Model 3)
+════════════════════════════════════════════════════ -->
+<h3 class="sp-section-heading">🎯 ML Recommended Career Roles</h3>
+<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:1.25rem;margin-bottom:2.25rem;">
+  {% for role in career_roles %}
+    <div class="sp-card sp-card-hover" style="margin-bottom:0;">
+      <div class="sp-card-body" style="padding:1.25rem;display:flex;flex-direction:column;justify-content:space-between;height:100%;">
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;">
+            <h4 style="font-size:1.05rem;font-weight:700;color:#fff;margin:0;">{{ role.title }}</h4>
+            <div style="font-size:1.15rem;font-weight:800;color:#38bdf8;font-family:'Space Grotesk',sans-serif;">
+              {{ role.confidence }}%
+            </div>
+          </div>
+
+          <div style="width:100%;height:6px;background:rgba(255,255,255,0.05);border-radius:999px;margin-bottom:1rem;overflow:hidden;">
+            <div style="width:{{ role.confidence }}%;height:100%;background:linear-gradient(90deg, #7c3aed, #0ea5e9);border-radius:999px;"></div>
+          </div>
+
+          <div style="margin-bottom:.75rem;">
+            <span style="font-size:.72rem;color:var(--txt-3);text-transform:uppercase;font-weight:700;letter-spacing:.05em;display:block;margin-bottom:.35rem;">
+              Matching Profile Skills
+            </span>
+            <div style="display:flex;flex-wrap:wrap;gap:.35rem;">
+              {% for skill in role.matching_skills %}
+                <span class="sp-badge sp-badge-sky" style="font-size:.7rem;padding:.15rem .5rem;">
+                  {{ skill }}
+                </span>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size:.75rem;color:var(--txt-3);border-top:1px solid rgba(255,255,255,0.04);padding-top:.6rem;margin-top:.5rem;">
+          High match confidence calculated by TF-IDF skill recommender engine.
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     SKILL GAP ANALYSIS & ROADMAP (ML Model 4)
+════════════════════════════════════════════════════ -->
+{% if missing_skills %}
+<div class="sp-card" style="margin-bottom:2rem;border-left:4px solid #f59e0b;">
+  <div class="sp-card-body" style="padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+    <div>
+      <h4 style="font-size:1rem;font-weight:700;color:#fff;margin:0 0 .35rem 0;display:flex;align-items:center;gap:.5rem;">
+        <span>🔍</span> ML Identified Skill Gaps for Target Roles
+      </h4>
+      <p style="font-size:.82rem;color:var(--txt-2);margin:0;">
+        Adding these missing skills will significantly boost your placement match confidence and salary expectations:
+      </p>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:.4rem;">
+      {% for sk in missing_skills %}
+        <span class="sp-badge sp-badge-amber" style="font-size:.78rem;padding:.25rem .65rem;">+ {{ sk }}</span>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- AI Learning Roadmap -->
+<h3 class="sp-section-heading">🗺️ AI Personalized Learning Roadmap</h3>
+<div class="sp-card" style="margin-bottom:2.25rem;">
+  <div class="sp-card-body" style="padding:1.5rem;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:1.25rem;">
+      {% for item in roadmap %}
+        <div style="background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:var(--r-md);padding:1.25rem;border-top:3px solid #7c3aed;">
+          <div style="font-size:.78rem;font-weight:700;color:#38bdf8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem;">
+            {{ item.week }}
+          </div>
+          <h4 style="font-size:.95rem;font-weight:700;color:#fff;margin:0 0 .5rem 0;">
+            {{ item.action }}
+          </h4>
+          <p style="font-size:.8rem;color:var(--txt-2);margin:0;line-height:1.45;">
+            Actionable milestone engineered to maximize career readiness and placement eligibility.
+          </p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     TRENDING INDUSTRY SKILLS
+════════════════════════════════════════════════════ -->
+<h3 class="sp-section-heading">🔥 Trending Industry Placement Skills</h3>
+<div class="sp-card" style="margin-bottom:3rem;">
+  <div class="sp-card-body" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:1rem;">
+    {% for sk in trending_skills %}
+      <div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);padding:.85rem 1rem;display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-weight:700;color:#fff;font-size:.9rem;">{{ sk.name }}</div>
+          <div style="font-size:.72rem;color:var(--txt-3);">{{ sk.category }}</div>
+        </div>
+        <div>
+          {% if sk.acquired %}
+            <span class="sp-badge sp-badge-green" style="font-size:.72rem;">✓ Acquired</span>
+          {% else %}
+            <span class="sp-badge sp-badge-amber" style="font-size:.72rem;">⚡ Learn</span>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     CHART.JS INITIALIZATION SCRIPTS
+════════════════════════════════════════════════════ -->
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.font.family = "'Space Grotesk', sans-serif";
+
+    // Chart 1: Placement Readiness (Radar/Doughnut)
+    new Chart(document.getElementById('chartReadiness'), {
+      type: 'doughnut',
+      data: {
+        labels: {{ chart_readiness_labels_json|safe }},
+        datasets: [{
+          data: {{ chart_readiness_data_json|safe }},
+          backgroundColor: ['#0ea5e9', '#6366f1', '#10b981', '#ec4899', '#f59e0b', '#8b5cf6'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } } }
+      }
+    });
+
+    // Chart 2: Skill Distribution (Doughnut)
+    new Chart(document.getElementById('chartSkills'), {
+      type: 'pie',
+      data: {
+        labels: {{ chart_skills_labels_json|safe }},
+        datasets: [{
+          data: {{ chart_skills_data_json|safe }},
+          backgroundColor: ['#8b5cf6', '#0ea5e9', '#f59e0b', '#10b981'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } } }
+      }
+    });
+
+    // Chart 3: Technology Usage (Bar)
+    new Chart(document.getElementById('chartTech'), {
+      type: 'bar',
+      data: {
+        labels: {{ chart_tech_labels_json|safe }},
+        datasets: [{
+          label: 'Projects & Mentions',
+          data: {{ chart_tech_data_json|safe }},
+          backgroundColor: '#6366f1',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { grid: { display: false } },
+          y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { stepSize: 1 } }
+        },
+        plugins: { legend: { display: false } }
+      }
+    });
+
+    // Chart 4: Salary Predictions (Bar)
+    new Chart(document.getElementById('chartSalary'), {
+      type: 'bar',
+      data: {
+        labels: {{ chart_salary_labels_json|safe }},
+        datasets: [{
+          label: 'Package (LPA ₹)',
+          data: {{ chart_salary_data_json|safe }},
+          backgroundColor: ['rgba(255,255,255,0.2)', '#34d399', 'rgba(255,255,255,0.3)', '#38bdf8'],
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { grid: { display: false } },
+          y: { grid: { color: 'rgba(255,255,255,0.05)' } }
+        },
+        plugins: { legend: { display: false } }
+      }
+    });
+
+    // Chart 5: Career Growth Matrix (Line)
+    new Chart(document.getElementById('chartGrowth'), {
+      type: 'line',
+      data: {
+        labels: {{ chart_growth_labels_json|safe }},
+        datasets: [{
+          label: 'Readiness Index %',
+          data: {{ chart_growth_data_json|safe }},
+          borderColor: '#0ea5e9',
+          backgroundColor: 'rgba(14,165,233,0.15)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { grid: { display: false } },
+          y: { grid: { color: 'rgba(255,255,255,0.05)' }, min: 0, max: 100 }
+        },
+        plugins: { legend: { display: false } }
+      }
+    });
+
+    // Chart 6: Learning Progress (Line)
+    new Chart(document.getElementById('chartLearning'), {
+      type: 'line',
+      data: {
+        labels: {{ chart_learning_labels_json|safe }},
+        datasets: [{
+          label: 'Activities & Hours',
+          data: {{ chart_learning_data_json|safe }},
+          borderColor: '#8b5cf6',
+          backgroundColor: 'rgba(139,92,246,0.15)',
+          fill: true,
+          tension: 0.3,
+          pointRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { grid: { display: false } },
+          y: { grid: { color: 'rgba(255,255,255,0.05)' } }
+        },
+        plugins: { legend: { display: false } }
+      }
+    });
+  });
+</script>
+
+{% endblock %}

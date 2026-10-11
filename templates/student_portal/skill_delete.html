@@ -1,0 +1,51 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Delete Skill | PlaceSync{% endblock %}
+{% block topbar_title %}Delete Skill{% endblock %}
+{% block nav_skills %}active{% endblock %}
+
+{% block content %}
+
+<div style="max-width:480px;margin:2rem auto;">
+  <div class="sp-card" style="border:1.5px solid #475569 !important;background:#FFFFFF !important;">
+    <div class="sp-card-header" style="background:#F8FAFC !important;border-bottom:1.5px solid #475569 !important;">
+      <span class="sp-card-title" style="color:#DC2626 !important;font-weight:800;">🗑️ Remove Skill</span>
+    </div>
+    <div class="sp-card-body">
+
+      <!-- Skill Preview -->
+      <div style="padding:1.25rem;background:#FEF2F2;border:1.5px solid #DC2626;border-radius:8px;margin-bottom:1.5rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;">
+          <div>
+            <div style="font-size:1rem;font-weight:800;color:#0F172A !important;">{{ skill.name }}</div>
+            <div style="font-size:.82rem;color:#1E293B !important;font-weight:700;margin-top:.15rem;">{{ skill.get_category_display }}</div>
+          </div>
+          <span class="sp-badge {{ skill.proficiency_css }}">{{ skill.get_proficiency_display }}</span>
+        </div>
+        <div class="sp-bar-wrap" style="height:8px;background:#E2E8F0;border-radius:9999px;">
+          <div class="sp-bar-fill {{ skill.bar_color_css }}" style="width:{{ skill.proficiency_pct }}%;height:100%;border-radius:9999px;"></div>
+        </div>
+        {% if skill.description %}
+        <div style="font-size:.8rem;color:#334155 !important;font-weight:600;margin-top:.5rem;">{{ skill.description }}</div>
+        {% endif %}
+      </div>
+
+      <p style="font-size:.88rem;color:#1E293B !important;font-weight:600;line-height:1.6;margin-bottom:1.5rem;">
+        Are you sure you want to remove <strong style="color:#0F172A !important;font-weight:800;">{{ skill.name }}</strong> from your skill list?
+        This action cannot be undone.
+      </p>
+
+      <div style="display:flex;gap:.75rem;">
+        <form method="post" action="{% url 'student_portal:skill_delete' skill.pk %}" style="flex:1;">
+          {% csrf_token %}
+          <button type="submit" class="sp-btn sp-btn-danger sp-btn-block" style="background:#DC2626 !important;color:#FFFFFF !important;font-weight:800;border:1.5px solid #DC2626 !important;">Yes, Delete</button>
+        </form>
+        <a href="{% url 'student_portal:skills' %}" class="sp-btn sp-btn-secondary" style="flex:1;text-align:center;border:1.5px solid #475569 !important;">
+          Cancel
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

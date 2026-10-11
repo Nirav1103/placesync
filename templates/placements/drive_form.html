@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}Launch Drive | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem; max-width: 800px;">
+    
+    <!-- Header -->
+    <div class="dashboard-header" style="border-bottom: none; margin-bottom: 1.5rem;">
+        <div>
+            <h1 class="dashboard-title">Launch Recruitment Drive</h1>
+            <p class="dashboard-welcome">Publish a new placement or internship drive for corporate partner recruiters.</p>
+        </div>
+        <div>
+            <a href="{% url 'placements:list' %}" class="btn btn-secondary">&larr; Back to Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Panel Form -->
+    <div class="card-panel" style="margin-top: 0; padding: 1.75rem;">
+        <form method="post" novalidate style="display: flex; flex-direction: column; gap: 1.5rem;">
+            {% csrf_token %}
+
+            <!-- Section 1: Basic Info -->
+            <div>
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;">🏢 Drive Profiles</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <!-- Company -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_company">Corporate Partner *</label>
+                        {{ form.company }}
+                        {% if form.company.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.company.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Drive Type -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_drive_type">Drive Type *</label>
+                        {{ form.drive_type }}
+                        {% if form.drive_type.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.drive_type.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                    <!-- Role -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_role">Position Role Title *</label>
+                        {{ form.role }}
+                        {% if form.role.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.role.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Package Amount -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_package_amount">Salary CTC / Stipend *</label>
+                        {{ form.package_amount }}
+                        {% if form.package_amount.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.package_amount.errors.0 }}</span>
+                        {% endif %}
+                        <span style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">e.g. 12.0 for 12 LPA, or 25000 for stipend.</span>
+                    </div>
+
+                    <!-- Job Mode -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_job_mode">Job Mode</label>
+                        {{ form.job_mode }}
+                        {% if form.job_mode.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.job_mode.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Eligibility Criteria -->
+            <div>
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;">🛡️ Eligibility Rules</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                    <!-- Min CGPA -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_min_cgpa">Minimum Required CGPA</label>
+                        {{ form.min_cgpa }}
+                        {% if form.min_cgpa.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.min_cgpa.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Max Backlogs -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_max_backlogs">Max Active Backlogs Allowed</label>
+                        {{ form.max_backlogs }}
+                        {% if form.max_backlogs.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.max_backlogs.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Deadline -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_deadline">Application Deadline *</label>
+                        {{ form.deadline }}
+                        {% if form.deadline.errors %}
+                            <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.deadline.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Eligible Departments checklist -->
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label class="form-label">Eligible Departments</label>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.5rem; background: rgba(255,255,255,0.01); border: 1px solid var(--card-border); padding: 0.75rem; border-radius: var(--radius-sm);">
+                        {% for checkbox in form.eligible_departments %}
+                            <label style="display: flex; gap: 0.5rem; align-items: center; color: #fff; font-size: 0.85rem; cursor: pointer;">
+                                {{ checkbox.tag }} {{ checkbox.choice_label }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                    {% if form.eligible_departments.errors %}
+                        <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.eligible_departments.errors.0 }}</span>
+                    {% endif %}
+                    <span style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">Leave unchecked to allow all departments to apply.</span>
+                </div>
+            </div>
+
+            <!-- Section 3: Recruitment Steps -->
+            <div>
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;">📜 Recruitment Process</h3>
+                
+                <!-- Status -->
+                <div class="form-group" style="width: 250px; margin-bottom: 1rem;">
+                    <label class="form-label" for="id_status">Drive Status</label>
+                    {{ form.status }}
+                    {% if form.status.errors %}
+                        <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.status.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <!-- Selection Process details -->
+                <div class="form-group">
+                    <label class="form-label" for="id_selection_process">Selection Process Rounds</label>
+                    {{ form.selection_process }}
+                    {% if form.selection_process.errors %}
+                        <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.selection_process.errors.0 }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Actions submit -->
+            <div style="display: flex; gap: 1rem; border-top: 1px solid var(--card-border); padding-top: 1.5rem; margin-top: 1rem;">
+                <button type="submit" class="btn btn-primary" style="padding: 0.85rem 2.5rem;">🚀 Launch Drive</button>
+                <a href="{% url 'placements:list' %}" class="btn btn-secondary" style="padding: 0.85rem 1.5rem;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

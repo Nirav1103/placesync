@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Batches | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem;">
+
+    <!-- Dashboard Header -->
+    <div class="sp-page-header" style="margin-bottom: 1.5rem;">
+        <div>
+            <h1 class="sp-page-title">Batches</h1>
+            <p class="sp-page-subtitle">Manage student batches and track placement statistics</p>
+        </div>
+        <div>
+            <a href="{% url 'batches:create' %}" class="sp-btn sp-btn-primary" style="font-weight:800;">Add Batch</a>
+        </div>
+    </div>
+
+    <!-- Search Toolbar -->
+    <form method="get" class="search-bar" style="margin-bottom:1.5rem; display:flex; gap:0.5rem;">
+        <input type="text" name="q" value="{{ q }}" placeholder="Search by batch name or department..." class="sp-form-control" style="font-size: 0.9rem; font-weight:600; flex:1;">
+        <button type="submit" class="sp-btn sp-btn-primary" style="padding: 0.75rem 1.25rem; font-weight:800;">Search</button>
+        {% if q %}
+            <a href="{% url 'batches:list' %}" class="sp-btn sp-btn-secondary" style="padding: 0.75rem 1.25rem; border:1.5px solid #475569 !important; font-weight:800;">Clear</a>
+        {% endif %}
+    </form>
+
+    <!-- Table Section -->
+    {% if batches %}
+        <div class="sp-card" style="background:#FFFFFF !important; border:1.5px solid #475569 !important; padding:1.25rem; border-radius:8px;">
+            <div class="table-wrapper">
+                <div class="table-responsive">
+                    <table class="sp-table" style="width:100%; border-collapse:collapse;">
+                        <thead>
+                            <tr style="background:#F8FAFC; border-bottom:1.5px solid #475569;">
+                                <th style="width: 25%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align:left;">Batch Name</th>
+                                <th style="width: 20%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align:left;">Department</th>
+                                <th style="width: 12%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align: center;">Passing Year</th>
+                                <th style="width: 10%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align: center;">Semester</th>
+                                <th style="width: 10%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align: center;">Division</th>
+                                <th style="width: 23%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align: right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for batch in batches %}
+                                <tr style="border-bottom:1px solid #CBD5E1;">
+                                    <td style="padding:0.75rem; color: #0F172A !important; font-weight: 800;">
+                                        <a href="{% url 'batches:dashboard' pk=batch.pk %}" style="color: #32867D !important; text-decoration: none; font-weight:800;">
+                                            {{ batch.name }}
+                                        </a>
+                                        {% if batch.description %}
+                                            <div style="font-size:0.78rem; color:#334155 !important; font-weight:600; margin-top:3px; max-width:300px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                                {{ batch.description }}
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                    <td style="padding:0.75rem; color:#1E293B !important; font-weight:600;">
+                                        <span class="sp-badge sp-badge-violet">{{ batch.department.code }}</span> - {{ batch.department.name }}
+                                    </td>
+                                    <td style="padding:0.75rem; text-align: center; color: #0F172A !important; font-weight:800;">
+                                        {{ batch.graduation_year }}
+                                    </td>
+                                    <td style="padding:0.75rem; text-align: center; color: #334155 !important; font-weight: 700;">
+                                        {{ batch.semester }}
+                                    </td>
+                                    <td style="padding:0.75rem; text-align: center; color: #334155 !important; font-weight: 700;">
+                                        {% if batch.division %}{{ batch.division }}{% else %}—{% endif %}
+                                    </td>
+                                    <td style="padding:0.75rem;">
+                                        <div class="table-actions" style="display:flex; justify-content: flex-end; gap:0.35rem;">
+                                            <a href="{% url 'batches:dashboard' pk=batch.pk %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="border:1.5px solid #475569 !important; font-weight:800;">Dashboard</a>
+                                            <a href="{% url 'batches:edit' pk=batch.pk %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="border:1.5px solid #475569 !important; font-weight:800;">Edit</a>
+                                            <a href="{% url 'batches:delete' pk=batch.pk %}" class="sp-btn sp-btn-danger sp-btn-xs" style="background:#FEF2F2 !important; color:#DC2626 !important; border:1.5px solid #DC2626 !important; font-weight:800;">Delete</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <!-- Empty State Panel -->
+        <div class="sp-card" style="text-align: center; padding: 4rem 2rem; border: 1.5px solid #475569 !important; background: #FFFFFF !important; margin-top: 1.5rem;">
+            <p style="color: #334155 !important; margin-bottom: 1.5rem; font-size: 1rem; font-weight:600;">
+                {% if q %}
+                    No batches match your search query: <strong style="color: #0F172A !important;">"{{ q }}"</strong>
+                {% else %}
+                    No batches have been registered in your college database yet.
+                {% endif %}
+            </p>
+            {% if q %}
+                <a href="{% url 'batches:list' %}" class="sp-btn sp-btn-secondary" style="border:1.5px solid #475569 !important; font-weight:800;">Clear Search</a>
+            {% else %}
+                <a href="{% url 'batches:create' %}" class="sp-btn sp-btn-primary" style="font-weight:800;">Create Your First Batch</a>
+            {% endif %}
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Template | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem; max-width: 700px;">
+    
+    <!-- Header -->
+    <div class="dashboard-header" style="border-bottom: none; margin-bottom: 1.5rem;">
+        <div>
+            <h1 class="dashboard-title">{{ action }} Prefill Template</h1>
+            <p class="dashboard-welcome">Configure prefill templates to expedite broadcasting announcements later.</p>
+        </div>
+        <div>
+            <a href="{% url 'communication:dashboard' %}" class="btn btn-secondary">&larr; Back to Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Form Panel -->
+    <div class="card-panel" style="margin-top: 0; padding: 1.75rem;">
+        <form method="post" novalidate style="display: flex; flex-direction: column; gap: 1.5rem;">
+            {% csrf_token %}
+
+            <!-- Template Name -->
+            <div class="form-group">
+                <label class="form-label" for="id_name">Template Reference Name *</label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                    <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.name.errors.0 }}</span>
+                {% endif %}
+                <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">e.g. 'Placement drive announcement', 'Interview instructions prefill'</span>
+            </div>
+
+            <!-- Subject Line -->
+            <div class="form-group">
+                <label class="form-label" for="id_subject">Default Email Subject Line *</label>
+                {{ form.subject }}
+                {% if form.subject.errors %}
+                    <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.subject.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Body Contents -->
+            <div class="form-group">
+                <label class="form-label" for="id_body">Prefill Message Body Content *</label>
+                {{ form.body }}
+                {% if form.body.errors %}
+                    <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.body.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Actions Submit -->
+            <div style="display: flex; gap: 1rem; border-top: 1px solid var(--card-border); padding-top: 1.5rem; margin-top: 1rem;">
+                <button type="submit" class="btn btn-primary" style="padding: 0.85rem 2.5rem;">💾 Save Template</button>
+                <a href="{% url 'communication:dashboard' %}" class="btn btn-secondary" style="padding: 0.85rem 1.5rem;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

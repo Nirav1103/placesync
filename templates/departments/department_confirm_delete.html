@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Department | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper" style="padding-top: 4rem;">
+    <div class="auth-card" style="text-align: center;">
+        <div class="auth-header">
+            <h1 class="auth-title" style="color: var(--danger);">Delete Department?</h1>
+            <p class="auth-subtitle" style="margin-top: 1rem; line-height: 1.6;">
+                Are you sure you want to permanently delete the department <strong style="color: #fff;">{{ department.name }} ({{ department.code }})</strong>?
+            </p>
+        </div>
+
+        <div style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); padding: 1rem 1.25rem; border-radius: var(--radius-md); margin-bottom: 2rem; font-size: 0.85rem; color: var(--text-secondary); text-align: left;">
+            <strong>Warning:</strong> Deleting this department may impact student records associated with it. This action cannot be undone.
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div style="display: flex; gap: 1rem;">
+                <button type="submit" class="btn btn-primary" style="background: var(--danger); flex: 1;">Yes, Delete</button>
+                <a href="{% url 'departments:list' %}" class="btn btn-secondary" style="flex: 1;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

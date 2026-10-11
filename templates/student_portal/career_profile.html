@@ -1,0 +1,135 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Career Profile Preferences | PlaceSync{% endblock %}
+{% block topbar_title %}Career Profile Preferences{% endblock %}
+{% block nav_profile %}active{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════════════
+     Page Header
+════════════════════════════════════════════════════ -->
+<div class="sp-page-header">
+  <div>
+    <h1 class="sp-page-title">🎯 Career Profile Preferences</h1>
+    <p class="sp-page-subtitle">Configure your career goals, target job roles, preferred work locations, and relocation preferences.</p>
+  </div>
+  <div style="display:flex;gap:.75rem;">
+    <a href="{% url 'student_portal:profile' %}" class="sp-btn sp-btn-secondary" style="border:1.5px solid #475569 !important;">👤 View Full Profile</a>
+    <a href="{% url 'student_portal:profile_edit' %}" class="sp-btn sp-btn-secondary" style="border:1.5px solid #475569 !important;">✏️ Personal Details</a>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Main Preferences Form Card
+════════════════════════════════════════════════════ -->
+<div style="max-width:860px;margin:0 auto 3rem;">
+  <form method="post" action="{% url 'student_portal:career_profile' %}" class="sp-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+    {% csrf_token %}
+    
+    <div class="sp-card-body" style="padding:2.25rem;display:flex;flex-direction:column;gap:2rem;">
+      
+      {% if form.non_field_errors %}
+        <div class="sp-alert sp-alert-error" style="border:1.5px solid #DC2626 !important; background:#FEF2F2 !important; color:#0F172A !important;">
+          <span>{{ form.non_field_errors }}</span>
+        </div>
+      {% endif %}
+
+      <!-- SECTION 1: Target Role & Industry -->
+      <div>
+        <h3 style="color:#0F172A !important;font-weight:800;font-size:1.1rem;border-bottom:1.5px solid #CBD5E1;padding-bottom:.5rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:.5rem;">
+          💼 Role &amp; Industry Preferences
+        </h3>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_preferred_job_role">Preferred Job Role <span style="color:#DC2626;">*</span></label>
+            {{ form.preferred_job_role }}
+            {% if form.preferred_job_role.errors %}<div style="color:#DC2626;font-size:.75rem;margin-top:.25rem;font-weight:700;">{{ form.preferred_job_role.errors.0 }}</div>{% endif %}
+            <small style="color:#334155 !important;font-size:.75rem;font-weight:600;">e.g. Full Stack Developer, Data Engineer, Software Engineer</small>
+          </div>
+
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_preferred_industry">Preferred Industry</label>
+            {{ form.preferred_industry }}
+            {% if form.preferred_industry.errors %}<div style="color:#DC2626;font-size:.75rem;margin-top:.25rem;font-weight:700;">{{ form.preferred_industry.errors.0 }}</div>{% endif %}
+            <small style="color:#334155 !important;font-size:.75rem;font-weight:600;">e.g. Information Technology, FinTech, E-commerce, Healthcare</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2: Location & Work Mode -->
+      <div>
+        <h3 style="color:#0F172A !important;font-weight:800;font-size:1.1rem;border-bottom:1.5px solid #CBD5E1;padding-bottom:.5rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:.5rem;">
+          🌍 Location &amp; Work Environment
+        </h3>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_preferred_city">Preferred City</label>
+            {{ form.preferred_city }}
+            {% if form.preferred_city.errors %}<div style="color:#DC2626;font-size:.75rem;margin-top:.25rem;font-weight:700;">{{ form.preferred_city.errors.0 }}</div>{% endif %}
+          </div>
+
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_preferred_country">Preferred Country</label>
+            {{ form.preferred_country }}
+            {% if form.preferred_country.errors %}<div style="color:#DC2626;font-size:.75rem;margin-top:.25rem;font-weight:700;">{{ form.preferred_country.errors.0 }}</div>{% endif %}
+          </div>
+
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_work_preference">Work Preference</label>
+            {{ form.work_preference }}
+            {% if form.work_preference.errors %}<div style="color:#DC2626;font-size:.75rem;margin-top:.25rem;font-weight:700;">{{ form.work_preference.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div style="background:#F8FAFC;padding:1rem 1.25rem;border-radius:8px;border:1.5px solid #475569;display:flex;align-items:center;gap:1rem;margin-top:.5rem;">
+          {{ form.willing_to_relocate }}
+          <div>
+            <label for="id_willing_to_relocate" style="font-size:.88rem;font-weight:800;color:#0F172A !important;cursor:pointer;">Willingness to Relocate</label>
+            <p style="font-size:.78rem;color:#334155 !important;font-weight:600;margin:0;">Check if you are open to relocating for placement opportunities in other cities or countries.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 3: Career Objectives & Expectations -->
+      <div>
+        <h3 style="color:#0F172A !important;font-weight:800;font-size:1.1rem;border-bottom:1.5px solid #CBD5E1;padding-bottom:.5rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:.5rem;">
+          💰 Salary Expectations &amp; Career Objective
+        </h3>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_expected_salary">Expected Package (LPA)</label>
+            {{ form.expected_salary }}
+            {% if form.expected_salary.errors %}<div style="color:#DC2626;font-size:.75rem;margin-top:.25rem;font-weight:700;">{{ form.expected_salary.errors.0 }}</div>{% endif %}
+            <small style="color:#334155 !important;font-size:.75rem;font-weight:600;">Expected annual CTC in Lakhs Per Annum (e.g. 8.50)</small>
+          </div>
+
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_career_objective">Primary Career Objective</label>
+            {{ form.career_objective }}
+            {% if form.career_objective.errors %}<div style="color:#DC2626;font-size:.75rem;margin-top:.25rem;font-weight:700;">{{ form.career_objective.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div class="sp-form-group" style="margin-top:.5rem;">
+          <label class="sp-form-label" for="id_higher_studies">Higher Studies Objective <span style="color:#334155 !important;font-weight:600;">(optional)</span></label>
+          {{ form.higher_studies }}
+          {% if form.higher_studies.errors %}<div style="color:#DC2626;font-size:.75rem;margin-top:.25rem;font-weight:700;">{{ form.higher_studies.errors.0 }}</div>{% endif %}
+          <small style="color:#334155 !important;font-size:.75rem;font-weight:600;">e.g. Planning MS in Computer Science (2027), MBA in IT Management</small>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="border-top:1.5px solid #CBD5E1;padding-top:1.5rem;display:flex;gap:1rem;justify-content:flex-end;">
+        <a href="{% url 'student_portal:profile' %}" class="sp-btn sp-btn-secondary" style="padding:.65rem 2rem;border:1.5px solid #475569 !important;">Cancel</a>
+        <button type="submit" class="sp-btn sp-btn-primary" style="padding:.65rem 2.5rem;">💾 Save Career Preferences</button>
+      </div>
+
+    </div>
+  </form>
+</div>
+
+{% endblock %}

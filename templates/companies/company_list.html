@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load staff_tags %}
+
+{% block title %}Company Directory | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem;">
+
+    <!-- Header -->
+    <div class="sp-page-header" style="margin-bottom: 1.5rem;">
+        <div>
+            <h1 class="sp-page-title">Company Directory</h1>
+            <p class="sp-page-subtitle">Manage partner recruiting companies, HR contacts, and placement terms.</p>
+        </div>
+        <div>
+            {% if request.user|can_edit_filter %}
+            <a href="{% url 'companies:create' %}" class="sp-btn sp-btn-primary" style="font-weight:800;"><i class="fa-solid fa-plus"></i> Add Company</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Layout Grid -->
+    <div style="display: grid; grid-template-columns: 280px 1fr; gap: 1.5rem; align-items: start;">
+        
+        <!-- Left: Filters Panel Form (No JS) -->
+        <div class="sp-card" style="margin-top: 0; padding: 1.25rem; background:#FFFFFF !important; border:1.5px solid #475569 !important;">
+            <h3 style="font-family:'Space Grotesk',sans-serif; font-size: 1.05rem; font-weight: 800; color: #0F172A !important; margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 1.5px solid #475569;">Filters Console</h3>
+            
+            <form method="get" novalidate style="display: flex; flex-direction: column; gap: 1.25rem;">
+                
+                <!-- Keyword Search -->
+                <div class="sp-form-group" style="margin-bottom: 0;">
+                    <label class="sp-form-label" style="font-size: 0.82rem; color:#1E293B !important; font-weight:800;">Search Query</label>
+                    <input type="text" name="q" value="{{ q }}" placeholder="Name, Industry, Location..." class="sp-form-control" style="font-size: 0.85rem; font-weight:600;">
+                </div>
+
+                <!-- Job Mode Filter -->
+                <div class="sp-form-group" style="margin-bottom: 0;">
+                    <label class="sp-form-label" style="font-size: 0.82rem; color:#1E293B !important; font-weight:800;">Job Mode</label>
+                    <select name="job_mode" class="sp-form-control" style="font-size: 0.85rem; font-weight:600;">
+                        <option value="">-- All Job Modes --</option>
+                        {% for code, label in job_modes %}
+                            <option value="{{ code }}" {% if selected_mode == code %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Min Package Filter -->
+                <div class="sp-form-group" style="margin-bottom: 0;">
+                    <label class="sp-form-label" style="font-size: 0.82rem; color:#1E293B !important; font-weight:800;">Min Package (LPA)</label>
+                    <input type="number" step="0.1" name="min_package" value="{{ selected_pkg }}" placeholder="e.g. 8.0" class="sp-form-control" style="font-size: 0.85rem; font-weight:600;">
+                </div>
+
+                <!-- Min Stipend Filter -->
+                <div class="sp-form-group" style="margin-bottom: 0;">
+                    <label class="sp-form-label" style="font-size: 0.82rem; color:#1E293B !important; font-weight:800;">Min Stipend (/mo)</label>
+                    <input type="number" step="1000" name="min_stipend" value="{{ selected_stipend }}" placeholder="e.g. 20000" class="sp-form-control" style="font-size: 0.85rem; font-weight:600;">
+                </div>
+
+                <!-- Buttons -->
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+                    <button type="submit" class="sp-btn sp-btn-primary" style="padding: 0.65rem; font-weight:800;">Apply Filters</button>
+                    {% if q or selected_mode or selected_pkg or selected_stipend %}
+                        <a href="{% url 'companies:list' %}" class="sp-btn sp-btn-secondary" style="padding: 0.65rem; text-align: center; border:1.5px solid #475569 !important; font-weight:800;">Reset Form</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        <!-- Right: Companies Grid -->
+        <div>
+            {% if companies %}
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
+                    {% for company in companies %}
+                        <div class="sp-card" style="margin-top: 0; display: flex; flex-direction: column; height: 100%; background:#FFFFFF !important; border:1.5px solid #475569 !important; padding:1.25rem; border-radius:8px;">
+                            <!-- Top Profile Details -->
+                            <div style="display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 1.25rem;">
+                                <!-- Logo Badge -->
+                                <div style="width: 60px; height: 60px; border-radius: 8px; border: 1.5px solid #475569; background: #F8FAFC; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+                                    {% if company.logo %}
+                                        <img src="{{ company.logo.url }}" alt="{{ company.name }} logo" style="width: 100%; height: 100%; object-fit: contain;">
+                                    {% else %}
+                                        <span style="font-size: 1.25rem; font-weight: 800; color: #32867D !important;">{{ company.name|slice:":2"|upper }}</span>
+                                    {% endif %}
+                                </div>
+                                
+                                <div style="flex: 1; min-width: 0;">
+                                    <h3 style="font-size: 1.15rem; font-weight: 800; color: #0F172A !important; margin-bottom: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                        {{ company.name }}
+                                    </h3>
+                                    {% if company.website %}
+                                        <a href="{{ company.website }}" target="_blank" style="font-size: 0.8rem; color: #32867D !important; font-weight:700; text-decoration: none; word-break: break-all;">
+                                            {{ company.website|cut:"https://"|cut:"http://" }} &rarr;
+                                        </a>
+                                    {% endif %}
+                                    {% if company.industry %}
+                                        <div style="font-size: 0.8rem; color: #334155 !important; font-weight:600; margin-top: 0.25rem;">{{ company.industry }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Middle placement terms & location -->
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem; border-top: 1.5px solid #CBD5E1; padding-top: 1rem; margin-bottom: 1.5rem; flex: 1;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-size: 0.82rem; color: #334155 !important; font-weight:700;">Location</span>
+                                    <span style="font-size: 0.88rem; color: #0F172A !important; font-weight: 800;"><i class="fa-solid fa-location-dot" style="color:#0284C7; margin-right:0.2rem;"></i> {{ company.location|default:"Not Specified" }}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-size: 0.82rem; color: #334155 !important; font-weight:700;">Job Mode</span>
+                                    <span>
+                                        {% if company.job_mode == 'REMOTE' %}
+                                            <span class="sp-badge sp-badge-violet">Remote</span>
+                                        {% elif company.job_mode == 'HYBRID' %}
+                                            <span class="sp-badge sp-badge-sky">Hybrid</span>
+                                        {% else %}
+                                            <span class="sp-badge sp-badge-green">On-site</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-size: 0.82rem; color: #334155 !important; font-weight:700;">Compensation</span>
+                                    <div style="text-align: right;">
+                                        {% if company.package_amount %}
+                                            <div style="font-size: 0.88rem; color: #0F172A !important; font-weight: 800;"><i class="fa-solid fa-money-bill-wave" style="color:#059669; font-size:0.8rem; margin-right:0.2rem;"></i> {{ company.package_amount }} LPA</div>
+                                        {% endif %}
+                                        {% if company.stipend_amount %}
+                                            <div style="font-size: 0.8rem; color: #334155 !important; font-weight:600;"><i class="fa-solid fa-coins" style="color:#D97706; font-size:0.75rem; margin-right:0.2rem;"></i> Stipend: {{ company.stipend_amount }}/mo</div>
+                                        {% endif %}
+                                        {% if not company.package_amount and not company.stipend_amount %}
+                                            <div style="font-size: 0.8rem; color: #334155 !important; font-style: italic; font-weight:600;">Not Specified</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bottom Action Console Links -->
+                            <div style="display: flex; gap: 0.5rem; justify-content: flex-end; border-top: 1.5px solid #CBD5E1; padding-top: 1rem; flex-shrink: 0;">
+                                <a href="{% url 'companies:detail' pk=company.pk %}" class="sp-btn sp-btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.85rem; border:1.5px solid #475569 !important; font-weight:800;">View</a>
+                                {% if request.user|can_edit_filter %}
+                                <a href="{% url 'companies:edit' pk=company.pk %}" class="sp-btn sp-btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.85rem; border:1.5px solid #475569 !important; font-weight:800;" title="Edit Company">Edit</a>
+                                <a href="{% url 'companies:delete' pk=company.pk %}" class="sp-btn sp-btn-danger" style="font-size: 0.8rem; padding: 0.4rem 0.85rem; background:#FEF2F2 !important; color:#DC2626 !important; border:1.5px solid #DC2626 !important; font-weight:800;" title="Delete Company">Delete</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="sp-card" style="text-align: center; padding: 5rem 2rem; border: 1.5px solid #475569 !important; background: #FFFFFF !important;">
+                    <p style="color: #334155 !important; font-size: 0.95rem; font-weight:600; margin-bottom: 1.5rem;">
+                        No company records matched your criteria.
+                    </p>
+                    {% if q or selected_mode or selected_pkg or selected_stipend %}
+                        <a href="{% url 'companies:list' %}" class="sp-btn sp-btn-secondary" style="font-size: 0.85rem; border:1.5px solid #475569 !important; font-weight:800;">Clear Filters</a>
+                    {% else %}
+                        {% if request.user|can_edit_filter %}
+                        <a href="{% url 'companies:create' %}" class="sp-btn sp-btn-primary" style="font-size: 0.85rem; font-weight:800;">Add Partner Company</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

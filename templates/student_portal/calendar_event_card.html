@@ -1,0 +1,44 @@
+<div class="sp-card" style="margin-bottom:0; transition:var(--t); border:1.5px solid #475569 !important; background:#FFFFFF !important; border-top: 4px solid 
+  {% if event.event_type == 'DEADLINE' %}#DC2626
+  {% elif event.event_type == 'APTITUDE_TEST' %}#0284C7
+  {% elif event.event_type == 'TECH_INTERVIEW' %}#7C3AED
+  {% elif event.event_type == 'HR_INTERVIEW' %}#059669
+  {% elif event.event_type == 'OFFER_RELEASE' %}#D97706
+  {% elif event.event_type == 'JOINING_DATE' %}#32867D
+  {% else %}#475569{% endif %} !important;">
+
+  <div class="sp-card-body" style="padding:1rem;">
+    <!-- Badges Row -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;">
+      <span class="sp-badge 
+        {% if event.event_type == 'DEADLINE' %}sp-badge-red
+        {% elif event.event_type == 'APTITUDE_TEST' %}sp-badge-sky
+        {% elif event.event_type == 'TECH_INTERVIEW' %}sp-badge-violet
+        {% elif event.event_type == 'HR_INTERVIEW' %}sp-badge-green
+        {% elif event.event_type == 'OFFER_RELEASE' %}sp-badge-amber
+        {% elif event.event_type == 'JOINING_DATE' %}sp-badge-sky
+        {% else %}sp-badge-gray{% endif %}">
+        {{ event.get_event_type_display }}
+      </span>
+      <span style="font-size:.78rem;color:#334155 !important;font-weight:700;">{{ event.event_date|date:"d M Y" }}</span>
+    </div>
+
+    <!-- Title and details -->
+    <h5 style="font-size:.95rem;font-weight:800;color:#0F172A !important;margin-bottom:.35rem;">{{ event.title }}</h5>
+    <div style="font-size:.82rem;color:#32867D !important;font-weight:800;margin-bottom:.5rem;">
+      {{ event.drive.company.name }} · <span style="color:#1E293B !important;font-weight:700;">{{ event.drive.role }}</span>
+    </div>
+
+    <!-- Description -->
+    <p
+      style="font-size:.78rem;color:#1E293B !important;font-weight:600;line-height:1.45;margin:0;border-top:1.5px solid #CBD5E1;padding-top:.5rem;">
+      {{ event.description }}
+    </p>
+
+    <!-- Details redirection link -->
+    <div style="margin-top:.625rem;text-align:right;">
+      <a href="{% url 'student_portal:drive_detail' event.drive.pk %}"
+        style="font-size:.75rem;color:#32867D !important;text-decoration:none;font-weight:800;">View Drive Details →</a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,289 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Career Analytics | PlaceSync{% endblock %}
+{% block topbar_title %}Career Analytics{% endblock %}
+{% block nav_analytics %}active{% endblock %}
+{% block page_body_class %}page-analytics{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════════════
+     Page Header
+════════════════════════════════════════════════════ -->
+<div class="sp-page-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1.25rem;">
+  <div>
+    <h1 class="sp-page-title">📈 Career Analytics Dashboard</h1>
+    <p class="sp-page-subtitle">Detailed breakdown of profile completion, resume ATS analysis, and corporate placement readiness metrics</p>
+  </div>
+  <div class="sp-page-actions">
+    <a href="{% url 'student_portal:passport_pdf' %}" class="sp-btn sp-btn-primary" style="padding:.625rem 1.35rem; font-size:.875rem;">
+      📇 Download Career Passport PDF
+    </a>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Analytics Scores Row (4 key metrics)
+════════════════════════════════════════════════════ -->
+<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:1.25rem; margin-bottom:1.75rem;">
+  
+  <!-- ATS Score Card -->
+  <div class="sp-card" style="margin-bottom:0; text-align:center; padding:1.5rem 1.25rem; border:1.5px solid #475569 !important; background:#FFFFFF !important; border-top:4px solid #7C3AED !important;">
+    <span style="font-size:.78rem; text-transform:uppercase; color:#1E293B !important; font-weight:800; letter-spacing:.05em;">ATS Resume Score</span>
+    <h2 style="font-size:2.25rem; font-weight:800; color:#7C3AED !important; margin:.5rem 0 .25rem 0; font-family:'Space Grotesk',sans-serif;">
+      {{ ats_score }}<span style="font-size:1.15rem; color:#334155 !important; font-weight:700;">%</span>
+    </h2>
+    <div style="font-size:.8rem; color:#334155 !important; font-weight:700;">Target: Min 70% for filtering</div>
+    <!-- Mini progress bar -->
+    <div style="background:#E2E8F0; border-radius:9999px; height:8px; margin-top:.75rem; overflow:hidden;">
+      <div style="width:{{ ats_score }}%; background:#7C3AED; height:100%; border-radius:9999px;"></div>
+    </div>
+  </div>
+
+  <!-- Placement Readiness Card -->
+  <div class="sp-card" style="margin-bottom:0; text-align:center; padding:1.5rem 1.25rem; border:1.5px solid #475569 !important; background:#FFFFFF !important; border-top:4px solid #0284C7 !important;">
+    <span style="font-size:.78rem; text-transform:uppercase; color:#1E293B !important; font-weight:800; letter-spacing:.05em;">Readiness Index</span>
+    <h2 style="font-size:2.25rem; font-weight:800; color:#0284C7 !important; margin:.5rem 0 .25rem 0; font-family:'Space Grotesk',sans-serif;">
+      {{ readiness_score }}<span style="font-size:1.15rem; color:#334155 !important; font-weight:700;">%</span>
+    </h2>
+    <div style="font-size:.8rem; color:#334155 !important; font-weight:700;">Based on active skills &amp; CGPA</div>
+    <!-- Mini progress bar -->
+    <div style="background:#E2E8F0; border-radius:9999px; height:8px; margin-top:.75rem; overflow:hidden;">
+      <div style="width:{{ readiness_score }}%; background:#0284C7; height:100%; border-radius:9999px;"></div>
+    </div>
+  </div>
+
+  <!-- Career Improvement Card -->
+  <div class="sp-card" style="margin-bottom:0; text-align:center; padding:1.5rem 1.25rem; border:1.5px solid #475569 !important; background:#FFFFFF !important; border-top:4px solid #059669 !important;">
+    <span style="font-size:.78rem; text-transform:uppercase; color:#1E293B !important; font-weight:800; letter-spacing:.05em;">Improvement Score</span>
+    <h2 style="font-size:2.25rem; font-weight:800; color:#059669 !important; margin:.5rem 0 .25rem 0; font-family:'Space Grotesk',sans-serif;">
+      {{ improvement_score }}<span style="font-size:1.15rem; color:#334155 !important; font-weight:700;">%</span>
+    </h2>
+    <div style="font-size:.8rem; color:#334155 !important; font-weight:700;">Based on shortlist conversions</div>
+    <!-- Mini progress bar -->
+    <div style="background:#E2E8F0; border-radius:9999px; height:8px; margin-top:.75rem; overflow:hidden;">
+      <div style="width:{{ improvement_score }}%; background:#059669; height:100%; border-radius:9999px;"></div>
+    </div>
+  </div>
+
+  <!-- Profile Completion Card -->
+  <div class="sp-card" style="margin-bottom:0; text-align:center; padding:1.5rem 1.25rem; border:1.5px solid #475569 !important; background:#FFFFFF !important; border-top:4px solid #D97706 !important;">
+    <span style="font-size:.78rem; text-transform:uppercase; color:#1E293B !important; font-weight:800; letter-spacing:.05em;">Profile Completion</span>
+    <h2 style="font-size:2.25rem; font-weight:800; color:#D97706 !important; margin:.5rem 0 .25rem 0; font-family:'Space Grotesk',sans-serif;">
+      {{ completion_score }}<span style="font-size:1.15rem; color:#334155 !important; font-weight:700;">%</span>
+    </h2>
+    <div style="font-size:.8rem; color:#334155 !important; font-weight:700;">Fields filled in profile/settings</div>
+    <!-- Mini progress bar -->
+    <div style="background:#E2E8F0; border-radius:9999px; height:8px; margin-top:.75rem; overflow:hidden;">
+      <div style="width:{{ completion_score }}%; background:#D97706; height:100%; border-radius:9999px;"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Probability & Stats Grid
+════════════════════════════════════════════════════ -->
+<div style="display:grid; grid-template-columns:1fr 360px; gap:1.25rem; align-items:start; margin-bottom:1.75rem;">
+  
+  <!-- Placement Probability Meter -->
+  <div class="sp-card" style="margin-bottom:0; border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+    <div class="sp-card-header" style="background:#F8FAFC !important; border-bottom:1.5px solid #475569 !important;">
+      <span class="sp-card-title" style="color:#0F172A !important; font-weight:800;">📈 Placement Probability Engine</span>
+    </div>
+    <div class="sp-card-body" style="display:flex; flex-direction:column; gap:1.25rem;">
+      <div style="display:flex; align-items:center; gap:1.5rem;">
+        
+        <!-- Probability Circle Score Meter -->
+        <div style="width:96px; height:96px; border-radius:9999px; background:#F8FAFC; border:6px solid 
+          {% if placement_probability >= 80 %}#059669
+          {% elif placement_probability >= 60 %}#D97706
+          {% else %}#DC2626{% endif %}; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+          <div style="text-align:center;">
+            <div style="font-size:1.5rem; font-weight:800; color:#0F172A !important; font-family:'Space Grotesk',sans-serif; line-height:1;">
+              {{ placement_probability }}%
+            </div>
+            <div style="font-size:.62rem; color:#334155 !important; text-transform:uppercase; font-weight:800; margin-top:.2rem; letter-spacing:.05em;">Probability</div>
+          </div>
+        </div>
+
+        <div>
+          <h4 style="font-size:1.1rem; font-weight:800; color:#0F172A !important; margin-bottom:.35rem;">Dynamic Probability Score Matrix</h4>
+          <p style="font-size:.84rem; color:#1E293B !important; font-weight:600; line-height:1.55; margin:0;">
+            Calculated in real-time based on your normalized academic record, active resume checks, profile completeness, skills count, and shortlist success rates.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Probability Factors Checklist -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:.875rem; background:#F8FAFC !important; border:1.5px solid #475569 !important; border-radius:8px; padding:1rem;">
+        <div style="font-size:.82rem; font-weight:700; display:flex; align-items:center; gap:.5rem;">
+          <span style="font-size:.95rem;">🎓</span>
+          <span style="color:#1E293B !important;">CGPA Component: <strong style="color:#0F172A !important; font-weight:800;">{{ student.cgpa|default:"0.00" }}/10</strong></span>
+        </div>
+        <div style="font-size:.82rem; font-weight:700; display:flex; align-items:center; gap:.5rem;">
+          <span style="font-size:.95rem;">📄</span>
+          <span style="color:#1E293B !important;">Active CV: <strong style="color:#0F172A !important; font-weight:800;">{% if student.resume %}Uploaded{% else %}Missing{% endif %}</strong></span>
+        </div>
+        <div style="font-size:.82rem; font-weight:700; display:flex; align-items:center; gap:.5rem;">
+          <span style="font-size:.95rem;">🔧</span>
+          <span style="color:#1E293B !important;">Total Skills: <strong style="color:#0F172A !important; font-weight:800;">{{ total_skills }}</strong></span>
+        </div>
+        <div style="font-size:.82rem; font-weight:700; display:flex; align-items:center; gap:.5rem;">
+          <span style="font-size:.95rem;">📋</span>
+          <span style="color:#1E293B !important;">Shortlists: <strong style="color:#0F172A !important; font-weight:800;">{{ total_interviews }} Applications</strong></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity Stats Card -->
+  <div class="sp-card" style="margin-bottom:0; border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+    <div class="sp-card-header" style="background:#F8FAFC !important; border-bottom:1.5px solid #475569 !important;">
+      <span class="sp-card-title" style="color:#0F172A !important; font-weight:800;">📊 Placement Activity Stats</span>
+    </div>
+    <div class="sp-card-body" style="display:flex; flex-direction:column; gap:.875rem;">
+      
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1.5px solid #CBD5E1; padding-bottom:.65rem;">
+        <span style="font-size:.84rem; color:#334155 !important; font-weight:700;">Total Applications Sent</span>
+        <strong style="font-size:1.05rem; color:#0F172A !important; font-weight:800;">{{ total_apps }}</strong>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1.5px solid #CBD5E1; padding-bottom:.65rem;">
+        <span style="font-size:.84rem; color:#334155 !important; font-weight:700;">Shortlisted Interviews</span>
+        <strong style="font-size:1.05rem; color:#059669 !important; font-weight:800;">{{ total_interviews }}</strong>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1.5px solid #CBD5E1; padding-bottom:.65rem;">
+        <span style="font-size:.84rem; color:#334155 !important; font-weight:700;">Placement Offers Received</span>
+        <strong style="font-size:1.05rem; color:#D97706 !important; font-weight:800;">{{ total_offers }}</strong>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:.84rem; color:#334155 !important; font-weight:700;">Active Skills Mapped</span>
+        <strong style="font-size:1.05rem; color:#0284C7 !important; font-weight:800;">{{ total_skills }}</strong>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Salary Prediction Matrix Card
+════════════════════════════════════════════════════ -->
+<div class="sp-card" style="margin-bottom:1.75rem; border:1.5px solid #475569 !important; background:#FFFFFF !important; border-left:5px solid #7C3AED !important;">
+  <div class="sp-card-header" style="display:flex; justify-content:space-between; align-items:center; background:#F8FAFC !important; border-bottom:1.5px solid #475569 !important;">
+    <span class="sp-card-title" style="color:#0F172A !important; font-weight:800;">💼 AI Career Salary Prediction Engine</span>
+    <span class="sp-badge sp-badge-violet">Skills-Based Valuation</span>
+  </div>
+  <div class="sp-card-body" style="padding:1.5rem; display:grid; grid-template-columns:300px 1fr; gap:2rem; align-items:start;">
+    
+    <!-- Left: Large Estimated Range Display -->
+    <div style="background:#F8FAFC !important; border:1.5px dashed #7C3AED !important; border-radius:8px; padding:2rem 1.5rem; text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%; box-sizing:border-box;">
+      <span style="font-size:.78rem; text-transform:uppercase; color:#334155 !important; font-weight:800; letter-spacing:.05em; display:block; margin-bottom:.5rem;">Estimated Fresher Package</span>
+      <h3 style="font-size:1.95rem; font-weight:800; color:#0F172A !important; margin:0; font-family:'Space Grotesk',sans-serif; line-height:1.2;">
+        ₹{{ salary_min }} - ₹{{ salary_max }}
+      </h3>
+      <span style="font-size:.9rem; font-weight:800; color:#7C3AED !important; display:block; margin-top:.35rem;">LPA (Lakhs Per Annum)</span>
+      <p style="font-size:.78rem; color:#1E293B !important; font-weight:600; margin-top:1rem; line-height:1.5;">
+        Average placement package range estimated for candidates matching your technical credentials.
+      </p>
+    </div>
+
+    <!-- Right: Detailed Breakdowns -->
+    <div>
+      <span style="font-size:.78rem; text-transform:uppercase; color:#334155 !important; font-weight:800; letter-spacing:.05em; display:block; margin-bottom:.75rem;">Valuation Model Breakdown</span>
+      
+      <div style="display:flex; flex-direction:column; gap:.75rem;">
+        
+        <!-- Base Package -->
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#F8FAFC !important; border:1.5px solid #475569 !important; border-radius:8px; padding:.85rem 1.1rem;">
+          <div>
+            <strong style="font-size:.88rem; color:#0F172A !important; font-weight:800; display:block; margin-bottom:.15rem;">Academic Baseline Package</strong>
+            <span style="font-size:.78rem; color:#334155 !important; font-weight:700;">Calculated from your academic CGPA ({{ student.cgpa|default:"6.50" }}/10)</span>
+          </div>
+          <div style="font-size:.95rem; font-weight:800; color:#32867D !important;">+ ₹{{ base_salary }} LPA</div>
+        </div>
+
+        <!-- Skill Premiums -->
+        {% if applied_premiums %}
+          {% for p in applied_premiums %}
+            <div style="display:flex; justify-content:space-between; align-items:center; background:#F8FAFC !important; border:1.5px solid #475569 !important; border-radius:8px; padding:.85rem 1.1rem;">
+              <div>
+                <strong style="font-size:.88rem; color:#0F172A !important; font-weight:800; display:block; margin-bottom:.25rem;">{{ p.category }} Premium</strong>
+                <div style="display:flex; flex-wrap:wrap; gap:.35rem;">
+                  {% for s in p.matched %}
+                    <span class="sp-badge sp-badge-violet">{{ s }}</span>
+                  {% endfor %}
+                </div>
+              </div>
+              <div style="font-size:.95rem; font-weight:800; color:#059669 !important;">+ ₹{{ p.earned }} LPA</div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div style="background:#F8FAFC !important; border:1.5px dashed #475569 !important; border-radius:8px; padding:1rem; text-align:center; color:#334155 !important; font-size:.82rem; font-weight:700;">
+            No specialized skill premiums earned yet. Add technical credentials (e.g. AWS, Python, Django, SQL) to elevate package projections.
+          </div>
+        {% endif %}
+
+        <!-- Total Premiums Summary -->
+        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1.5px solid #CBD5E1; padding-top:.85rem; margin-top:.25rem;">
+          <span style="font-size:.85rem; color:#1E293B !important; font-weight:700;">Total Skill Premiums Added</span>
+          <strong style="font-size:1rem; color:#059669 !important; font-weight:800;">+ ₹{{ total_premium }} LPA</strong>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Application History Table
+════════════════════════════════════════════════════ -->
+<div class="sp-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+  <div class="sp-card-header" style="background:#F8FAFC !important; border-bottom:1.5px solid #475569 !important;">
+    <span class="sp-card-title" style="color:#0F172A !important; font-weight:800;">📋 Recent Placement Application Log</span>
+  </div>
+  <div class="sp-card-body" style="padding:0;">
+    {% if applications %}
+      <table class="sp-table" style="width:100%; border-collapse:collapse; text-align:left;">
+        <thead>
+          <tr style="border-bottom:1.5px solid #475569 !important; background:#F8FAFC !important;">
+            <th style="padding:1rem; font-size:.78rem; color:#0F172A !important; font-weight:800; text-transform:uppercase;">Company</th>
+            <th style="padding:1rem; font-size:.78rem; color:#0F172A !important; font-weight:800; text-transform:uppercase;">Role</th>
+            <th style="padding:1rem; font-size:.78rem; color:#0F172A !important; font-weight:800; text-transform:uppercase;">Date Applied</th>
+            <th style="padding:1rem; font-size:.78rem; color:#0F172A !important; font-weight:800; text-transform:uppercase; text-align:right;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for app in applications %}
+            <tr style="border-bottom:1.5px solid #CBD5E1;">
+              <td style="padding:1rem; font-size:.88rem; font-weight:800; color:#0F172A !important;">{{ app.drive.company.name }}</td>
+              <td style="padding:1rem; font-size:.84rem; font-weight:700; color:#1E293B !important;">{{ app.drive.role }}</td>
+              <td style="padding:1rem; font-size:.84rem; font-weight:700; color:#334155 !important;">{{ app.applied_at|date:"M d, Y" }}</td>
+              <td style="padding:1rem; text-align:right;">
+                <span class="sp-badge 
+                  {% if app.status == 'APPLIED' %}sp-badge-violet
+                  {% elif app.status == 'SHORTLISTED' %}sp-badge-sky
+                  {% elif app.status == 'SELECTED' %}sp-badge-green
+                  {% else %}sp-badge-gray{% endif %}">
+                  {{ app.get_status_display }}
+                </span>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="sp-empty" style="padding:3rem 1.5rem; text-align:center;">
+        <div style="font-size:2rem; margin-bottom:.5rem;">📋</div>
+        <div style="font-size:.88rem; color:#334155 !important; font-weight:700;">No applications found.</div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

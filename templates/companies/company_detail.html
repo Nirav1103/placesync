@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load staff_tags %}
+
+{% block title %}{{ company.name }} Details | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem; max-width: 900px;">
+
+    <!-- Header -->
+    <div class="dashboard-header" style="border-bottom: none; margin-bottom: 1.5rem;">
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <!-- Logo -->
+            <div style="width: 70px; height: 70px; border-radius: var(--radius-sm); border: 1px solid var(--card-border); background: rgba(255, 255, 255, 0.02); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+                {% if company.logo %}
+                <img src="{{ company.logo.url }}" alt="{{ company.name }} logo" style="width: 100%; height: 100%; object-fit: contain;">
+                {% else %}
+                <span style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">{{ company.name|slice:":2"|upper }}</span>
+                {% endif %}
+            </div>
+            <div>
+                <h1 class="dashboard-title">{{ company.name }}</h1>
+                <p class="dashboard-welcome">Registered partner company details & placement parameters.</p>
+            </div>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+            <a href="{% url 'companies:list' %}" class="btn btn-secondary">&larr; Back to Directory</a>
+            {% if request.user|can_edit_filter %}
+            <a href="{% url 'companies:edit' pk=company.pk %}" class="btn btn-primary" style="background: var(--info); border-color: var(--info);">Edit Profile</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Layout Grid -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; align-items: start;">
+
+        <!-- Left Column: Detailed Info -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+
+            <!-- Company Overview -->
+            <div class="card-panel" style="margin-top: 0;">
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;">🏢 Company Details</h3>
+
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                    <tbody>
+                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
+                            <td style="padding: 0.75rem 0; color: var(--text-secondary); width: 35%;">Company Name</td>
+                            <td style="padding: 0.75rem 0; color: #fff; font-weight: 600;">{{ company.name }}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
+                            <td style="padding: 0.75rem 0; color: var(--text-secondary);">Industry Verticals</td>
+                            <td style="padding: 0.75rem 0; color: #fff;">{{ company.industry|default:"Not Specified" }}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
+                            <td style="padding: 0.75rem 0; color: var(--text-secondary);">Company Size</td>
+                            <td style="padding: 0.75rem 0; color: #fff;">{{ company.company_size|default:"Not Specified" }}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
+                            <td style="padding: 0.75rem 0; color: var(--text-secondary);">Registration Number</td>
+                            <td style="padding: 0.75rem 0; color: #fff;">{{ company.registration_number|default:"Not Provided (Optional)" }}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
+                            <td style="padding: 0.75rem 0; color: var(--text-secondary);">Website</td>
+                            <td style="padding: 0.75rem 0;">
+                                {% if company.website %}
+                                <a href="{{ company.website }}" target="_blank" style="color: var(--primary); text-decoration: none;">
+                                    {{ company.website }} &rarr;
+                                </a>
+                                {% else %}
+                                <span style="color: var(--text-muted); font-style: italic;">Not Specified</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.02);">
+                            <td style="padding: 0.75rem 0; color: var(--text-secondary);">LinkedIn Profile</td>
+                            <td style="padding: 0.75rem 0;">
+                                {% if company.linkedin_url %}
+                                <a href="{{ company.linkedin_url }}" target="_blank" style="color: var(--primary); text-decoration: none;">
+                                    {{ company.linkedin_url }} &rarr;
+                                </a>
+                                {% else %}
+                                <span style="color: var(--text-muted); font-style: italic;">Not Specified</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.75rem 0; color: var(--text-secondary);">Head Office Location</td>
+                            <td style="padding: 0.75rem 0; color: #fff;">📍 {{ company.location|default:"Not Specified" }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- About Company -->
+            <div class="card-panel" style="margin-top: 0;">
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;">📖 About Company</h3>
+                {% if company.about_company %}
+                <div style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; white-space: pre-line;">
+                    {{ company.about_company }}
+                </div>
+                {% else %}
+                <p style="font-size: 0.85rem; color: var(--text-muted); font-style: italic;">
+                    No description provided for this company yet.
+                </p>
+                {% endif %}
+            </div>
+
+            <!-- Recruitment Performance / Placement History -->
+            <div class="card-panel" style="margin-top: 0;">
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;">📜 Placement History</h3>
+                {% if company.placement_history %}
+                <div style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; white-space: pre-line;">
+                    {{ company.placement_history }}
+                </div>
+                {% else %}
+                <p style="font-size: 0.85rem; color: var(--text-muted); font-style: italic;">
+                    No placement history logs recorded for this company yet.
+                </p>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <!-- Right Column: Sidebar (Verification & HR Details) -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+
+            <!-- Verification Status Card -->
+            <div class="card-panel" style="margin-top: 0;">
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;">✅ Verification</h3>
+
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Status</span>
+                        {% if company.verification_status == 'VERIFIED' %}
+                        <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.25); font-size: 0.85rem; padding: 0.25rem 0.5rem; font-weight: bold;">Verified</span>
+                        {% elif company.verification_status == 'REJECTED' %}
+                        <span class="badge" style="background: rgba(244, 63, 94, 0.1); color: var(--danger); border-color: rgba(244, 63, 94, 0.25); font-size: 0.85rem; padding: 0.25rem 0.5rem; font-weight: bold;">Rejected</span>
+                        {% else %}
+                        <span class="badge" style="background: rgba(245, 158, 11, 0.1); color: var(--warning); border-color: rgba(245, 158, 11, 0.25); font-size: 0.85rem; padding: 0.25rem 0.5rem;">Pending</span>
+                        {% endif %}
+                    </div>
+
+                    <div style="margin-top: 0.25rem;">
+                        <span style="font-size: 0.75rem; color: var(--text-secondary); display: block;">Trust Score</span>
+                        <span style="font-size: 1.15rem; color: #fff; font-weight: 700;">{{ company.trust_score }} / 100</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HR Contacts Details -->
+            <div class="card-panel" style="margin-top: 0;">
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;">📞 HR Coordinator</h3>
+
+                <div style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.85rem;">
+                    <div>
+                        <strong style="color: #fff; font-size: 0.9rem;">{{ company.hr_name|default:"Not Specified" }}</strong>
+                        <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.15rem;">Representative Name</span>
+                    </div>
+                    {% if company.hr_email %}
+                    <div>
+                        <a href="mailto:{{ company.hr_email }}" style="color: var(--primary); text-decoration: none;">✉️ {{ company.hr_email }}</a>
+                    </div>
+                    {% endif %}
+                    {% if company.hr_phone %}
+                    <div>
+                        <span style="color: var(--text-secondary);">📞 {{ company.hr_phone }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}

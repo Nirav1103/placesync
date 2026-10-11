@@ -1,0 +1,220 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Project Portfolio | PlaceSync{% endblock %}
+{% block topbar_title %}{% if is_recruiter %}{{ student.name }}'s Project Portfolio{% else %}Project Portfolio{% endif %}{% endblock %}
+{% block nav_projects %}active{% endblock %}
+{% block page_body_class %}page-projects{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════════════
+     Page Header & Action Bar
+════════════════════════════════════════════════════ -->
+<div class="sp-page-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;">
+  <div>
+    <h1 class="sp-page-title">📁 Project Portfolio</h1>
+    <p class="sp-page-subtitle">Showcase your technical projects, GitHub repositories, live applications, and technical documentation to recruiters.</p>
+  </div>
+  {% if not is_recruiter %}
+  <div class="sp-page-actions">
+    <a href="{% url 'student_portal:project_create' %}" class="sp-btn sp-btn-primary" style="padding:.65rem 1.35rem;font-size:.875rem;">
+      ➕ Add New Project
+    </a>
+  </div>
+  {% endif %}
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     KPI Statistics Row (4 Cards)
+════════════════════════════════════════════════════ -->
+<div class="sp-stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:1.75rem;gap:1rem;">
+  
+  <div class="sp-stat" style="padding: 1rem 0.85rem; min-height: 100px; border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+    <div class="sp-stat-icon si-v" style="font-size: 0.95rem; width: 32px; height: 32px; margin-bottom: 0.5rem; background:#F8FAFC !important; border:1.5px solid #475569 !important; color:#0F172A !important;">🔨</div>
+    <div class="sp-stat-label" style="font-size: 0.72rem; color:#1E293B !important; font-weight:800; margin-bottom: 0.15rem;">Total Projects</div>
+    <div class="sp-stat-value" style="font-size: 1.5rem; color:#0F172A !important; font-weight:800;">{{ total_projects }}</div>
+  </div>
+
+  <div class="sp-stat" style="padding: 1rem 0.85rem; min-height: 100px; border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+    <div class="sp-stat-icon si-g" style="font-size: 0.95rem; width: 32px; height: 32px; margin-bottom: 0.5rem; background:#F8FAFC !important; border:1.5px solid #475569 !important; color:#059669 !important;">✅</div>
+    <div class="sp-stat-label" style="font-size: 0.72rem; color:#1E293B !important; font-weight:800; margin-bottom: 0.15rem;">Completed</div>
+    <div class="sp-stat-value" style="font-size: 1.5rem; color:#059669 !important; font-weight:800;">{{ completed_projects }}</div>
+  </div>
+
+  <div class="sp-stat" style="padding: 1rem 0.85rem; min-height: 100px; border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+    <div class="sp-stat-icon si-a" style="font-size: 0.95rem; width: 32px; height: 32px; margin-bottom: 0.5rem; background:#F8FAFC !important; border:1.5px solid #475569 !important; color:#D97706 !important;">⭐</div>
+    <div class="sp-stat-label" style="font-size: 0.72rem; color:#1E293B !important; font-weight:800; margin-bottom: 0.15rem;">Featured</div>
+    <div class="sp-stat-value" style="font-size: 1.5rem; color:#D97706 !important; font-weight:800;">{{ featured_projects }}</div>
+  </div>
+
+  <div class="sp-stat" style="padding: 1rem 0.85rem; min-height: 100px; border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+    <div class="sp-stat-icon si-t" style="font-size: 0.95rem; width: 32px; height: 32px; margin-bottom: 0.5rem; background:#F8FAFC !important; border:1.5px solid #475569 !important; color:#7C3AED !important;">🏆</div>
+    <div class="sp-stat-label" style="font-size: 0.72rem; color:#1E293B !important; font-weight:800; margin-bottom: 0.15rem;">Portfolio Score</div>
+    <div class="sp-stat-value" style="font-size: 1.5rem; color:#7C3AED !important; font-weight:800;">{{ portfolio_score }}<span style="font-size:0.8rem;color:#334155 !important;font-weight:700;">/45</span></div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Search & Filters Form
+════════════════════════════════════════════════════ -->
+<div class="sp-card" style="margin-bottom:1.75rem; border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+  <div class="sp-card-body" style="padding: 1.125rem;">
+    <form method="get" action="{% if is_recruiter %}{% url 'student_portal:recruiter_portfolio' student.id %}{% else %}{% url 'student_portal:projects_list' %}{% endif %}" style="display:grid;grid-template-columns:1.8fr 1fr 1fr auto;gap:0.75rem;align-items:end;">
+      
+      <div class="sp-form-group" style="margin-bottom:0;">
+        <label class="sp-form-label" for="filter_q" style="color:#1E293B !important; font-weight:800;">Search Projects</label>
+        <input type="text" name="q" id="filter_q" class="sp-form-control" placeholder="Search by name, technology..." value="{{ q }}">
+      </div>
+
+      <div class="sp-form-group" style="margin-bottom:0;">
+        <label class="sp-form-label" for="filter_category" style="color:#1E293B !important; font-weight:800;">Category</label>
+        <select name="category" id="filter_category" class="sp-form-control">
+          <option value="">All Categories</option>
+          {% for val, label in categories %}
+          <option value="{{ val }}" {% if selected_category == val %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="sp-form-group" style="margin-bottom:0;">
+        <label class="sp-form-label" for="filter_status" style="color:#1E293B !important; font-weight:800;">Status</label>
+        <select name="status" id="filter_status" class="sp-form-control">
+          <option value="">All Statuses</option>
+          {% for val, label in statuses %}
+          <option value="{{ val }}" {% if selected_status == val %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div style="display:flex;gap:0.5rem;align-items:center;">
+        <button type="submit" class="sp-btn sp-btn-primary">Search</button>
+        <a href="{% if is_recruiter %}{% url 'student_portal:recruiter_portfolio' student.id %}{% else %}{% url 'student_portal:projects_list' %}{% endif %}" class="sp-btn sp-btn-secondary" style="height:36px;padding:.5rem 1rem;border:1.5px solid #475569 !important;">Clear</a>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Projects Grid List
+════════════════════════════════════════════════════ -->
+{% if projects %}
+<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(360px, 1fr));gap:1.5rem;margin-bottom:2rem;">
+  {% for project in projects %}
+  <div class="sp-card sp-card-hover" style="display:flex;flex-direction:column;position:relative;transition:var(--t);border:1.5px solid #475569 !important; background:#FFFFFF !important; border-top:4px solid {% if project.is_featured %}#7C3AED{% else %}#32867D{% endif %} !important;">
+
+    <!-- Featured Badge overlay -->
+    {% if project.is_featured %}
+    <span class="sp-badge sp-badge-violet" style="position:absolute;top:10px;left:10px;z-index:10;">
+      ⭐ Featured
+    </span>
+    {% endif %}
+
+    <!-- Card header with clean banner box -->
+    <div style="height:140px;width:100%;position:relative;background:#F8FAFC;display:flex;flex-direction:column;align-items:center;justify-content:center;border-bottom:1.5px solid #475569;padding:1rem;">
+      <span style="font-size:3rem;margin-bottom:0.25rem;">🚀</span>
+
+      <!-- Category Tag (Top Right) -->
+      <span class="sp-badge sp-badge-sky" style="position:absolute;top:10px;right:10px;">
+        {{ project.get_category_display }}
+      </span>
+
+      <!-- Status Tag overlay (Bottom Left) -->
+      <span class="sp-badge {% if project.status == 'COMPLETED' %}sp-badge-green{% elif project.status == 'ONGOING' or project.status == 'IN_PROGRESS' %}sp-badge-sky{% else %}sp-badge-amber{% endif %}" style="position:absolute;bottom:10px;left:10px;">
+        {{ project.get_status_display }}
+      </span>
+
+      <!-- Score Tag overlay (Bottom Right) -->
+      <span class="sp-badge sp-badge-violet" style="position:absolute;bottom:10px;right:10px;">
+        Score: {{ project.portfolio_score }}/45
+      </span>
+    </div>
+
+    <!-- Body -->
+    <div class="sp-card-body" style="padding:1.35rem;flex:1;display:flex;flex-direction:column;justify-content:space-between;gap:1rem;">
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;gap:0.5rem;">
+          <h3 style="font-family:'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:800;color:#0F172A !important;margin:0;">{{ project.title }}</h3>
+          <span style="font-size:0.78rem;color:#334155 !important;font-weight:700;white-space:nowrap;">{{ project.get_project_type_display }}</span>
+        </div>
+
+        <!-- Short description -->
+        <p style="font-size:0.86rem;color:#1E293B !important;font-weight:600;line-height:1.55;margin-bottom:0.875rem;">
+          {{ project.short_description }}
+        </p>
+
+        <!-- Technology Badges -->
+        <div style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:0.75rem;">
+          {% for badge in project.technology_badges|slice:":5" %}
+          <span class="sp-badge {{ badge.class }}">{{ badge.name }}</span>
+          {% endfor %}
+          {% if project.technology_list|length > 5 %}
+          <span class="sp-badge sp-badge-gray">+{{ project.technology_list|length|add:"-5" }} more</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Action Row (Links & Buttons) -->
+      <div style="border-top:1.5px solid #CBD5E1;padding-top:1rem;margin-top:auto;">
+
+        <!-- Link Icons -->
+        <div style="display:flex;gap:0.85rem;margin-bottom:0.85rem;align-items:center;justify-content:flex-start;">
+          {% if project.github_url %}
+          <a href="{{ project.github_url }}" target="_blank" title="GitHub Repository" style="text-decoration:none;font-size:1.15rem;color:#0F172A !important;font-weight:800;">
+            🐙 <span style="font-size:0.82rem;font-weight:800;margin-left:0.15rem;">GitHub</span>
+          </a>
+          {% endif %}
+          {% if project.live_url %}
+          <a href="{{ project.live_url }}" target="_blank" title="Live Application" style="text-decoration:none;font-size:1.15rem;color:#32867D !important;font-weight:800;">
+            🌐 <span style="font-size:0.82rem;font-weight:800;margin-left:0.15rem;">Live Demo</span>
+          </a>
+          {% endif %}
+          {% if project.youtube_url %}
+          <a href="{{ project.youtube_url }}" target="_blank" title="Video Walkthrough" style="text-decoration:none;font-size:1.15rem;color:#D97706 !important;font-weight:800;">
+            📺 <span style="font-size:0.82rem;font-weight:800;margin-left:0.15rem;">Walkthrough</span>
+          </a>
+          {% endif %}
+          {% if not project.github_url and not project.live_url and not project.youtube_url %}
+          <span style="font-size:0.78rem;color:#334155 !important;font-style:italic;font-weight:600;">No live demo links provided</span>
+          {% endif %}
+        </div>
+
+        <!-- Operations Row -->
+        <div style="display:grid;grid-template-columns:{% if not is_recruiter %}1.8fr 1fr 1fr{% else %}1fr{% endif %};gap:0.5rem;align-items:center;">
+
+          {% if is_recruiter %}
+          <a href="{% url 'student_portal:recruiter_project_detail' project.pk %}" class="sp-btn sp-btn-primary sp-btn-sm" style="text-align:center;">🔍 View Project Portfolio</a>
+          {% else %}
+          <a href="{% url 'student_portal:project_detail' project.pk %}" class="sp-btn sp-btn-primary sp-btn-sm" style="text-align:center;padding:.45rem 0.5rem;font-size:.82rem;font-weight:800;">🔍 View Details</a>
+          <a href="{% url 'student_portal:project_edit' project.pk %}" class="sp-btn sp-btn-secondary sp-btn-sm" style="text-align:center;padding:.45rem 0.5rem;font-size:.82rem;font-weight:800;border:1.5px solid #475569 !important;">✏️ Edit</a>
+          <a href="{% url 'student_portal:project_delete' project.pk %}" class="sp-btn sp-btn-danger sp-btn-sm" style="text-align:center;padding:.45rem 0.5rem;font-size:.82rem;font-weight:800;background:#FEF2F2 !important;color:#DC2626 !important;border:1.5px solid #DC2626 !important;">🗑️ Delete</a>
+          {% endif %}
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+  {% endfor %}
+</div>
+
+{% else %}
+<!-- Empty State -->
+<div class="sp-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+  <div class="sp-empty" style="padding:5rem 2rem;text-align:center;">
+    <div class="sp-empty-icon" style="font-size:3rem;margin-bottom:1rem;">🔨</div>
+    <h3 style="font-family:'Space Grotesk',sans-serif;font-size:1.25rem;color:#0F172A !important;font-weight:800;margin-bottom:0.5rem;">No Projects Found</h3>
+    <p style="font-size:0.875rem;color:#334155 !important;font-weight:600;max-width:420px;margin:0 auto 1.5rem;">
+      Showcase your tech achievements! Upload your academic models, hackathon websites, and developer tools to stand out to recruiters.
+    </p>
+    {% if not is_recruiter %}
+    <a href="{% url 'student_portal:project_create' %}" class="sp-btn sp-btn-primary">➕ Showcase Your First Project</a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

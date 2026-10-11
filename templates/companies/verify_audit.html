@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Verify {{ company.name }} | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem; max-width: 800px;">
+    
+    <!-- Header -->
+    <div class="dashboard-header" style="border-bottom: none; margin-bottom: 1.5rem;">
+        <div>
+            <h1 class="dashboard-title">Verify Partner Profile</h1>
+            <p class="dashboard-welcome">Reviewing and auditing credentials checklist for <strong style="color: #fff;">{{ company.name }}</strong></p>
+        </div>
+        <div>
+            <a href="{% url 'companies:verification_dashboard' %}" class="btn btn-secondary">&larr; Back to Board</a>
+        </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div style="display: grid; grid-template-columns: 320px 1fr; gap: 1.5rem; align-items: start;">
+        
+        <!-- Left: Company Details Panel -->
+        <div class="card-panel" style="margin-top: 0; padding: 1.25rem;">
+            <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;">🏢 Profile Metadata</h3>
+            
+            <div style="display: flex; flex-direction: column; gap: 1.25rem; font-size: 0.85rem;">
+                <!-- Website -->
+                <div>
+                    <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Website URL</span>
+                    {% if company.website %}
+                        <a href="{{ company.website }}" target="_blank" style="color: var(--primary); text-decoration: none; word-break: break-all;">🔗 {{ company.website }}</a>
+                    {% else %}
+                        <span style="color: var(--text-muted); font-style: italic;">Not Specified</span>
+                    {% endif %}
+                </div>
+
+                <!-- Career Page -->
+                <div>
+                    <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Career Page URL</span>
+                    {% if company.career_page %}
+                        <a href="{{ company.career_page }}" target="_blank" style="color: var(--primary); text-decoration: none; word-break: break-all;">🔗 {{ company.career_page }}</a>
+                    {% else %}
+                        <span style="color: var(--text-muted); font-style: italic;">Not Specified</span>
+                    {% endif %}
+                </div>
+
+                <!-- Official HR Email -->
+                <div>
+                    <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Official HR Email</span>
+                    {% if company.hr_email %}
+                        <span style="color: #fff;">✉️ {{ company.hr_email }}</span>
+                    {% else %}
+                        <span style="color: var(--text-muted); font-style: italic;">Not Specified</span>
+                    {% endif %}
+                </div>
+
+                <!-- Physical Address -->
+                <div>
+                    <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Office Address</span>
+                    <span style="color: #fff;">📍 {{ company.location|default:"Not Specified" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Verification Checks Checklist Form -->
+        <div class="card-panel" style="margin-top: 0; padding: 1.5rem;">
+            <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;">🛡️ Verification Checklist</h3>
+            
+            <form method="post" novalidate style="display: flex; flex-direction: column; gap: 1.5rem;">
+                {% csrf_token %}
+
+                <!-- Verification checkboxes -->
+                <div style="display: flex; flex-direction: column; gap: 1.25rem; background: rgba(255, 255, 255, 0.01); border: 1px solid var(--card-border); padding: 1.25rem; border-radius: var(--radius-sm);">
+                    
+                    <!-- Website Check -->
+                    <label style="display: flex; align-items: start; gap: 0.75rem; cursor: pointer; color: #fff; font-size: 0.9rem;">
+                        {{ form.is_website_verified }}
+                        <div>
+                            <strong style="display: block;">Website Verification</strong>
+                            <span style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-top: 0.15rem;">Domain is registered, active, and matches corporate branding.</span>
+                        </div>
+                    </label>
+
+                    <!-- Official Email Check -->
+                    <label style="display: flex; align-items: start; gap: 0.75rem; cursor: pointer; color: #fff; font-size: 0.9rem; margin-top: 0.25rem;">
+                        {{ form.is_email_verified }}
+                        <div>
+                            <strong style="display: block;">Official Email Verification</strong>
+                            <span style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-top: 0.15rem;">HR contact email domain is verified and corresponds to the company website domain.</span>
+                        </div>
+                    </label>
+
+                    <!-- Career Page Check -->
+                    <label style="display: flex; align-items: start; gap: 0.75rem; cursor: pointer; color: #fff; font-size: 0.9rem; margin-top: 0.25rem;">
+                        {{ form.is_career_page_verified }}
+                        <div>
+                            <strong style="display: block;">Career Page Verification</strong>
+                            <span style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-top: 0.15rem;">Corporate career opportunities page is verified and reachable.</span>
+                        </div>
+                    </label>
+
+                    <!-- Address Check -->
+                    <label style="display: flex; align-items: start; gap: 0.75rem; cursor: pointer; color: #fff; font-size: 0.9rem; margin-top: 0.25rem;">
+                        {{ form.is_address_verified }}
+                        <div>
+                            <strong style="display: block;">Office Address Verification</strong>
+                            <span style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-top: 0.15rem;">Registered physical office location is confirmed and validated.</span>
+                        </div>
+                    </label>
+
+                </div>
+
+                <!-- Verification Status & Notes -->
+                <div style="display: grid; grid-template-columns: 1fr; gap: 1.25rem;">
+                    <!-- Status -->
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label" for="id_verification_status">Verification Status Decision</label>
+                        {{ form.verification_status }}
+                        <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">
+                            Change status to Verified to approve this company for placement drives.
+                        </span>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label" for="id_verification_notes">Auditing & Checklist Logs</label>
+                        {{ form.verification_notes }}
+                    </div>
+                </div>
+
+                <!-- Form Save Action -->
+                <div style="display: flex; gap: 1rem; border-top: 1px solid var(--card-border); padding-top: 1.5rem; margin-top: 0.5rem;">
+                    <button type="submit" class="btn btn-primary" style="padding: 0.85rem 2rem;">🛡️ Save Decision</button>
+                    <a href="{% url 'companies:verification_dashboard' %}" class="btn btn-secondary" style="padding: 0.85rem 1.5rem;">Cancel</a>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

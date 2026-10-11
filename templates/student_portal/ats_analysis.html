@@ -1,0 +1,391 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}ATS Analysis | PlaceSync{% endblock %}
+{% block topbar_title %}ATS Analysis{% endblock %}
+{% block nav_ats %}active{% endblock %}
+{% block page_body_class %}page-ats{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════════════
+     Page Header
+════════════════════════════════════════════════════ -->
+<div class="sp-page-header">
+  <div>
+    <h1 class="sp-page-title">🤖 ATS Resume Analysis</h1>
+    <p class="sp-page-subtitle">Analyze how your uploaded resumes perform against automated Applicant Tracking Systems (ATS).</p>
+  </div>
+  <div class="sp-page-actions">
+    <a href="{% url 'student_portal:resume_dashboard' %}" class="sp-btn sp-btn-secondary">📄 Manage Resumes</a>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Resume Selector Bar (NO UPLOAD HERE)
+════════════════════════════════════════════════════ -->
+<div class="sp-card" style="margin-bottom:1.75rem;padding:1.25rem 1.5rem;">
+  <form method="get" action="{% url 'student_portal:ats_analysis' %}" style="display:flex;flex-wrap:wrap;gap:1rem;align-items:center;justify-content:space-between;">
+    <div style="display:flex;align-items:center;gap:1rem;flex:1;min-width:280px;">
+      <label for="resume_id" style="font-weight:600;color:#fff;font-size:.9rem;white-space:nowrap;">Select Resume to Analyze:</label>
+      <select name="resume_id" id="resume_id" class="sp-form-input" style="margin-bottom:0;flex:1;" onchange="this.form.submit()">
+        {% for r in all_resumes %}
+          <option value="{{ r.pk }}" {% if selected_resume and selected_resume.pk == r.pk %}selected{% endif %}>
+            {{ r.display_name }} {% if r.is_default %}(⭐ Default){% endif %} — {{ r.uploaded_at|date:"M d, Y" }}
+          </option>
+        {% empty %}
+          <option value="">No resumes uploaded yet</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      {% if all_resumes %}
+        <button type="submit" class="sp-btn sp-btn-primary">🚀 Analyze Resume</button>
+      {% else %}
+        <a href="{% url 'student_portal:resume_dashboard' %}" class="sp-btn sp-btn-primary">📤 Upload a Resume First</a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+
+{% if selected_resume and analysis %}
+
+<!-- ══════════════════════════════════════════════════
+     Main Analysis Dashboard
+════════════════════════════════════════════════════ -->
+<div style="display:grid;grid-template-columns:300px 1fr;gap:1.5rem;margin-bottom:2rem;align-items:start;">
+  
+  <!-- Left Column: ATS Score Circle -->
+  <div class="sp-card" style="text-align:center;padding:2rem 1.5rem;">
+    <div style="font-size:.85rem;font-weight:600;color:var(--txt-2);margin-bottom:1rem;text-transform:uppercase;letter-spacing:.05em;">ATS Compatibility Score</div>
+    
+    <!-- Circular Gauge -->
+    <div style="position:relative;width:160px;height:160px;margin:0 auto 1.25rem;display:flex;align-items:center;justify-content:center;">
+      <svg width="160" height="160" viewBox="0 0 160 160">
+        <circle cx="80" cy="80" r="68" stroke="rgba(255,255,255,0.06)" stroke-width="12" fill="none"/>
+        <circle cx="80" cy="80" r="68" stroke="{% if selected_resume.ats_score >= 80 %}#10b981{% elif selected_resume.ats_score >= 65 %}#0ea5e9{% elif selected_resume.ats_score >= 50 %}#f59e0b{% else %}#f43f5e{% endif %}"
+                stroke-width="12" stroke-dasharray="427.25"
+                stroke-dashoffset="{{ 427.25|add:'-0' }}"
+                style="stroke-dashoffset: calc(427.25 - (427.25 * {{ selected_resume.ats_score }}) / 100); transition: stroke-dashoffset 1s var(--ease);"
+                stroke-linecap="round" fill="none" transform="rotate(-90 80 80)"/>
+      </svg>
+      <div style="position:absolute;text-align:center;">
+        <span style="font-size:2.5rem;font-weight:800;color:#fff;line-height:1;font-family:'Space Grotesk',sans-serif;">{{ selected_resume.ats_score }}</span>
+        <span style="font-size:1rem;color:var(--txt-3);font-weight:600;">/100</span>
+      </div>
+    </div>
+
+    <!-- Status Badge -->
+    <div style="margin-bottom:1.25rem;">
+      {% if selected_resume.ats_score >= 80 %}
+        <span class="sp-badge sp-badge-green" style="font-size:.85rem;padding:.35rem .9rem;">Excellent ATS Match</span>
+      {% elif selected_resume.ats_score >= 65 %}
+        <span class="sp-badge sp-badge-sky" style="font-size:.85rem;padding:.35rem .9rem;">Good ATS Match</span>
+      {% elif selected_resume.ats_score >= 50 %}
+        <span class="sp-badge sp-badge-amber" style="font-size:.85rem;padding:.35rem .9rem;">Average ATS Match</span>
+      {% else %}
+        <span class="sp-badge sp-badge-rose" style="font-size:.85rem;padding:.35rem .9rem;">Needs Improvement</span>
+      {% endif %}
+    </div>
+
+    <!-- Additional Scores -->
+    <div style="border-top:1px solid rgba(255,255,255,.06);padding-top:1rem;display:flex;flex-direction:column;gap:.75rem;text-align:left;">
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:.78rem;color:var(--txt-2);margin-bottom:.3rem;">
+          <span>Formatting Score</span>
+          <span style="font-weight:700;color:#fff;">{{ selected_resume.formatting_score }}%</span>
+        </div>
+        <div style="height:6px;background:rgba(255,255,255,.07);border-radius:9999px;overflow:hidden;">
+          <div style="width:{{ selected_resume.formatting_score }}%;height:100%;background:#0ea5e9;border-radius:9999px;"></div>
+        </div>
+      </div>
+
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:.78rem;color:var(--txt-2);margin-bottom:.3rem;">
+          <span>Keyword Match Rate</span>
+          <span style="font-weight:700;color:#fff;">{{ analysis.keyword_match_pct }}%</span>
+        </div>
+        <div style="height:6px;background:rgba(255,255,255,.07);border-radius:9999px;overflow:hidden;">
+          <div style="width:{{ analysis.keyword_match_pct }}%;height:100%;background:#10b981;border-radius:9999px;"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right Column: Strengths & Feedback -->
+  <div style="display:flex;flex-direction:column;gap:1.5rem;">
+    
+    <!-- Strengths, Weaknesses & Missing Skills Row -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:1.25rem;">
+      
+      <!-- Resume Strengths -->
+      <div class="sp-card">
+        <div class="sp-card-header">
+          <span class="sp-card-title" style="color:#10b981;">✓ Resume Strengths</span>
+        </div>
+        <div class="sp-card-body">
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.6rem;">
+            {% for s in analysis.strengths %}
+              <li style="font-size:.84rem;color:var(--txt-1);display:flex;align-items:flex-start;gap:.5rem;">
+                <span style="color:#10b981;font-weight:800;">✓</span>
+                <span>{{ s }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+
+      <!-- Resume Weaknesses -->
+      <div class="sp-card">
+        <div class="sp-card-header">
+          <span class="sp-card-title" style="color:#f43f5e;">⚠️ Weaknesses</span>
+        </div>
+        <div class="sp-card-body">
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.6rem;">
+            {% for w in analysis.weaknesses %}
+              <li style="font-size:.84rem;color:var(--txt-1);display:flex;align-items:flex-start;gap:.5rem;">
+                <span style="color:#f43f5e;font-weight:800;">•</span>
+                <span>{{ w }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+
+      <!-- Missing Keywords / Skills -->
+      <div class="sp-card">
+        <div class="sp-card-header">
+          <span class="sp-card-title" style="color:#f59e0b;">🏷️ Missing Keywords</span>
+        </div>
+        <div class="sp-card-body">
+          {% if analysis.missing_keywords %}
+            <div style="display:flex;flex-wrap:wrap;gap:.4rem;">
+              {% for kw in analysis.missing_keywords %}
+                <span class="sp-badge sp-badge-amber" style="font-size:.75rem;">+ {{ kw }}</span>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p style="font-size:.84rem;color:var(--txt-2);margin:0;">No critical industry keywords missing!</p>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Improvement Suggestions -->
+    <div class="sp-card">
+      <div class="sp-card-header">
+        <span class="sp-card-title">💡 Actionable Improvement Suggestions</span>
+      </div>
+      <div class="sp-card-body">
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.65rem;">
+          {% for sug in analysis.suggestions %}
+            <li style="font-size:.84rem;color:var(--txt-1);display:flex;align-items:flex-start;gap:.5rem;">
+              <span style="color:#0ea5e9;font-weight:700;">•</span>
+              <span>{{ sug }}</span>
+            </li>
+          {% empty %}
+            <li style="font-size:.84rem;color:var(--txt-2);">Your resume formatting and content structure look great!</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Parsed Category Breakdown Cards
+════════════════════════════════════════════════════ -->
+<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:1.25rem;margin-bottom:2.5rem;">
+  
+  <!-- Education Analysis -->
+  <div class="sp-card">
+    <div class="sp-card-header">
+      <span class="sp-card-title">🎓 Education Analysis</span>
+    </div>
+    <div class="sp-card-body">
+      {% if analysis.education %}
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.5rem;">
+          {% for ed in analysis.education %}
+            <li style="font-size:.8rem;color:var(--txt-1);background:rgba(255,255,255,.03);padding:.4rem .75rem;border-radius:var(--r-sm);">{{ ed }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p style="font-size:.8rem;color:var(--txt-3);margin:0;">Degree / College details detected</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Project Analysis -->
+  <div class="sp-card">
+    <div class="sp-card-header">
+      <span class="sp-card-title">🔨 Project Analysis</span>
+    </div>
+    <div class="sp-card-body">
+      {% if analysis.projects %}
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.5rem;">
+          {% for proj in analysis.projects %}
+            <li style="font-size:.8rem;color:var(--txt-1);background:rgba(255,255,255,.03);padding:.4rem .75rem;border-radius:var(--r-sm);">{{ proj }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p style="font-size:.8rem;color:var(--txt-3);margin:0;">Technical projects detected</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Skill Analysis -->
+  <div class="sp-card">
+    <div class="sp-card-header">
+      <span class="sp-card-title">💻 Skill Analysis</span>
+    </div>
+    <div class="sp-card-body">
+      {% if analysis.skills %}
+        <div style="display:flex;flex-wrap:wrap;gap:.35rem;">
+          {% for sk in analysis.skills %}
+            <span class="sp-badge sp-badge-sky" style="font-size:.72rem;">{{ sk }}</span>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p style="font-size:.8rem;color:var(--txt-3);margin:0;">Technical skills extracted</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Experience Analysis -->
+  <div class="sp-card">
+    <div class="sp-card-header">
+      <span class="sp-card-title">💼 Experience Analysis</span>
+    </div>
+    <div class="sp-card-body">
+      {% if analysis.experience %}
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.5rem;">
+          {% for exp in analysis.experience %}
+            <li style="font-size:.8rem;color:var(--txt-1);background:rgba(255,255,255,.03);padding:.4rem .75rem;border-radius:var(--r-sm);">{{ exp }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p style="font-size:.8rem;color:var(--txt-3);margin:0;">Work experience / Internship sections scanned</p>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+{% endif %}
+
+<!-- ══════════════════════════════════════════════════
+     RESUME COMPARISON SECTION
+════════════════════════════════════════════════════ -->
+<div class="sp-card" style="margin-top:2rem;" id="resume-compare-section">
+  <div class="sp-card-header">
+    <span class="sp-card-title">⚖️ Resume Comparison</span>
+    <span class="sp-badge sp-badge-purple">Side-by-side Diagnostic</span>
+  </div>
+  <div class="sp-card-body">
+    <p style="font-size:.85rem;color:var(--txt-2);margin-bottom:1.25rem;">Compare two of your uploaded resumes side by side to determine which version is best optimized for placements.</p>
+
+    <!-- Select Form -->
+    <form method="get" action="{% url 'student_portal:ats_analysis' %}#resume-compare-section" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:1.25rem;align-items:end;margin-bottom:1.5rem;">
+      {% if selected_resume %}
+        <input type="hidden" name="resume_id" value="{{ selected_resume.pk }}">
+      {% endif %}
+
+      <div>
+        <label for="resume_a" class="sp-form-label">Resume A:</label>
+        <select name="resume_a" id="resume_a" class="sp-form-input" style="margin-bottom:0;" required>
+          <option value="">Select Resume A...</option>
+          {% for r in all_resumes %}
+            <option value="{{ r.pk }}" {% if comp_ver1 and comp_ver1.pk == r.pk %}selected{% endif %}>{{ r.display_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <label for="resume_b" class="sp-form-label">Resume B:</label>
+        <select name="resume_b" id="resume_b" class="sp-form-input" style="margin-bottom:0;" required>
+          <option value="">Select Resume B...</option>
+          {% for r in all_resumes %}
+            <option value="{{ r.pk }}" {% if comp_ver2 and comp_ver2.pk == r.pk %}selected{% endif %}>{{ r.display_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <button type="submit" class="sp-btn sp-btn-primary" style="width:100%;">⚖️ Compare Resumes</button>
+      </div>
+    </form>
+
+    <!-- Comparison Output Cards -->
+    {% if comp_ver1 and comp_ver2 %}
+    <div style="margin-top:1.5rem;border-top:1px solid rgba(255,255,255,.08);padding-top:1.5rem;">
+      
+      <!-- Recommended Winner Banner -->
+      {% if comp_recommendation %}
+      <div style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:var(--r-md);padding:1.25rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1.25rem;">
+        <div style="font-size:2rem;">🏆</div>
+        <div>
+          <div style="font-size:1.05rem;font-weight:700;color:#10b981;">Recommended Resume: Resume {{ comp_recommendation.winner_key }} ({{ comp_recommendation.winner.display_name }})</div>
+          <div style="font-size:.85rem;color:var(--txt-1);margin-top:.25rem;">{{ comp_recommendation.explanation }}</div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Side-by-side Table -->
+      <div class="sp-table-wrap">
+        <table class="sp-table">
+          <thead>
+            <tr>
+              <th style="width:25%;">Feature Metric</th>
+              <th style="width:37.5%;color:#0ea5e9;">Resume A: {{ comp_ver1.display_name }}</th>
+              <th style="width:37.5%;color:#10b981;">Resume B: {{ comp_ver2.display_name }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>ATS Score</strong></td>
+              <td><span class="sp-badge sp-badge-sky">{{ comp_ver1.ats_score }} / 100</span></td>
+              <td><span class="sp-badge sp-badge-green">{{ comp_ver2.ats_score }} / 100</span></td>
+            </tr>
+            <tr>
+              <td><strong>Keyword Match Rate</strong></td>
+              <td>{{ comp_analysis1.keyword_match }}%</td>
+              <td>{{ comp_analysis2.keyword_match }}%</td>
+            </tr>
+            <tr>
+              <td><strong>Formatting Score</strong></td>
+              <td>{{ comp_ver1.formatting_score }}%</td>
+              <td>{{ comp_ver2.formatting_score }}%</td>
+            </tr>
+            <tr>
+              <td><strong>Technical Skills Found</strong></td>
+              <td>{{ comp_analysis1.skills|length }} skills detected</td>
+              <td>{{ comp_analysis2.skills|length }} skills detected</td>
+            </tr>
+            <tr>
+              <td><strong>Projects Detected</strong></td>
+              <td>{{ comp_analysis1.projects|length }} projects</td>
+              <td>{{ comp_analysis2.projects|length }} projects</td>
+            </tr>
+            <tr>
+              <td><strong>Education Sections</strong></td>
+              <td>{{ comp_analysis1.education|length }} degree entries</td>
+              <td>{{ comp_analysis2.education|length }} degree entries</td>
+            </tr>
+            <tr>
+              <td><strong>Work Experience</strong></td>
+              <td>{{ comp_analysis1.experience|length }} experience items</td>
+              <td>{{ comp_analysis2.experience|length }} experience items</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}

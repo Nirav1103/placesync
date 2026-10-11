@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}Compose Broadcast | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem; max-width: 800px;">
+    
+    <!-- Header -->
+    <div class="sp-page-header" style="margin-bottom: 1.5rem;">
+        <div>
+            <h1 class="sp-page-title">Compose Email Broadcast</h1>
+            <p class="sp-page-subtitle">Broadcast notifications to students, partner recruiters, or custom recipient lists.</p>
+        </div>
+        <div>
+            <a href="{% url 'communication:dashboard' %}" class="sp-btn sp-btn-secondary" style="border:1.5px solid #475569 !important; font-weight:800;">&larr; Back to Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Composers Form -->
+    <div class="sp-card" style="padding: 1.75rem; background:#FFFFFF !important; border:1.5px solid #475569 !important;">
+        
+        <!-- Quick Template Selector Helper -->
+        <div style="background: #F8FAFC !important; border: 1.5px solid #475569 !important; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+            <span style="font-size: 0.85rem; color: #0F172A !important; font-weight: 800;">Prefill Template:</span>
+            {% if form.fields.template.queryset %}
+                <form method="get" action="{% url 'communication:compose' %}" style="display: flex; gap: 0.5rem; margin: 0; align-items: center; flex: 1;">
+                    <select name="template_id" class="sp-form-control" style="font-size: 0.84rem; padding: 0.4rem; max-width: 300px; font-weight:800;" onchange="this.form.submit()">
+                        <option value="">-- Choose Template --</option>
+                        {% for tpl in form.fields.template.queryset %}
+                            <option value="{{ tpl.pk }}" {% if request.GET.template_id|add:"0" == tpl.pk %}selected{% endif %}>{{ tpl.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="sp-btn sp-btn-secondary sp-btn-xs" style="padding: 0.4rem 0.85rem; border:1.5px solid #475569 !important; font-weight:800;">Apply</button>
+                </form>
+            {% else %}
+                <span style="font-size: 0.82rem; color: #334155 !important; font-weight:600; font-style: italic;">No templates configured. Create one first!</span>
+            {% endif %}
+        </div>
+
+        <form method="post" enctype="multipart/form-data" novalidate style="display: flex; flex-direction: column; gap: 1.5rem;">
+            {% csrf_token %}
+
+            <!-- Section 1: Recipients Target Setup -->
+            <div>
+                <h3 style="font-family:'Space Grotesk',sans-serif; font-size: 1.1rem; font-weight: 800; color: #0F172A !important; margin-bottom: 1rem; border-bottom: 1.5px solid #475569; padding-bottom: 0.5rem;">👥 Recipients Configuration</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                    <!-- Recipient Type -->
+                    <div class="sp-form-group">
+                        <label class="sp-form-label" for="id_recipient_type" style="color:#1E293B !important; font-weight:800;">Recipient Category *</label>
+                        {{ form.recipient_type }}
+                        {% if form.recipient_type.errors %}
+                            <span style="font-size: 0.8rem; color: #DC2626; font-weight:700; display: block; margin-top: 0.25rem;">{{ form.recipient_type.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Target Batch -->
+                    <div class="sp-form-group">
+                        <label class="sp-form-label" for="id_target_batch" style="color:#1E293B !important; font-weight:800;">Filter Student Batch</label>
+                        {{ form.target_batch }}
+                        {% if form.target_batch.errors %}
+                            <span style="font-size: 0.8rem; color: #DC2626; font-weight:700; display: block; margin-top: 0.25rem;">{{ form.target_batch.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Target Department -->
+                    <div class="sp-form-group">
+                        <label class="sp-form-label" for="id_target_department" style="color:#1E293B !important; font-weight:800;">Filter Student Department</label>
+                        {{ form.target_department }}
+                        {% if form.target_department.errors %}
+                            <span style="font-size: 0.8rem; color: #DC2626; font-weight:700; display: block; margin-top: 0.25rem;">{{ form.target_department.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Custom Recipients list -->
+                <div class="sp-form-group" style="margin-top: 1rem;">
+                    <label class="sp-form-label" for="id_custom_recipients" style="color:#1E293B !important; font-weight:800;">Custom Recipients (Comma-separated)</label>
+                    {{ form.custom_recipients }}
+                    {% if form.custom_recipients.errors %}
+                        <span style="font-size: 0.8rem; color: #DC2626; font-weight:700; display: block; margin-top: 0.25rem;">{{ form.custom_recipients.errors.0 }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Section 2: Subject & Message Body -->
+            <div>
+                <h3 style="font-family:'Space Grotesk',sans-serif; font-size: 1.1rem; font-weight: 800; color: #0F172A !important; margin-bottom: 1rem; border-bottom: 1.5px solid #475569; padding-bottom: 0.5rem;">✍️ Message Composer</h3>
+                
+                <!-- Subject -->
+                <div class="sp-form-group">
+                    <label class="sp-form-label" for="id_subject" style="color:#1E293B !important; font-weight:800;">Subject Line *</label>
+                    {{ form.subject }}
+                    {% if form.subject.errors %}
+                        <span style="font-size: 0.8rem; color: #DC2626; font-weight:700; display: block; margin-top: 0.25rem;">{{ form.subject.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <!-- Body -->
+                <div class="sp-form-group" style="margin-top: 1rem;">
+                    <label class="sp-form-label" for="id_body" style="color:#1E293B !important; font-weight:800;">Message Body *</label>
+                    {{ form.body }}
+                    {% if form.body.errors %}
+                        <span style="font-size: 0.8rem; color: #DC2626; font-weight:700; display: block; margin-top: 0.25rem;">{{ form.body.errors.0 }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Section 3: Attachment & Dispatch Scheduling -->
+            <div>
+                <h3 style="font-family:'Space Grotesk',sans-serif; font-size: 1.1rem; font-weight: 800; color: #0F172A !important; margin-bottom: 1rem; border-bottom: 1.5px solid #475569; padding-bottom: 0.5rem;">⏱️ Attachments &amp; Timeline</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <!-- Attachment -->
+                    <div class="sp-form-group">
+                        <label class="sp-form-label" for="id_attachment" style="color:#1E293B !important; font-weight:800;">File Attachment</label>
+                        {{ form.attachment }}
+                        {% if form.attachment.errors %}
+                            <span style="font-size: 0.8rem; color: #DC2626; font-weight:700; display: block; margin-top: 0.25rem;">{{ form.attachment.errors.0 }}</span>
+                        {% endif %}
+                        <span style="font-size: 0.78rem; color: #334155 !important; font-weight:600; display: block; margin-top: 0.25rem;">Upload PDFs, DOCX, or Excel sheets to broadcast.</span>
+                    </div>
+
+                    <!-- Scheduled datetime -->
+                    <div class="sp-form-group">
+                        <label class="sp-form-label" for="id_scheduled_time" style="color:#1E293B !important; font-weight:800;">Schedule Dispatch Date/Time</label>
+                        {{ form.scheduled_time }}
+                        {% if form.scheduled_time.errors %}
+                            <span style="font-size: 0.8rem; color: #DC2626; font-weight:700; display: block; margin-top: 0.25rem;">{{ form.scheduled_time.errors.0 }}</span>
+                        {% endif %}
+                        <span style="font-size: 0.78rem; color: #334155 !important; font-weight:600; display: block; margin-top: 0.25rem;">Leave blank to broadcast immediately via SMTP.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions Submit -->
+            <div style="display: flex; gap: 1rem; border-top: 1.5px solid #CBD5E1; padding-top: 1.5rem; margin-top: 1rem; justify-content:flex-end;">
+                <a href="{% url 'communication:dashboard' %}" class="sp-btn sp-btn-secondary" style="padding: 0.75rem 1.75rem; border:1.5px solid #475569 !important; font-weight:800;">Cancel</a>
+                <button type="submit" class="sp-btn sp-btn-primary" style="padding: 0.75rem 2.5rem; font-weight:800;">🚀 Dispatch Broadcast</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}

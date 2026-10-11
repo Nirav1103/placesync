@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load staff_tags %}
+
+{% block title %}Opportunity Discovery Center | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem;">
+
+    <!-- Header -->
+    <div class="sp-page-header" style="margin-bottom: 1.5rem;">
+        <div>
+            <h1 class="sp-page-title">Opportunity Discovery Center</h1>
+            <p class="sp-page-subtitle">Scrape career portals to discover and verify new recruitment openings.</p>
+        </div>
+    </div>
+
+    <!-- Scraper Panel Form -->
+    <div class="sp-card" style="margin-top: 0; padding: 1.5rem; background: #FFFFFF !important; border: 1.5px solid #475569 !important; border-radius: 8px;">
+        <h3 style="font-family:'Space Grotesk',sans-serif; font-size: 1.05rem; font-weight: 800; color: #0F172A !important; margin-bottom: 0.75rem;"><i class="fa-solid fa-spider" style="color:#32867D; margin-right:0.3rem;"></i> Web Scraping Engine</h3>
+        <p style="font-size: 0.84rem; color: #1E293B !important; font-weight: 600; margin-bottom: 1rem;">
+            Provide a public career page or job listing URL. The engine will crawl it using Python <strong>Requests</strong> &amp; <strong>BeautifulSoup</strong> to extract positions.
+            For testing, you can use the pre-filled local mockup URL.
+        </p>
+        
+        <form method="post" style="display: flex; gap: 0.75rem; align-items: flex-end; flex-wrap: wrap;">
+            {% csrf_token %}
+            <div style="flex: 1; min-width: 280px;">
+                <label class="sp-form-label" style="font-size: 0.82rem; color:#1E293B !important; font-weight:800; margin-bottom: 0.35rem;" for="id_url">Target Career URL</label>
+                {{ scrape_form.url }}
+            </div>
+            <button type="submit" class="sp-btn sp-btn-primary" style="padding: 0.75rem 1.5rem; font-weight:800;"><i class="fa-solid fa-spider"></i> Scrape &amp; Discover</button>
+        </form>
+    </div>
+
+    <!-- Listings & Filtering Layout -->
+    <div class="sp-card" style="margin-top: 2rem; background: #FFFFFF !important; border: 1.5px solid #475569 !important; padding: 1.5rem; border-radius: 8px;">
+        
+        <!-- Search & Status Filter Console -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-bottom: 1.5px solid #475569; padding-bottom: 1rem; margin-bottom: 1.5rem;">
+            <h3 class="sp-card-title" style="margin: 0; color:#0F172A !important; font-weight:800;">Discovered Openings</h3>
+            
+            <form method="get" style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                <!-- Search Query -->
+                <input type="text" name="q" value="{{ q }}" placeholder="Company, role, location..." class="sp-form-control" style="font-size: 0.85rem; padding: 0.5rem; width: 220px; font-weight:600;">
+                
+                <!-- Status Filter -->
+                <select name="status" class="sp-form-control" style="font-size: 0.85rem; padding: 0.5rem; width: 160px; font-weight:600;">
+                    <option value="">-- Active Statuses --</option>
+                    {% for code, label in statuses %}
+                        <option value="{{ code }}" {% if selected_status == code %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                
+                <button type="submit" class="sp-btn sp-btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem; font-weight:800;">Filter</button>
+                {% if q or selected_status %}
+                    <a href="{% url 'opportunities:list' %}" class="sp-btn sp-btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem; border:1.5px solid #475569 !important; font-weight:800;">Clear</a>
+                {% endif %}
+            </form>
+        </div>
+
+        <!-- Table -->
+        {% if opportunities %}
+            <div class="table-wrapper">
+                <div class="table-responsive">
+                    <table class="sp-table" style="width:100%; border-collapse:collapse;">
+                        <thead>
+                            <tr style="background:#F8FAFC; border-bottom:1.5px solid #475569;">
+                                <th style="width: 15%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align:left;">Company</th>
+                                <th style="width: 20%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align:left;">Role / Title</th>
+                                <th style="width: 12%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align:left;">Package</th>
+                                <th style="width: 15%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align:left;">Location</th>
+                                <th style="width: 10%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align:left;">Deadline</th>
+                                <th style="width: 10%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align: center;">Trust Score</th>
+                                <th style="width: 8%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align:left;">Status</th>
+                                <th style="width: 10%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align: right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for opp in opportunities %}
+                                <tr style="border-bottom:1px solid #CBD5E1;">
+                                    <td style="padding:0.75rem;">
+                                        <strong style="color: #0F172A !important; font-weight:800;">{{ opp.company_name }}</strong>
+                                        {% if opp.source %}
+                                            <div style="margin-top: 0.15rem;">
+                                                <a href="{{ opp.source }}" target="_blank" style="font-size: 0.78rem; color: #32867D !important; font-weight:700; text-decoration: none;">Link &rarr;</a>
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                    <td style="padding:0.75rem; color: #1E293B !important; font-weight: 800;">
+                                        {{ opp.role }}
+                                    </td>
+                                    <td style="padding:0.75rem; color:#1E293B !important; font-weight:700;">
+                                        {{ opp.package|default:"-" }}
+                                    </td>
+                                    <td style="padding:0.75rem; color:#1E293B !important; font-weight:700;">
+                                        <i class="fa-solid fa-location-dot" style="color:#0284C7; margin-right:0.2rem;"></i> {{ opp.location|default:"-" }}
+                                    </td>
+                                    <td style="padding:0.75rem; color:#1E293B !important; font-weight:700;">
+                                        <i class="fa-solid fa-calendar-days" style="color:#6366F1; margin-right:0.2rem;"></i> {{ opp.deadline|default:"-" }}
+                                    </td>
+                                    <td style="padding:0.75rem;">
+                                        <!-- Trust Score Progress bar -->
+                                        <div style="display: flex; align-items: center; gap: 0.35rem; justify-content: center;">
+                                            <span style="font-size: 0.8rem; font-weight: 800; color: #0F172A !important;">{{ opp.trust_score }}%</span>
+                                            <div style="width: 50px; background: #E2E8F0; height: 8px; border-radius: 4px; overflow: hidden; border:1px solid #CBD5E1;">
+                                                <div style="width: {{ opp.trust_score }}%; background: {% if opp.trust_score >= 80 %}#059669{% elif opp.trust_score >= 50 %}#D97706{% else %}#DC2626{% endif %}; height: 100%;"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="padding:0.75rem;">
+                                        {% if opp.verification_status == 'VERIFIED' %}
+                                            <span class="sp-badge sp-badge-green">Verified</span>
+                                        {% elif opp.verification_status == 'IGNORED' %}
+                                            <span class="sp-badge sp-badge-rose">Ignored</span>
+                                        {% else %}
+                                            <span class="sp-badge sp-badge-amber">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="padding:0.75rem;">
+                                        <div class="table-actions" style="display:flex; justify-content: flex-end; gap: 0.35rem; flex-wrap: wrap;">
+                                            {% if request.user|can_edit_filter %}
+                                            <!-- Create Drive link -->
+                                            <a href="{% url 'opportunities:create_drive' pk=opp.pk %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="border:1.5px solid #059669 !important; color:#059669 !important; font-weight:800;" title="Create Drive"><i class="fa-solid fa-rocket"></i> Drive</a>
+                                            
+                                            <!-- Import Company -->
+                                            <form action="{% url 'opportunities:import_company' pk=opp.pk %}" method="post" style="margin:0;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="sp-btn sp-btn-secondary sp-btn-xs" style="border:1.5px solid #0284C7 !important; color:#0284C7 !important; font-weight:800;" title="Import Company Directory"><i class="fa-solid fa-building"></i> Import</button>
+                                            </form>
+                                            
+                                            <!-- Verify -->
+                                            {% if opp.verification_status == 'PENDING' %}
+                                                <form action="{% url 'opportunities:verify' pk=opp.pk %}" method="post" style="margin: 0;">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="sp-btn sp-btn-secondary sp-btn-xs" style="border:1.5px solid #475569 !important; font-weight:800;" title="Verify Listing"><i class="fa-solid fa-check"></i> Verify</button>
+                                                </form>
+                                            {% endif %}
+                                            
+                                            <!-- Ignore -->
+                                            {% if opp.verification_status != 'IGNORED' %}
+                                                <form action="{% url 'opportunities:ignore' pk=opp.pk %}" method="post" style="margin: 0;">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="sp-btn sp-btn-danger sp-btn-xs" style="background:#FEF2F2 !important; color:#DC2626 !important; border:1.5px solid #DC2626 !important; font-weight:800;" title="Ignore Listing"><i class="fa-solid fa-xmark"></i> Ignore</button>
+                                                </form>
+                                            {% endif %}
+                                            
+                                            <!-- Edit -->
+                                            <a href="{% url 'opportunities:edit' pk=opp.pk %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="border:1.5px solid #475569 !important; font-weight:800;" title="Edit Scraped Details">Edit</a>
+                                            {% else %}
+                                            <span style="color: #334155 !important; font-size: 0.75rem; font-style: italic; font-weight:600;">View Only</span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <p style="text-align: center; color: #334155 !important; font-style: italic; padding: 3rem 0; margin: 0; font-weight:600;">
+                No discovered opportunities listed. Submit a scraping run above to crawl listings.
+            </p>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

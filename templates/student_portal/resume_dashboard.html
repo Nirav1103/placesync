@@ -1,0 +1,286 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Resume & CV Management | PlaceSync{% endblock %}
+{% block topbar_title %}Resume & CV Management{% endblock %}
+{% block nav_resume_dashboard %}active{% endblock %}
+{% block page_body_class %}page-resume{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════════════
+     Page Header
+════════════════════════════════════════════════════ -->
+<div class="sp-page-header">
+  <div>
+    <h1 class="sp-page-title">📄 Resume & CV Management</h1>
+    <p class="sp-page-subtitle">Upload, rename, manage, and preview your PDF resumes and curriculum vitae (CV) for
+      placement applications.</p>
+  </div>
+  <div class="sp-page-actions">
+    <a href="{% url 'student_portal:ats_analysis' %}" class="sp-btn sp-btn-secondary">🎯 ATS Intelligence</a>
+    <a href="{% url 'student_portal:resume_parser' %}" class="sp-btn sp-btn-secondary">🤖 AI Resume Parser</a>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     KPI Stats Bar
+════════════════════════════════════════════════════ -->
+<div class="sp-stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:1.5rem;">
+  <div class="sp-stat" style="padding:1.1rem 1rem;min-height:105px;background:#FFFFFF !important;border:1.5px solid #475569 !important;">
+    <div class="sp-stat-icon si-v" style="font-size:1rem;width:32px;height:32px;margin-bottom:0.4rem;">📚</div>
+    <div class="sp-stat-label" style="font-size:0.75rem;color:#1E293B !important;font-weight:800;text-transform:uppercase;margin-bottom:0.25rem;">Total Resumes / CVs</div>
+    <div class="sp-stat-value" style="font-size:1.6rem;color:#0F172A !important;font-weight:800;">{{ total_count }}</div>
+  </div>
+
+  <div class="sp-stat" style="padding:1.1rem 1rem;min-height:105px;background:#FFFFFF !important;border:1.5px solid #475569 !important;">
+    <div class="sp-stat-icon si-g" style="font-size:1rem;width:32px;height:32px;margin-bottom:0.4rem;">⭐</div>
+    <div class="sp-stat-label" style="font-size:0.75rem;color:#1E293B !important;font-weight:800;text-transform:uppercase;margin-bottom:0.25rem;">Default Resume</div>
+    <div class="sp-stat-value" style="font-size:1.1rem;word-break:break-word;">
+      {% if default_resume %}
+        <span style="color:#32867D !important;font-weight:800;">{{ default_resume.display_name|truncatechars:18 }}</span>
+      {% else %}
+        <span style="color:#64748B !important;font-weight:700;font-size:0.9rem;">Not set</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="sp-stat" style="padding:1.1rem 1rem;min-height:105px;background:#FFFFFF !important;border:1.5px solid #475569 !important;">
+    <div class="sp-stat-icon si-a" style="font-size:1rem;width:32px;height:32px;margin-bottom:0.4rem;">📄</div>
+    <div class="sp-stat-label" style="font-size:0.75rem;color:#1E293B !important;font-weight:800;text-transform:uppercase;margin-bottom:0.25rem;">Resumes Count</div>
+    <div class="sp-stat-value" style="font-size:1.6rem;color:#0284C7 !important;font-weight:800;">{{ resume_count }}</div>
+  </div>
+
+  <div class="sp-stat" style="padding:1.1rem 1rem;min-height:105px;background:#FFFFFF !important;border:1.5px solid #475569 !important;">
+    <div class="sp-stat-icon si-t" style="font-size:1rem;width:32px;height:32px;margin-bottom:0.4rem;">📑</div>
+    <div class="sp-stat-label" style="font-size:0.75rem;color:#1E293B !important;font-weight:800;text-transform:uppercase;margin-bottom:0.25rem;">CVs Count</div>
+    <div class="sp-stat-value" style="font-size:1.6rem;color:#059669 !important;font-weight:800;">{{ cv_count }}</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Upload Card
+════════════════════════════════════════════════════ -->
+<div class="sp-card" style="margin-bottom:1.75rem;" id="upload-section">
+  <div class="sp-card-header">
+    <span class="sp-card-title">📤 Upload New Resume / CV</span>
+    <span class="sp-badge sp-badge-sky">PDF Only · Max {{ max_file_size_mb }}MB</span>
+  </div>
+  <div class="sp-card-body">
+    <form method="post" action="{% url 'student_portal:resume_upload' %}" enctype="multipart/form-data"
+      id="resumeUploadForm">
+      {% csrf_token %}
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:1.25rem;align-items:end;">
+
+        <!-- Resume Name -->
+        <div class="sp-form-group" style="margin-bottom:0;">
+          <label class="sp-form-label" for="id_resume_name">Resume Name <span
+              style="color:var(--txt-3);font-weight:400;">(optional)</span></label>
+          <input type="text" name="resume_name" id="id_resume_name" class="sp-form-input"
+            placeholder="e.g. Full Stack Developer Resume">
+        </div>
+
+        <!-- Resume Type -->
+        <div class="sp-form-group" style="margin-bottom:0;">
+          <label class="sp-form-label" for="id_resume_type">Resume Type <span style="color:var(--red);">*</span></label>
+          <select name="resume_type" id="id_resume_type" class="sp-form-input">
+            <option value="RESUME">Resume (Standard)</option>
+            <option value="CV">CV (Academic / Research)</option>
+          </select>
+        </div>
+
+        <!-- File Upload Input -->
+        <div class="sp-form-group" style="margin-bottom:0;">
+          <label class="sp-form-label" for="id_file">Choose PDF File <span style="color:var(--red);">*</span></label>
+          <input type="file" name="file" id="id_file" class="sp-form-input" accept=".pdf" required>
+        </div>
+
+        <!-- Submit Button & Default checkbox -->
+        <div style="display:flex;flex-direction:column;gap:.5rem;">
+          <label style="font-size:.8rem;color:var(--txt-2);display:flex;align-items:center;cursor:pointer;">
+            <input type="checkbox" name="is_default" value="true" style="margin-right:.4rem;transform:scale(1.15);">
+            Set as Default Resume
+          </label>
+          <button type="submit" class="sp-btn sp-btn-primary">➕ Upload Resume</button>
+        </div>
+
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Search & Filter Bar
+════════════════════════════════════════════════════ -->
+<div class="sp-card" style="margin-bottom:1.5rem;padding:1rem 1.25rem;">
+  <form method="get" action="{% url 'student_portal:resume_dashboard' %}"
+    style="display:flex;flex-wrap:wrap;gap:1rem;align-items:center;justify-content:space-between;">
+
+    <!-- Search Input -->
+    <div style="flex:1;min-width:220px;display:flex;align-items:center;gap:.5rem;">
+      <input type="text" name="q" value="{{ q }}" class="sp-form-input" placeholder="🔍 Search resume by name..."
+        style="margin-bottom:0;">
+    </div>
+
+    <!-- Filter Type -->
+    <div style="display:flex;align-items:center;gap:.5rem;">
+      <span style="font-size:.8rem;color:var(--txt-3);">Type:</span>
+      <select name="type" class="sp-form-input" style="margin-bottom:0;width:auto;" onchange="this.form.submit()">
+        <option value="ALL" {% if selected_type == 'ALL' %}selected{% endif %}>All Types</option>
+        <option value="RESUME" {% if selected_type == 'RESUME' %}selected{% endif %}>Resume Only</option>
+        <option value="CV" {% if selected_type == 'CV' %}selected{% endif %}>CV Only</option>
+      </select>
+    </div>
+
+    <!-- Sort By -->
+    <div style="display:flex;align-items:center;gap:.5rem;">
+      <span style="font-size:.8rem;color:var(--txt-3);">Sort:</span>
+      <select name="sort" class="sp-form-input" style="margin-bottom:0;width:auto;" onchange="this.form.submit()">
+        <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>Newest First</option>
+        <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+        <option value="alphabetical" {% if selected_sort == 'alphabetical' %}selected{% endif %}>Alphabetical</option>
+      </select>
+    </div>
+
+    <!-- Actions -->
+    <div style="display:flex;gap:.5rem;">
+      <button type="submit" class="sp-btn sp-btn-secondary sp-btn-sm">Filter</button>
+      {% if q or selected_type != 'ALL' or selected_sort != 'newest' %}
+      <a href="{% url 'student_portal:resume_dashboard' %}" class="sp-btn sp-btn-danger sp-btn-sm">Reset</a>
+      {% endif %}
+    </div>
+
+  </form>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Resumes Cards Grid
+════════════════════════════════════════════════════ -->
+{% if resumes %}
+<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));gap:1.25rem;">
+  {% for r in resumes %}
+  <div class="sp-card"
+    style="position:relative;display:flex;flex-direction:column;justify-content:space-between;border:1px solid {% if r.is_default %}rgba(245,158,11,.4){% else %}var(--border){% endif %};">
+
+    <!-- Card Header -->
+    <div style="padding:1.25rem 1.25rem 1rem;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;margin-bottom:.5rem;">
+        <div style="font-size:1.05rem;font-weight:700;color:#fff;word-break:break-word;line-height:1.3;">
+          {{ r.display_name }}
+        </div>
+        {% if r.is_default %}
+        <span class="sp-badge sp-badge-amber">⭐ Default Resume</span>
+        {% else %}
+        <span class="sp-badge sp-badge-purple">{{ r.get_resume_type_display }}</span>
+        {% endif %}
+      </div>
+
+      <!-- Metadata -->
+      <div style="display:flex;flex-wrap:wrap;gap:1rem;font-size:.78rem;color:var(--txt-3);margin-top:.75rem;">
+        <span>📅 {{ r.uploaded_at|date:"M d, Y" }}</span>
+        <span>📦 {{ r.formatted_file_size }}</span>
+        <span>📑 {{ r.get_resume_type_display }}</span>
+      </div>
+    </div>
+
+    <!-- Rename Collapsible / Inline Form -->
+    <div id="rename-box-{{ r.pk }}" style="display:none;padding:0 1.25rem 1rem;">
+      <form method="post" action="{% url 'student_portal:resume_rename' r.pk %}" style="display:flex;gap:.5rem;">
+        {% csrf_token %}
+        <input type="text" name="resume_name" value="{{ r.display_name }}" class="sp-form-input"
+          style="margin-bottom:0;font-size:.82rem;" required>
+        <button type="submit" class="sp-btn sp-btn-primary sp-btn-xs">Save</button>
+        <button type="button" class="sp-btn sp-btn-secondary sp-btn-xs"
+          onclick="document.getElementById('rename-box-{{ r.pk }}').style.display='none';">Cancel</button>
+      </form>
+    </div>
+
+    <!-- Action Buttons Row -->
+    <div
+      style="padding:1rem 1.25rem;border-top:1px solid rgba(255,255,255,.05);background:rgba(0,0,0,.15);display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;justify-content:space-between;">
+
+      <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+        <!-- Preview -->
+        <a href="{% url 'student_portal:resume_preview' r.pk %}" target="_blank"
+          class="sp-btn sp-btn-secondary sp-btn-xs" title="Preview PDF inline">👁️ Preview</a>
+
+        <!-- Download -->
+        <a href="{% url 'student_portal:resume_download' r.pk %}" class="sp-btn sp-btn-secondary sp-btn-xs"
+          title="Download File">📥 Download</a>
+
+        <!-- Rename -->
+        <button type="button" class="sp-btn sp-btn-secondary sp-btn-xs"
+          onclick="document.getElementById('rename-box-{{ r.pk }}').style.display='block';">✏️ Rename</button>
+      </div>
+
+      <div style="display:flex;gap:.4rem;align-items:center;">
+        <!-- Set Default Button -->
+        {% if r.is_default %}
+        <span style="font-size:.72rem;color:#f59e0b;font-weight:600;padding:.2rem .5rem;">⭐ Default</span>
+        {% else %}
+        <form method="post" action="{% url 'student_portal:resume_set_default' r.pk %}" style="margin:0;">
+          {% csrf_token %}
+          <button type="submit" class="sp-btn sp-btn-warning sp-btn-xs">⭐ Set Default</button>
+        </form>
+        {% endif %}
+
+        <!-- Delete -->
+        <a href="{% url 'student_portal:resume_delete' r.pk %}" class="sp-btn sp-btn-danger sp-btn-xs"
+          title="Delete Resume">🗑️ Delete</a>
+      </div>
+
+    </div>
+
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Pagination Controls -->
+{% if page_obj.has_other_pages %}
+<div style="display:flex;justify-content:center;align-items:center;gap:.5rem;margin-top:1.75rem;">
+  {% if page_obj.has_previous %}
+  <a href="?page={{ page_obj.previous_page_number }}&q={{ q }}&type={{ selected_type }}&sort={{ selected_sort }}"
+    class="sp-btn sp-btn-secondary sp-btn-sm">← Previous</a>
+  {% endif %}
+  <span style="font-size:.8rem;color:var(--txt-2);padding:0 .5rem;">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}
+  <a href="?page={{ page_obj.next_page_number }}&q={{ q }}&type={{ selected_type }}&sort={{ selected_sort }}"
+    class="sp-btn sp-btn-secondary sp-btn-sm">Next →</a>
+  {% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<!-- ══════════════════════════════════════════════════
+     Empty State
+════════════════════════════════════════════════════ -->
+<div class="sp-card">
+  <div class="sp-empty" style="padding:4.5rem 2rem;">
+    <div class="sp-empty-icon" style="font-size:3.5rem;margin-bottom:1rem;">📄</div>
+    <div class="sp-empty-text" style="font-size:1.25rem;font-weight:700;color:#fff;">No resumes uploaded yet</div>
+    <div class="sp-empty-sub" style="max-width:440px;margin:.5rem auto 1.5rem;">Upload your first PDF resume above to
+      start building your placement profile and analyzing your ATS score.</div>
+    <a href="#upload-section" class="sp-btn sp-btn-primary">📤 Upload Your First Resume</a>
+  </div>
+</div>
+{% endif %}
+
+<script>
+  // Simple File Validation Client-Side
+  document.getElementById('id_file')?.addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    if (file) {
+      if (!file.name.toLowerCase().endsWith('.pdf')) {
+        alert('Please select a valid PDF file (.pdf extension only).');
+        e.target.value = '';
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size exceeds the 5 MB limit. Please select a smaller PDF file.');
+        e.target.value = '';
+        return;
+      }
+    }
+  });
+</script>
+
+{% endblock %}

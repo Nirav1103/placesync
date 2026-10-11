@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ action }} Staff Member | PlaceSync{% endblock %}
+
+{% block content %}
+<style>
+    .role-card-input:checked + .role-card-box,
+    .status-card-input:checked + .status-card-box {
+        border-color: var(--btn-primary) !important;
+        background: #F0FDFF !important;
+        box-shadow: none !important;
+    }
+    .role-card-box:hover,
+    .status-card-box:hover {
+        background: #F0FDFF;
+        border-color: var(--btn-primary);
+    }
+</style>
+
+<div class="container" style="flex: 1; padding: 2rem 1.5rem; max-width: 800px;">
+    
+    <!-- Header -->
+    <div class="dashboard-header" style="border-bottom: none; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1 class="dashboard-title">🛡️ {{ action }} Staff Member</h1>
+            <p class="dashboard-welcome">Configure user profile, account credentials, and portal role settings.</p>
+        </div>
+        <a href="{% url 'staff_permissions:staff_list' %}" class="btn btn-secondary" style="padding: 0.55rem 1.25rem;">&larr; Back to List</a>
+    </div>
+
+    <!-- Form Panel -->
+    <div class="card-panel" style="margin-top: 0; padding: 2.5rem; border: 1px solid var(--card-border); box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+        <form method="post" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.75rem;">
+            {% csrf_token %}
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <!-- Full Name -->
+                <div class="form-group">
+                    <label for="full_name" class="form-label" style="font-weight: 600; margin-bottom: 0.5rem; color: #fff;">Full Name *</label>
+                    <input type="text" id="full_name" name="full_name" required
+                           value="{% if staff %}{{ staff.user.get_full_name }}{% else %}{{ full_name|default:'' }}{% endif %}"
+                           placeholder="e.g. Jane Smith" class="form-control" style="width: 100%; padding: 0.75rem; background: rgba(0,0,0,0.2); border: 1px solid var(--card-border); border-radius: var(--radius-sm); color: #fff;">
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email" class="form-label" style="font-weight: 600; margin-bottom: 0.5rem; color: #fff;">Email Address *</label>
+                    <input type="email" id="email" name="email" required
+                           value="{% if staff %}{{ staff.user.email }}{% else %}{{ email|default:'' }}{% endif %}"
+                           placeholder="e.g. jane.smith@college.edu" class="form-control" style="width: 100%; padding: 0.75rem; background: rgba(0,0,0,0.2); border: 1px solid var(--card-border); border-radius: var(--radius-sm); color: #fff;">
+                </div>
+            </div>
+
+            <!-- Username and Photo Row -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start;">
+                <!-- Username -->
+                <div class="form-group">
+                    <label for="username" class="form-label" style="font-weight: 600; margin-bottom: 0.5rem; color: #fff;">Username *</label>
+                    <input type="text" id="username" name="username" required
+                           value="{% if staff %}{{ staff.user.username }}{% else %}{{ username|default:'' }}{% endif %}"
+                           {% if staff %}disabled style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: var(--radius-sm); opacity: 0.5; cursor: not-allowed; color: var(--text-muted);"{% else %}style="width: 100%; padding: 0.75rem; background: rgba(0,0,0,0.2); border: 1px solid var(--card-border); border-radius: var(--radius-sm); color: #fff;"{% endif %}
+                           placeholder="e.g. janesmith" class="form-control">
+                    {% if staff %}
+                        <small style="color: var(--text-muted); display: block; margin-top: 0.25rem; font-size: 0.75rem;">Username cannot be modified after registration.</small>
+                    {% endif %}
+                </div>
+
+                <!-- Profile Photo -->
+                <div class="form-group">
+                    <label for="profile_picture" class="form-label" style="font-weight: 600; margin-bottom: 0.5rem; color: #fff;">Profile Photo</label>
+                    {% if staff and staff.profile_picture %}
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                            <img src="{{ staff.profile_picture.url }}" alt="Photo" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid var(--primary);">
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">Current Photo</span>
+                        </div>
+                    {% endif %}
+                    <input type="file" id="profile_picture" name="profile_picture" accept="image/*" class="form-control" style="width: 100%; padding: 0.65rem 0.75rem; background: rgba(0,0,0,0.2); border: 1px solid var(--card-border); border-radius: var(--radius-sm); color: #fff;">
+                </div>
+            </div>
+
+            {% if action == 'Create' %}
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <!-- Password -->
+                    <div class="form-group">
+                        <label for="password" class="form-label" style="font-weight: 600; margin-bottom: 0.5rem; color: #fff;">Password *</label>
+                        <input type="password" id="password" name="password" required placeholder="Choose password" class="form-control" style="width: 100%; padding: 0.75rem; background: rgba(0,0,0,0.2); border: 1px solid var(--card-border); border-radius: var(--radius-sm); color: #fff;">
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="form-group">
+                        <label for="confirm_password" class="form-label" style="font-weight: 600; margin-bottom: 0.5rem; color: #fff;">Confirm Password *</label>
+                        <input type="password" id="confirm_password" name="confirm_password" required placeholder="Verify password" class="form-control" style="width: 100%; padding: 0.75rem; background: rgba(0,0,0,0.2); border: 1px solid var(--card-border); border-radius: var(--radius-sm); color: #fff;">
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Role Section -->
+            <div class="form-group">
+                <label class="form-label" style="font-weight: 600; margin-bottom: 0.5rem; color: #fff; display: block;">Portal Access Role *</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-top: 0.5rem;">
+                    <!-- Editor Role -->
+                    <label style="position: relative; display: block; cursor: pointer; margin: 0;">
+                        <input type="radio" name="role" value="EDITOR" class="role-card-input" style="display: none;" required
+                               {% if staff and staff.role == 'EDITOR' %}checked
+                               {% elif not staff and role == 'EDITOR' %}checked
+                               {% elif not staff %}checked{% endif %}>
+                        <div class="role-card-box" style="border: 1px solid var(--card-border); background: rgba(0, 0, 0, 0.1); border-radius: var(--radius-md); padding: 1.25rem; display: flex; flex-direction: column; gap: 0.35rem; transition: all 0.25rem; height: 100%;">
+                            <span style="font-weight: 700; color: #fff; font-size: 0.98rem; display: flex; align-items: center; gap: 0.5rem;">
+                                ✍️ Editor
+                            </span>
+                            <span style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5;">
+                                Full access to manage students, drives, opportunities, certificates, and view reports. No Settings access.
+                            </span>
+                        </div>
+                    </label>
+                    
+                    <!-- View Only Role -->
+                    <label style="position: relative; display: block; cursor: pointer; margin: 0;">
+                        <input type="radio" name="role" value="VIEW_ONLY" class="role-card-input" style="display: none;" required
+                               {% if staff and staff.role == 'VIEW_ONLY' %}checked
+                               {% elif not staff and role == 'VIEW_ONLY' %}checked{% endif %}>
+                        <div class="role-card-box" style="border: 1px solid var(--card-border); background: rgba(0, 0, 0, 0.1); border-radius: var(--radius-md); padding: 1.25rem; display: flex; flex-direction: column; gap: 0.35rem; transition: all 0.25rem; height: 100%;">
+                            <span style="font-weight: 700; color: #fff; font-size: 0.98rem; display: flex; align-items: center; gap: 0.5rem;">
+                                👁️ View Only
+                            </span>
+                            <span style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5;">
+                                Read-only access to view students, placement drives, discovery opportunities, and reports.
+                            </span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Status Section -->
+            <div class="form-group">
+                <label class="form-label" style="font-weight: 600; margin-bottom: 0.5rem; color: #fff; display: block;">Account Status</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-top: 0.5rem;">
+                    <!-- Active Status -->
+                    <label style="position: relative; display: block; cursor: pointer; margin: 0;">
+                        <input type="radio" name="status" value="active" class="status-card-input" style="display: none;"
+                               {% if staff and staff.user.is_active %}checked
+                               {% elif not staff and status != 'inactive' %}checked{% endif %}>
+                        <div class="status-card-box" style="border: 1px solid var(--card-border); background: rgba(0, 0, 0, 0.1); border-radius: var(--radius-md); padding: 1rem; display: flex; align-items: center; gap: 1rem; transition: all 0.25rem;">
+                            <span style="font-size: 1.25rem;">🟢</span>
+                            <div>
+                                <span style="font-weight: 600; color: #fff; font-size: 0.92rem; display: block;">Active</span>
+                                <span style="font-size: 0.75rem; color: var(--text-secondary);">Immediate portal login access</span>
+                            </div>
+                        </div>
+                    </label>
+                    
+                    <!-- Inactive Status -->
+                    <label style="position: relative; display: block; cursor: pointer; margin: 0;">
+                        <input type="radio" name="status" value="inactive" class="status-card-input" style="display: none;"
+                               {% if staff and not staff.user.is_active %}checked
+                               {% elif not staff and status == 'inactive' %}checked{% endif %}>
+                        <div class="status-card-box" style="border: 1px solid var(--card-border); background: rgba(0, 0, 0, 0.1); border-radius: var(--radius-md); padding: 1rem; display: flex; align-items: center; gap: 1rem; transition: all 0.25rem;">
+                            <span style="font-size: 1.25rem;">🔴</span>
+                            <div>
+                                <span style="font-weight: 600; color: #fff; font-size: 0.92rem; display: block;">Inactive</span>
+                                <span style="font-size: 0.75rem; color: var(--text-secondary);">Block all portal logins</span>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem; border-top: 1px solid var(--card-border); padding-top: 1.75rem;">
+                <button type="submit" class="btn btn-primary" style="padding: 0.65rem 2rem; font-weight: 600;">Save Staff Account</button>
+                <a href="{% url 'staff_permissions:staff_list' %}" class="btn btn-secondary" style="padding: 0.65rem 2rem; text-align: center;">Cancel</a>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+{% endblock %}

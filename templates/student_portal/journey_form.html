@@ -1,0 +1,62 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}{{ title_prefix }} | PlaceSync{% endblock %}
+{% block topbar_title %}{{ title_prefix }}{% endblock %}
+{% block nav_coding %}active{% endblock %}
+
+{% block content %}
+
+<div class="sp-page-header">
+  <div>
+    <h1 class="sp-page-title">✏️ {{ title_prefix }}</h1>
+    <p class="sp-page-subtitle">Update your developer logs, achievements, platform metrics or links.</p>
+  </div>
+  <div class="sp-page-actions">
+    <a href="{% url 'student_portal:journey' %}" class="sp-btn sp-btn-secondary" style="border:1.5px solid #475569 !important;">⬅️ Cancel</a>
+  </div>
+</div>
+
+<div style="max-width: 720px; margin: 0 auto 3rem;">
+  <form method="post" enctype="multipart/form-data" class="sp-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+    {% csrf_token %}
+
+    <div class="sp-card-body" style="padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem;">
+      
+      {% if form.non_field_errors %}
+      <div class="sp-alert sp-alert-error" style="background:#FEF2F2 !important; color:#DC2626 !important; border:1.5px solid #DC2626 !important; font-weight:800;">
+        <span>{{ form.non_field_errors }}</span>
+      </div>
+      {% endif %}
+
+      {% for field in form %}
+      <div class="sp-form-group">
+        <label class="sp-form-label" for="{{ field.id_for_label }}" style="color:#1E293B !important; font-weight:800;">
+          {{ field.label }} 
+          {% if field.field.required %}<span style="color: #DC2626;">*</span>{% endif %}
+        </label>
+        {{ field }}
+        {% if field.errors %}
+        <div style="color: #DC2626; font-size: 0.8rem; font-weight:700; margin-top: 0.25rem;">
+          {{ field.errors.0 }}
+        </div>
+        {% endif %}
+        {% if field.help_text %}
+        <small style="color: #334155 !important; font-size: 0.78rem; font-weight:600; margin-top: 0.15rem; display: block;">
+          {{ field.help_text }}
+        </small>
+        {% endif %}
+      </div>
+      {% endfor %}
+
+      <div style="border-top: 1.5px solid #CBD5E1; padding-top: 1.5rem; margin-top: 0.5rem; display: flex; gap: 1rem; justify-content: flex-end;">
+        <a href="{% url 'student_portal:journey' %}" class="sp-btn sp-btn-secondary" style="padding: 0.65rem 2rem; border:1.5px solid #475569 !important;">Cancel</a>
+        <button type="submit" class="sp-btn sp-btn-primary" style="padding: 0.65rem 2.5rem;">
+          {% if is_edit %}Save Changes{% else %}Record Entry{% endif %}
+        </button>
+      </div>
+
+    </div>
+  </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}Placement Analytics | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 4rem;">
+
+    <!-- Header -->
+    <div class="sp-page-header" style="margin-bottom: 2rem;">
+        <div>
+            <h1 class="sp-page-title">Placement Analytics Dashboard</h1>
+            <p class="sp-page-subtitle">Interactive visual summaries tracking campus hiring performance.</p>
+        </div>
+        <div>
+            <a href="{% url 'reports:dashboard' %}" class="sp-btn sp-btn-secondary" style="border:1.5px solid #475569 !important; font-weight:800;">📋 View Detailed Reports</a>
+        </div>
+    </div>
+
+    <!-- Core KPI Stats Cards Grid -->
+    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+        <div class="sp-stat" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+            <p class="sp-stat-label" style="color:#1E293B !important; font-weight:800;">Placement Ratio</p>
+            <h2 class="sp-stat-value" style="color: #059669 !important; font-weight:800; font-size: 1.65rem; margin-top:0.3rem;">{{ kpis.placement_pct }}</h2>
+        </div>
+        <div class="sp-stat" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+            <p class="sp-stat-label" style="color:#1E293B !important; font-weight:800;">Internship Ratio</p>
+            <h2 class="sp-stat-value" style="color: #0284C7 !important; font-weight:800; font-size: 1.65rem; margin-top:0.3rem;">{{ kpis.internship_pct }}</h2>
+        </div>
+        <div class="sp-stat" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+            <p class="sp-stat-label" style="color:#1E293B !important; font-weight:800;">Highest Package</p>
+            <h2 class="sp-stat-value" style="color: #0F172A !important; font-weight:800; font-size: 1.65rem; margin-top:0.3rem;">{{ kpis.highest_pkg }}</h2>
+        </div>
+        <div class="sp-stat" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+            <p class="sp-stat-label" style="color:#1E293B !important; font-weight:800;">Average Package</p>
+            <h2 class="sp-stat-value" style="color: #32867D !important; font-weight:800; font-size: 1.65rem; margin-top:0.3rem;">{{ kpis.avg_pkg }}</h2>
+        </div>
+        <div class="sp-stat" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+            <p class="sp-stat-label" style="color:#1E293B !important; font-weight:800;">Highest Stipend</p>
+            <h2 class="sp-stat-value" style="color: #7C3AED !important; font-weight:800; font-size: 1.5rem; margin-top:0.3rem;">{{ kpis.highest_stipend }}</h2>
+        </div>
+        <div class="sp-stat" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+            <p class="sp-stat-label" style="color:#1E293B !important; font-weight:800;">Average Stipend</p>
+            <h2 class="sp-stat-value" style="color: #7C3AED !important; font-weight:800; font-size: 1.5rem; margin-top:0.3rem;">{{ kpis.avg_stipend }}</h2>
+        </div>
+    </div>
+
+    <!-- Row 1: Status Distribution (Full Width Card with Pie Chart) -->
+    <div class="sp-card" style="margin-top: 0; padding: 2rem; margin-bottom: 2rem; background:#FFFFFF !important; border:1.5px solid #475569 !important;">
+        <h3 style="font-family:'Space Grotesk',sans-serif; font-size: 1.15rem; font-weight: 800; color: #0F172A !important; margin-bottom: 1.5rem; border-bottom: 1.5px solid #475569; padding-bottom: 0.75rem;">📊 College Placement Distribution</h3>
+        
+        <div style="display: flex; gap: 3rem; align-items: center; flex-wrap: wrap; justify-content: center;">
+            {% if status_chart %}
+                <div>
+                    <img src="data:image/png;base64,{{ status_chart }}" alt="Status Distribution Pie Chart" style="max-width: 100%; border-radius: 8px; border: 1.5px solid #475569; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                </div>
+                <div style="flex: 1; min-width: 280px; max-width: 500px;">
+                    <h4 style="color: #0F172A !important; margin-top: 0; margin-bottom: 1rem; font-size: 1.25rem; font-weight:800;">Hiring Status Distribution Breakdown</h4>
+                    <p style="color: #1E293B !important; line-height: 1.6; font-size: 0.95rem; margin-bottom: 1.5rem; font-weight:600;">
+                        This chart visualizes the distribution of student hiring status across the institution:
+                    </p>
+                    <ul style="color: #334155 !important; line-height: 1.8; font-size: 0.9rem; padding-left: 1.25rem; font-weight:600;">
+                        <li><strong style="color: #059669 !important;">Placed:</strong> Hired for full-time corporate roles.</li>
+                        <li><strong style="color: #0284C7 !important;">Internship:</strong> Undergoing industrial internships.</li>
+                        <li><strong style="color: #7C3AED !important;">Placed &amp; Intern:</strong> Hired for full-time roles with pre-placement internships.</li>
+                        <li><strong style="color: #DC2626 !important;">Unplaced:</strong> Actively appearing for drives.</li>
+                    </ul>
+                </div>
+            {% else %}
+                <p style="text-align: center; color: #334155 !important; font-style: italic; width: 100%; font-weight:600;">
+                    Insufficient student profile records to compile status distribution chart.
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Row 2: Department & Batch (Grid columns) -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; align-items: start;">
+        
+        <!-- Department Analytics -->
+        <div class="sp-card" style="margin-top: 0; padding: 1.5rem; background:#FFFFFF !important; border:1.5px solid #475569 !important;">
+            <h3 style="font-family:'Space Grotesk',sans-serif; font-size: 1.05rem; font-weight: 800; color: #0F172A !important; margin-bottom: 1.25rem; border-bottom: 1.5px solid #475569; padding-bottom: 0.5rem;">🏢 Department Performance Comparison</h3>
+            
+            {% if dept_chart %}
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <img src="data:image/png;base64,{{ dept_chart }}" alt="Department Bar Chart" style="max-width: 100%; border-radius: 8px; border: 1.5px solid #475569;">
+                </div>
+                
+                <table class="sp-table" style="width:100%; border-collapse:collapse; font-size: 0.85rem;">
+                    <thead>
+                        <tr style="background:#F8FAFC; border-bottom:1.5px solid #475569;">
+                            <th style="padding:0.6rem; color:#0F172A !important; font-weight:800; text-align:left;">Branch</th>
+                            <th style="padding:0.6rem; color:#0F172A !important; font-weight:800; text-align: right;">Average Package</th>
+                            <th style="padding:0.6rem; color:#0F172A !important; font-weight:800; text-align: right;">Placement Ratio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for code, pkg, ratio in dept_data %}
+                            <tr style="border-bottom:1px solid #CBD5E1;">
+                                <td style="padding:0.6rem;"><strong style="color: #0F172A !important;">{{ code }}</strong></td>
+                                <td style="padding:0.6rem; text-align: right; color:#1E293B !important; font-weight:700;">{{ pkg|floatformat:2 }} LPA</td>
+                                <td style="padding:0.6rem; text-align: right; color: #059669 !important; font-weight: 800;">{{ ratio|floatformat:1 }}%</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p style="text-align: center; color: #334155 !important; font-style: italic; padding: 2rem 0; font-weight:600;">
+                    No department statistics compiled.
+                </p>
+            {% endif %}
+        </div>
+
+        <!-- Batch Analytics -->
+        <div class="sp-card" style="margin-top: 0; padding: 1.5rem; background:#FFFFFF !important; border:1.5px solid #475569 !important;">
+            <h3 style="font-family:'Space Grotesk',sans-serif; font-size: 1.05rem; font-weight: 800; color: #0F172A !important; margin-bottom: 1.25rem; border-bottom: 1.5px solid #475569; padding-bottom: 0.5rem;">🎓 Batch-wise Recruitment Trends</h3>
+            
+            {% if batch_chart %}
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <img src="data:image/png;base64,{{ batch_chart }}" alt="Batch Line Chart" style="max-width: 100%; border-radius: 8px; border: 1.5px solid #475569;">
+                </div>
+                
+                <table class="sp-table" style="width:100%; border-collapse:collapse; font-size: 0.85rem;">
+                    <thead>
+                        <tr style="background:#F8FAFC; border-bottom:1.5px solid #475569;">
+                            <th style="padding:0.6rem; color:#0F172A !important; font-weight:800; text-align:left;">Batch Class</th>
+                            <th style="padding:0.6rem; color:#0F172A !important; font-weight:800; text-align: right;">Placement Ratio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for name, ratio in batch_data %}
+                            <tr style="border-bottom:1px solid #CBD5E1;">
+                                <td style="padding:0.6rem;"><strong style="color: #0F172A !important;">{{ name }}</strong></td>
+                                <td style="padding:0.6rem; text-align: right; color: #059669 !important; font-weight: 800;">{{ ratio|floatformat:1 }}%</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p style="text-align: center; color: #334155 !important; font-style: italic; padding: 2rem 0; font-weight:600;">
+                    No batch statistics compiled.
+                </p>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- Row 3: Student & Company (Grid columns) -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start;">
+        
+        <!-- Student Analytics -->
+        <div class="sp-card" style="margin-top: 0; padding: 1.5rem; background:#FFFFFF !important; border:1.5px solid #475569 !important;">
+            <h3 style="font-family:'Space Grotesk',sans-serif; font-size: 1.05rem; font-weight: 800; color: #0F172A !important; margin-bottom: 1.25rem; border-bottom: 1.5px solid #475569; padding-bottom: 0.5rem;">🎓 CGPA vs Package CTC Correlation</h3>
+            
+            {% if student_chart %}
+                <div style="text-align: center; margin-bottom: 1rem;">
+                    <img src="data:image/png;base64,{{ student_chart }}" alt="CGPA vs Package Scatter Plot" style="max-width: 100%; border-radius: 8px; border: 1.5px solid #475569;">
+                </div>
+                <p style="font-size: 0.8rem; color: #334155 !important; font-weight:600; line-height: 1.5; margin: 0; text-align: center;">
+                    💡 Each scatter dot maps a selected student's academic score (CGPA) on the X-axis against their package size (LPA) on the Y-axis.
+                </p>
+            {% else %}
+                <p style="text-align: center; color: #334155 !important; font-style: italic; padding: 4rem 0; font-weight:600;">
+                    Scatter plot requires student profile records with configured CGPA &amp; packages.
+                </p>
+            {% endif %}
+        </div>
+
+        <!-- Company Analytics -->
+        <div class="sp-card" style="margin-top: 0; padding: 1.5rem; background:#FFFFFF !important; border:1.5px solid #475569 !important;">
+            <h3 style="font-family:'Space Grotesk',sans-serif; font-size: 1.05rem; font-weight: 800; color: #0F172A !important; margin-bottom: 1.25rem; border-bottom: 1.5px solid #475569; padding-bottom: 0.5rem;">🏆 Top Recruiter Corporations</h3>
+            
+            {% if company_chart %}
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <img src="data:image/png;base64,{{ company_chart }}" alt="Top recruiters chart" style="max-width: 100%; border-radius: 8px; border: 1.5px solid #475569;">
+                </div>
+                
+                <table class="sp-table" style="width:100%; border-collapse:collapse; font-size: 0.85rem;">
+                    <thead>
+                        <tr style="background:#F8FAFC; border-bottom:1.5px solid #475569;">
+                            <th style="padding:0.6rem; color:#0F172A !important; font-weight:800; text-align:left;">Company Name</th>
+                            <th style="padding:0.6rem; color:#0F172A !important; font-weight:800; text-align: right;">Total Recruits</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for name, hires in company_data %}
+                            <tr style="border-bottom:1px solid #CBD5E1;">
+                                <td style="padding:0.6rem;"><strong style="color: #0F172A !important;">{{ name }}</strong></td>
+                                <td style="padding:0.6rem; text-align: right; color: #0284C7 !important; font-weight: 800;">{{ hires }} Hired</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p style="text-align: center; color: #334155 !important; font-style: italic; padding: 2rem 0; font-weight:600;">
+                    Top recruiters list compiled from selected applicant drive selections.
+                </p>
+            {% endif %}
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

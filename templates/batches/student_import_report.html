@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}Import Report - {{ batch.name }} | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem;">
+    
+    <!-- Header -->
+    <div class="dashboard-header" style="border-bottom: none; margin-bottom: 1.5rem;">
+        <div>
+            <h1 class="dashboard-title">Student Import Report</h1>
+            <p class="dashboard-welcome">Account provisioning transaction report details.</p>
+        </div>
+        <div>
+            <a href="{% url 'batches:dashboard' pk=batch.pk %}" class="btn btn-primary">Go to Batch Dashboard &rarr;</a>
+        </div>
+    </div>
+
+    <!-- Success Hero -->
+    <div class="panel" style="background: rgba(16, 185, 129, 0.05); border-color: var(--success); margin-bottom: 2rem; padding: 2rem;">
+        <h2 style="font-size: 1.5rem; color: var(--success); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+            🎉 Import Completed Successfully!
+        </h2>
+        <p style="font-size: 1rem; color: var(--text-secondary); max-width: 800px;">
+            A total of <strong style="color: #fff;">{{ report.total_imported }}</strong> verified student accounts have been created and assigned to batch <strong>{{ report.batch_name }}</strong>. 
+        </p>
+        
+        <div style="background: rgba(0, 0, 0, 0.2); border: 1px dashed rgba(16, 185, 129, 0.3); border-radius: var(--radius-sm); padding: 1rem; margin-top: 1.5rem; display: inline-block;">
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;">
+                Temporary default password set: <strong style="color: #fff; font-family: monospace; font-size: 1rem; padding: 0.15rem 0.5rem; background: rgba(255,255,255,0.05); border-radius: 4px;">{{ report.default_password }}</strong>
+            </p>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.5rem 0 0 0;">
+                ℹ️ Students must log in using their **Enrollment Number** as their username and this password, then change it immediately.
+            </p>
+        </div>
+    </div>
+
+    <!-- 1. Imported Students -->
+    <div class="card-panel" style="margin-top: 0; margin-bottom: 2rem;">
+        <h3 class="panel-title" style="border-bottom: 1px solid var(--card-border); padding-bottom: 0.75rem; margin-bottom: 1.5rem; color: var(--success);">
+            ✅ Imported Students ({{ report.imported|length }})
+        </h3>
+        {% if report.imported %}
+            <div class="table-wrapper">
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 8%;">Index</th>
+                                <th style="width: 25%;">Enrollment No (Username)</th>
+                                <th style="width: 30%;">Student Name</th>
+                                <th style="width: 25%;">Email</th>
+                                <th style="width: 12%;">System Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in report.imported %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td style="color: #fff; font-weight: 600;"><code>{{ student.roll_number }}</code></td>
+                                    <td style="color: #fff; font-weight: 600;">{{ student.name }}</td>
+                                    <td>{{ student.email }}</td>
+                                    <td>
+                                        <span class="badge badge-amber">Pending Reset</span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <p style="color: var(--text-muted); font-style: italic;">No student accounts were created.</p>
+        {% endif %}
+    </div>
+
+    <!-- 2. Failed Students -->
+    {% if report.failed %}
+    <div class="card-panel" style="margin-top: 0; margin-bottom: 2rem;">
+        <h3 class="panel-title" style="border-bottom: 1px solid var(--card-border); padding-bottom: 0.75rem; margin-bottom: 1.5rem; color: var(--danger);">
+            ❌ Failed Students ({{ report.failed|length }}) — Skipped due to validation issues
+        </h3>
+        <div class="table-wrapper">
+            <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 10%; text-align: center;">Row No</th>
+                            <th style="width: 20%;">Enrollment No</th>
+                            <th style="width: 25%;">Student Name</th>
+                            <th style="width: 45%;">Validation Errors</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in report.failed %}
+                            <tr>
+                                <td style="text-align: center; color: var(--danger); font-weight: 700;">{{ student.row_num }}</td>
+                                <td><code>{{ student.roll_number }}</code></td>
+                                <td>{{ student.name }}</td>
+                                <td style="color: var(--danger); font-size: 0.85rem;">{{ student.errors }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- 3. Duplicate Students -->
+    {% if report.duplicates %}
+    <div class="card-panel" style="margin-top: 0; margin-bottom: 2rem;">
+        <h3 class="panel-title" style="border-bottom: 1px solid var(--card-border); padding-bottom: 0.75rem; margin-bottom: 1.5rem; color: var(--warning);">
+            ⚠️ Duplicate Students ({{ report.duplicates|length }}) — Skipped due to conflict
+        </h3>
+        <div class="table-wrapper">
+            <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 20%;">Enrollment No</th>
+                            <th style="width: 25%;">Student Name</th>
+                            <th style="width: 25%;">Email</th>
+                            <th style="width: 30%;">Conflict details / Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in report.duplicates %}
+                            <tr>
+                                <td><code>{{ student.roll_number }}</code></td>
+                                <td>{{ student.name }}</td>
+                                <td>{{ student.email }}</td>
+                                <td style="color: var(--warning); font-size: 0.85rem;">{{ student.reason }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+        <a href="{% url 'batches:dashboard' pk=batch.pk %}" class="btn btn-secondary" style="padding: 0.75rem 1.5rem;">Return to Batch Dashboard</a>
+    </div>
+
+</div>
+{% endblock %}

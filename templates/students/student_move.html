@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Move Student Batch - {{ student.name }} | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper" style="padding-top: 4rem; padding-bottom: 4rem;">
+    <div class="auth-card" style="max-width: 500px; width: 100%; background:#FFFFFF !important; border:1.5px solid #475569 !important; border-radius:12px; padding:2.5rem; margin:0 auto;">
+        <div class="auth-header" style="margin-bottom:1.5rem;">
+            <a href="{% url 'students:list' %}" style="display:inline-flex;align-items:center;gap:0.4rem;font-size:0.88rem;color:#32867D !important;text-decoration:none;font-weight:800;margin-bottom:1rem;">
+                ← Back to Student Directory
+            </a>
+            <h1 class="auth-title" style="color:#0F172A !important; font-weight:800; font-size:1.5rem;">Move Student Batch</h1>
+            <p class="auth-subtitle" style="color:#334155 !important; font-weight:600; font-size:0.9rem; margin-top:0.25rem;">Migrate <strong style="color: #0F172A !important;">{{ student.name }}</strong> to a different academic batch</p>
+        </div>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="non-field-errors" style="background: #FEF2F2 !important; border: 1.5px solid #DC2626 !important; border-radius: 8px; padding: 0.75rem; margin-bottom: 1.25rem; color: #DC2626 !important; font-size: 0.9rem; font-weight:700;">
+                    {% for error in form.non_field_errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="sp-form-group">
+                    <label class="sp-form-label" for="{{ field.id_for_label }}" style="color:#1E293B !important; font-weight:800;">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <span style="font-size: 0.78rem; color: #334155 !important; font-weight:600; display: block; margin-top: 0.25rem;">
+                            {{ field.help_text }}
+                        </span>
+                    {% endif %}
+                    {% if field.errors %}
+                        <ul class="form-error" style="color:#DC2626; font-size:0.8rem; font-weight:700; list-style:none; padding-left:0; margin-top:0.25rem;">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div style="background: #F0F9FF !important; border: 1.5px solid #0284C7 !important; border-radius: 8px; padding: 0.75rem; font-size: 0.85rem; color: #0369A1 !important; font-weight:700; margin-top: 1rem;">
+                ℹ️ Transferring the student to another batch will automatically update their <strong>Department</strong> to match the new batch's department.
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <a href="{% url 'students:list' %}" class="sp-btn sp-btn-secondary" style="flex: 1; padding: 0.8rem; text-align: center; border:1.5px solid #475569 !important; font-weight:800;">Cancel</a>
+                <button type="submit" class="sp-btn sp-btn-primary" style="flex: 1; padding: 0.8rem; font-weight:800;">Transfer Batch</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

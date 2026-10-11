@@ -1,0 +1,88 @@
+<div class="sp-card" style="margin-bottom:0; transition:var(--t); border-left: 5px solid 
+  {% if opp.match_pct >= 85 %}#10b981
+  {% elif opp.match_pct >= 70 %}#f59e0b
+  {% else %}#64748b{% endif %};">
+  
+  <div class="sp-card-body" style="padding:1.5rem; display:flex; flex-direction:column; gap:1.25rem;">
+    
+    <!-- Top Row: Role name, Company, Match % and source tags -->
+    <div style="display:flex; justify-content:space-between; align-items:start; flex-wrap:wrap; gap:1rem;">
+      <div>
+        <div style="display:flex; align-items:center; gap:.5rem; margin-bottom:.35rem;">
+          <h3 style="font-size:1.15rem; font-weight:700; color:#fff; margin:0; line-height:1.2;">{{ opp.role }}</h3>
+          <span class="sp-badge {% if opp.source == 'ON-CAMPUS' %}sp-badge-violet{% else %}sp-badge-sky{% endif %}" style="font-size:.65rem; padding:.15rem .45rem;">
+            {{ opp.source }}
+          </span>
+        </div>
+        <div style="font-size:.84rem; color:var(--txt-2); font-weight:600;">
+          {{ opp.company_name }} · <span style="font-weight:400; color:var(--txt-3);">{{ opp.industry }}</span>
+        </div>
+      </div>
+
+      <!-- Match Circle & Score Indicator -->
+      <div style="display:flex; align-items:center; gap:.625rem; background:rgba(255,255,255,.02); border:1px solid var(--border); padding:.5rem .875rem; border-radius:var(--r-md);">
+        <div style="width:10px; height:10px; border-radius:9999px; background:
+          {% if opp.match_pct >= 85 %}#10b981
+          {% elif opp.match_pct >= 70 %}#f59e0b
+          {% else %}#64748b{% endif %};">
+        </div>
+        <div style="font-size:1.1rem; font-weight:800; font-family:'Space Grotesk',sans-serif; color:#fff;">
+          {{ opp.match_pct }}% <span style="font-size:.7rem; font-weight:600; color:var(--txt-3); text-transform:uppercase;">Match</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Middle grid: Matched & Missing Skills comparison -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; border-top:1px solid rgba(255,255,255,.03); border-bottom:1px solid rgba(255,255,255,.03); padding:1rem 0;">
+      
+      <!-- Matched Skills -->
+      <div>
+        <span style="font-size:.72rem; text-transform:uppercase; color:#34d399; font-weight:700; letter-spacing:.05em; display:block; margin-bottom:.5rem;">✅ Matched Skills</span>
+        {% if opp.matched_skills %}
+          <div style="display:flex; flex-wrap:wrap; gap:.35rem;">
+            {% for s in opp.matched_skills %}
+              <span class="sp-badge sp-badge-green" style="font-size:.65rem; padding:.15rem .45rem;">{{ s }}</span>
+            {% endfor %}
+          </div>
+        {% else %}
+          <span style="font-size:.76rem; color:var(--txt-3);">No matching skills found in role title/requirements.</span>
+        {% endif %}
+      </div>
+
+      <!-- Missing Skills -->
+      <div>
+        <span style="font-size:.72rem; text-transform:uppercase; color:#fcd34d; font-weight:700; letter-spacing:.05em; display:block; margin-bottom:.5rem;">⚠️ Missing Skills</span>
+        {% if opp.missing_skills %}
+          <div style="display:flex; flex-wrap:wrap; gap:.35rem;">
+            {% for s in opp.missing_skills %}
+              <span class="sp-badge sp-badge-amber" style="font-size:.65rem; padding:.15rem .45rem;">{{ s }}</span>
+            {% endfor %}
+          </div>
+        {% else %}
+          <span style="font-size:.76rem; color:var(--txt-3); color:#34d399;">All skills satisfied!</span>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <!-- Bottom Section: Explainability details & action button -->
+    <div style="display:flex; justify-content:space-between; align-items:end; flex-wrap:wrap; gap:1rem;">
+      <div style="flex:1;">
+        <span style="font-size:.72rem; text-transform:uppercase; color:var(--txt-3); font-weight:700; letter-spacing:.05em; display:block; margin-bottom:.35rem;">🔍 Why Recommended?</span>
+        <ul style="margin:0; padding-left:1.15rem; font-size:.78rem; color:var(--txt-2); line-height:1.5; display:flex; flex-direction:column; gap:.25rem;">
+          {% for reason in opp.reasons %}
+            <li>{{ reason }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- Action redirection -->
+      {% if opp.source == 'ON-CAMPUS' %}
+        <a href="{{ opp.opportunity_url }}" class="sp-btn sp-btn-primary sp-btn-sm" style="font-size:.78rem; padding:.45rem 1rem;">Apply On Campus →</a>
+      {% else %}
+        <a href="{{ opp.opportunity_url }}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-sm" style="font-size:.78rem; padding:.45rem 1rem;">View Careers Page ↗</a>
+      {% endif %}
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Student Details - {{ student.name }} | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper" style="padding-top: 4rem; padding-bottom: 4rem;">
+    <div class="auth-card" style="max-width: 600px; width: 100%; background:#FFFFFF !important; border:1.5px solid #475569 !important; border-radius:12px; padding:2.5rem; margin:0 auto;">
+        <div class="auth-header" style="margin-bottom:1.5rem;">
+            <a href="{% url 'students:list' %}" style="display:inline-flex;align-items:center;gap:0.4rem;font-size:0.88rem;color:#32867D !important;text-decoration:none;font-weight:800;margin-bottom:1rem;">
+                ← Back to Student Directory
+            </a>
+            <h1 class="auth-title" style="color:#0F172A !important; font-weight:800; font-size:1.5rem;">Edit Student Profile</h1>
+            <p class="auth-subtitle" style="color:#334155 !important; font-weight:600; font-size:0.9rem; margin-top:0.25rem;">Update details for <strong style="color: #0F172A !important;">{{ student.name }}</strong> (Roll No: <code style="color:#32867D; font-weight:800;">{{ student.roll_number }}</code>)</p>
+        </div>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="non-field-errors" style="background: #FEF2F2 !important; border: 1.5px solid #DC2626 !important; border-radius: 8px; padding: 0.75rem; margin-bottom: 1.25rem; color: #DC2626 !important; font-size: 0.9rem; font-weight:700;">
+                    {% for error in form.non_field_errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Form Row 1: Roll number and Name -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="sp-form-group">
+                    <label class="sp-form-label" for="{{ form.roll_number.id_for_label }}" style="color:#1E293B !important; font-weight:800;">Roll Number (Username) *</label>
+                    {{ form.roll_number }}
+                    {% if form.roll_number.errors %}
+                        <ul class="form-error" style="color:#DC2626; font-size:0.8rem; font-weight:700; list-style:none; padding-left:0; margin-top:0.25rem;">
+                            {% for error in form.roll_number.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="sp-form-group">
+                    <label class="sp-form-label" for="{{ form.name.id_for_label }}" style="color:#1E293B !important; font-weight:800;">Student Name *</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                        <ul class="form-error" style="color:#DC2626; font-size:0.8rem; font-weight:700; list-style:none; padding-left:0; margin-top:0.25rem;">
+                            {% for error in form.name.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Form Row 2: Email and Phone -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                <div class="sp-form-group">
+                    <label class="sp-form-label" for="{{ form.email.id_for_label }}" style="color:#1E293B !important; font-weight:800;">Email Address *</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <ul class="form-error" style="color:#DC2626; font-size:0.8rem; font-weight:700; list-style:none; padding-left:0; margin-top:0.25rem;">
+                            {% for error in form.email.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="sp-form-group">
+                    <label class="sp-form-label" for="{{ form.phone.id_for_label }}" style="color:#1E293B !important; font-weight:800;">Phone Number</label>
+                    {{ form.phone }}
+                    {% if form.phone.errors %}
+                        <ul class="form-error" style="color:#DC2626; font-size:0.8rem; font-weight:700; list-style:none; padding-left:0; margin-top:0.25rem;">
+                            {% for error in form.phone.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Form Row 3: Placement status and details -->
+            <div class="sp-form-group" style="margin-top: 1.5rem;">
+                <label class="sp-form-label" for="{{ form.placement_status.id_for_label }}" style="color:#1E293B !important; font-weight:800;">Placement Status *</label>
+                {{ form.placement_status }}
+                {% if form.placement_status.errors %}
+                    <ul class="form-error" style="color:#DC2626; font-size:0.8rem; font-weight:700; list-style:none; padding-left:0; margin-top:0.25rem;">
+                        {% for error in form.placement_status.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                <div class="sp-form-group">
+                    <label class="sp-form-label" for="{{ form.package_amount.id_for_label }}" style="color:#1E293B !important; font-weight:800;">Full Time Package (LPA)</label>
+                    {{ form.package_amount }}
+                    {% if form.package_amount.errors %}
+                        <ul class="form-error" style="color:#DC2626; font-size:0.8rem; font-weight:700; list-style:none; padding-left:0; margin-top:0.25rem;">
+                            {% for error in form.package_amount.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="sp-form-group">
+                    <label class="sp-form-label" for="{{ form.stipend_amount.id_for_label }}" style="color:#1E293B !important; font-weight:800;">Internship Stipend (/mo)</label>
+                    {{ form.stipend_amount }}
+                    {% if form.stipend_amount.errors %}
+                        <ul class="form-error" style="color:#DC2626; font-size:0.8rem; font-weight:700; list-style:none; padding-left:0; margin-top:0.25rem;">
+                            {% for error in form.stipend_amount.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div style="display: flex; gap: 1rem; margin-top: 2.5rem;">
+                <a href="{% url 'students:list' %}" class="sp-btn sp-btn-secondary" style="flex: 1; padding: 0.8rem; text-align: center; border:1.5px solid #475569 !important; font-weight:800;">Cancel</a>
+                <button type="submit" class="sp-btn sp-btn-primary" style="flex: 1; padding: 0.8rem; font-weight:800;">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

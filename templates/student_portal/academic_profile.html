@@ -1,0 +1,470 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Academic Profile | PlaceSync{% endblock %}
+{% block topbar_title %}Academic Profile{% endblock %}
+{% block nav_profile_open %}open{% endblock %}{% block nav_profile_parent %}active{% endblock %}{% block nav_academic_profile %}active{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="sp-page-header">
+  <div>
+    <h1 class="sp-page-title">🎓 Academic Profile</h1>
+    <p class="sp-page-subtitle">Official academic records, semester grades, and placement eligibility checks.</p>
+  </div>
+  {% if not is_edit %}
+  <div class="sp-page-actions">
+    <a href="?edit=1" class="sp-btn sp-btn-primary">✏️ Edit Academic Details</a>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Notice -->
+<div class="sp-alert sp-alert-info" style="margin-bottom: 1.75rem; border: 1.5px solid #475569 !important; background: #F8FAFC !important; display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.25rem; border-radius: 8px;">
+  <span style="font-size: 1.25rem;">ℹ️</span>
+  <span style="font-size: 0.85rem; color: #1E293B !important; font-weight: 600; line-height: 1.5;">
+    <strong>Notice:</strong> Fields imported from the College Admin CSV registry are locked and cannot be edited by students. You can manage previous education, current academic year, expected graduation, and semester SPIs below.
+  </span>
+</div>
+
+<!-- Top Summary Cards -->
+<div class="sp-stats" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 2rem; gap: 1rem;">
+  
+  <div class="sp-stat">
+    <div class="sp-stat-icon si-v">📅</div>
+    <div class="sp-stat-label">Current Semester</div>
+    <div class="sp-stat-value" style="color: #0F172A !important;">Sem {{ student.semester }}</div>
+  </div>
+
+  <div class="sp-stat">
+    <div class="sp-stat-icon si-g">📈</div>
+    <div class="sp-stat-label">Current SPI</div>
+    <div class="sp-stat-value" style="color: #32867D !important;">{% if student.spi %}{{ student.spi }}{% else %}--{% endif %}</div>
+  </div>
+
+  <div class="sp-stat">
+    <div class="sp-stat-icon si-s">📊</div>
+    <div class="sp-stat-label">Overall CGPA</div>
+    <div class="sp-stat-value" style="color: #0F172A !important;">{% if student.cgpa %}{{ student.cgpa|floatformat:2 }}{% else %}--{% endif %}</div>
+  </div>
+
+  <div class="sp-stat">
+    <div class="sp-stat-icon {% if is_eligible %}si-s{% else %}si-r{% endif %}">⚖️</div>
+    <div class="sp-stat-label">Academic Status</div>
+    <div class="sp-stat-value" style="font-size: 1.25rem; font-weight: 800;">
+      {% if is_eligible %}
+        <span style="color: #059669 !important;">{{ academic_status }}</span>
+      {% else %}
+        <span style="color: #DC2626 !important;">{{ academic_status }}</span>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+{% if is_edit %}
+<!-- ================= EDIT MODE ================= -->
+<form method="post" style="display: grid; grid-template-columns: 2fr 1.25fr; gap: 1.75rem; margin-bottom: 4rem; align-items: start;">
+  {% csrf_token %}
+
+  <!-- LEFT COLUMN: Editable Fields -->
+  <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+
+    {% if form.errors %}
+    <div class="sp-alert sp-alert-error" style="border: 1.5px solid #DC2626 !important; background: #FEF2F2 !important; padding: 1rem; border-radius: 8px; font-size: 0.85rem; color: #0F172A !important;">
+      <strong>Please correct the form errors:</strong>
+      <ul style="margin-top: 0.35rem; margin-left: 1.25rem;">
+        {% for field, errs in form.errors.items %}
+          {% for err in errs %}
+            <li>{{ field|title }}: {{ err }}</li>
+          {% endfor %}
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <!-- Academic Information Card -->
+    <div class="sp-card" style="border: 1.5px solid #475569 !important; background: #FFFFFF !important;">
+      <div class="sp-card-header" style="background: #F8FAFC !important; border-bottom: 1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color: #0F172A !important; font-weight: 800;">🏫 Academic Information</span>
+      </div>
+      <div class="sp-card-body" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem;">
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="{{ form.college.id_for_label }}">College Name</label>
+            {{ form.college }}
+            {% if form.college.disabled %}
+              <div style="font-size:0.75rem; color:#334155 !important; font-weight:700; margin-top:0.25rem;">🔒 Locked (Seeded by Admin)</div>
+            {% endif %}
+          </div>
+          
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="{{ form.department.id_for_label }}">Department</label>
+            {{ form.department }}
+            {% if form.department.disabled %}
+              <div style="font-size:0.75rem; color:#334155 !important; font-weight:700; margin-top:0.25rem;">🔒 Locked (Seeded by Admin)</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="{{ form.course.id_for_label }}">Course / Degree Title</label>
+            {{ form.course }}
+            {% if form.course.disabled %}
+              <div style="font-size:0.75rem; color:#334155 !important; font-weight:700; margin-top:0.25rem;">🔒 Locked (Seeded by Admin)</div>
+            {% endif %}
+          </div>
+
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="{{ form.batch.id_for_label }}">Batch</label>
+            {{ form.batch }}
+            {% if form.batch.disabled %}
+              <div style="font-size:0.75rem; color:#334155 !important; font-weight:700; margin-top:0.25rem;">🔒 Locked (Seeded by Admin)</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="{{ form.current_academic_year.id_for_label }}">Current Academic Year</label>
+            {{ form.current_academic_year }}
+          </div>
+
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="{{ form.semester.id_for_label }}">Current Semester</label>
+            {{ form.semester }}
+            {% if form.semester.disabled %}
+              <div style="font-size:0.75rem; color:#334155 !important; font-weight:700; margin-top:0.25rem;">🔒 Locked (Seeded by Admin)</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="{{ form.admission_year.id_for_label }}">Admission Year</label>
+            {{ form.admission_year }}
+            {% if form.admission_year.disabled %}
+              <div style="font-size:0.75rem; color:#334155 !important; font-weight:700; margin-top:0.25rem;">🔒 Locked (Seeded by Admin)</div>
+            {% endif %}
+          </div>
+
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="{{ form.graduation_year.id_for_label }}">Expected Graduation Year</label>
+            {{ form.graduation_year }}
+            {% if form.graduation_year.disabled %}
+              <div style="font-size:0.75rem; color:#334155 !important; font-weight:700; margin-top:0.25rem;">🔒 Locked (Seeded by Admin)</div>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Prior Education Card -->
+    <div class="sp-card" style="border: 1.5px solid #475569 !important; background: #FFFFFF !important;">
+      <div class="sp-card-header" style="background: #F8FAFC !important; border-bottom: 1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color: #0F172A !important; font-weight: 800;">📖 Previous Education Details</span>
+      </div>
+      <div class="sp-card-body" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem;">
+        
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 1rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="{{ form.tenth_board.id_for_label }}">10th Board Name</label>
+            {{ form.tenth_board }}
+          </div>
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="{{ form.tenth_percentage.id_for_label }}">10th Percentage / CGPA</label>
+            {{ form.tenth_percentage }}
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 1rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="{{ form.twelfth_board.id_for_label }}">12th Board / Diploma Name</label>
+            {{ form.twelfth_board }}
+          </div>
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="{{ form.twelfth_percentage.id_for_label }}">12th Percentage / CGPA</label>
+            {{ form.twelfth_percentage }}
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-bottom: 2rem;">
+      <a href="?" class="sp-btn sp-btn-secondary" style="padding: 0.65rem 2.25rem; border: 1.5px solid #475569 !important;">Cancel</a>
+      <button type="submit" class="sp-btn sp-btn-primary" style="padding: 0.65rem 2.75rem;">Save Academic Profile</button>
+    </div>
+
+  </div>
+
+  <!-- RIGHT COLUMN: SPI Table Editing -->
+  <div>
+    <div class="sp-card" style="border: 1.5px solid #475569 !important; background: #FFFFFF !important;">
+      <div class="sp-card-header" style="background: #F8FAFC !important; border-bottom: 1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color: #0F172A !important; font-weight: 800;">📈 Edit Semester SPIs</span>
+      </div>
+      <div class="sp-card-body" style="padding: 1rem; display: flex; flex-direction: column; gap: 1rem;">
+        <p style="font-size: 0.82rem; color: #1E293B !important; font-weight: 600; line-height: 1.5; margin-bottom: 0.5rem;">
+          Input your decimal scores out of 10.00. Overall CGPA will automatically recalculate.
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+          
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+            <span style="font-size: 0.88rem; font-weight: 800; color: #0F172A !important;">Semester 1</span>
+            <div style="width: 100px;">{{ form.spi_sem_1 }}</div>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+            <span style="font-size: 0.88rem; font-weight: 800; color: #0F172A !important;">Semester 2</span>
+            <div style="width: 100px;">{{ form.spi_sem_2 }}</div>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+            <span style="font-size: 0.88rem; font-weight: 800; color: #0F172A !important;">Semester 3</span>
+            <div style="width: 100px;">{{ form.spi_sem_3 }}</div>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+            <span style="font-size: 0.88rem; font-weight: 800; color: #0F172A !important;">Semester 4</span>
+            <div style="width: 100px;">{{ form.spi_sem_4 }}</div>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+            <span style="font-size: 0.88rem; font-weight: 800; color: #0F172A !important;">Semester 5</span>
+            <div style="width: 100px;">{{ form.spi_sem_5 }}</div>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+            <span style="font-size: 0.88rem; font-weight: 800; color: #0F172A !important;">Semester 6</span>
+            <div style="width: 100px;">{{ form.spi_sem_6 }}</div>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+            <span style="font-size: 0.88rem; font-weight: 800; color: #0F172A !important;">Semester 7</span>
+            <div style="width: 100px;">{{ form.spi_sem_7 }}</div>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+            <span style="font-size: 0.88rem; font-weight: 800; color: #0F172A !important;">Semester 8</span>
+            <div style="width: 100px;">{{ form.spi_sem_8 }}</div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</form>
+
+{% else %}
+<!-- ================= VIEW MODE ================= -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.75rem; margin-bottom: 3.5rem; align-items: start;">
+  
+  <!-- Left Side: Official Details & Prior Education -->
+  <div style="display: flex; flex-direction: column; gap: 1.75rem;">
+    
+    <!-- Academic Details Card -->
+    <div class="sp-card" style="border: 1.5px solid #475569 !important; background: #FFFFFF !important;">
+      <div class="sp-card-header" style="background: #F8FAFC !important; border-bottom: 1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color: #0F172A !important; font-weight: 800;">🏫 Academic Information</span>
+      </div>
+      <div class="sp-card-body" style="padding: 0;">
+        <div class="sp-profile-info-card" style="border: none; padding: 0.5rem 1.25rem;">
+          
+          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1.5px solid #CBD5E1;">
+            <div class="sp-info-label" style="font-size: 0.82rem; color: #334155 !important; font-weight: 700;">Enrollment Number</div>
+            <div class="sp-info-value" style="font-size: 0.88rem; color: #0F172A !important; font-weight: 800;">{{ student.roll_number }}</div>
+          </div>
+
+          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1.5px solid #CBD5E1;">
+            <div class="sp-info-label" style="font-size: 0.82rem; color: #334155 !important; font-weight: 700;">College Name</div>
+            <div class="sp-info-value" style="font-size: 0.88rem; color: #0F172A !important; font-weight: 800;">{{ student.college.name|default:"Not seeded" }}</div>
+          </div>
+
+          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1.5px solid #CBD5E1;">
+            <div class="sp-info-label" style="font-size: 0.82rem; color: #334155 !important; font-weight: 700;">Department</div>
+            <div class="sp-info-value" style="font-size: 0.88rem; color: #0F172A !important; font-weight: 800;">{{ student.department.name|default:"Not seeded" }}</div>
+          </div>
+
+          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1.5px solid #CBD5E1;">
+            <div class="sp-info-label" style="font-size: 0.82rem; color: #334155 !important; font-weight: 700;">Course / Degree</div>
+            <div class="sp-info-value" style="font-size: 0.88rem; color: #0F172A !important; font-weight: 800;">{{ student.course|default:"Not seeded" }}</div>
+          </div>
+
+          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1.5px solid #CBD5E1;">
+            <div class="sp-info-label" style="font-size: 0.82rem; color: #334155 !important; font-weight: 700;">Batch</div>
+            <div class="sp-info-value" style="font-size: 0.88rem; color: #0F172A !important; font-weight: 800;">{{ student.batch.name|default:"Not seeded" }}</div>
+          </div>
+
+          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1.5px solid #CBD5E1;">
+            <div class="sp-info-label" style="font-size: 0.82rem; color: #334155 !important; font-weight: 700;">Current Academic Year</div>
+            <div class="sp-info-value" style="font-size: 0.88rem; color: #0F172A !important; font-weight: 800;">{{ student.current_academic_year|default:"Not updated" }}</div>
+          </div>
+
+          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1.5px solid #CBD5E1;">
+            <div class="sp-info-label" style="font-size: 0.82rem; color: #334155 !important; font-weight: 700;">Admission Year</div>
+            <div class="sp-info-value" style="font-size: 0.88rem; color: #0F172A !important; font-weight: 800;">{{ student.admission_year|default:"Not updated" }}</div>
+          </div>
+
+          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border: none;">
+            <div class="sp-info-label" style="font-size: 0.82rem; color: #334155 !important; font-weight: 700;">Expected Graduation Year</div>
+            <div class="sp-info-value" style="font-size: 0.88rem; color: #0F172A !important; font-weight: 800;">{{ student.graduation_year|default:"Not updated" }}</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Previous Education Card -->
+    <div class="sp-card" style="border: 1.5px solid #475569 !important; background: #FFFFFF !important;">
+      <div class="sp-card-header" style="background: #F8FAFC !important; border-bottom: 1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color: #0F172A !important; font-weight: 800;">📖 Previous Education</span>
+      </div>
+      <div class="sp-card-body" style="padding: 0;">
+        <table class="sp-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+          <thead>
+            <tr style="border-bottom: 1.5px solid #475569; font-size: 0.8rem; color: #0F172A !important; background:#F8FAFC;">
+              <th style="padding: 0.85rem 1.25rem; font-weight:800;">Level</th>
+              <th style="padding: 0.85rem 1.25rem; font-weight:800;">Board / University</th>
+              <th style="padding: 0.85rem 1.25rem; text-align: right; font-weight:800;">Percentage / CGPA</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1.5px solid #CBD5E1;">
+              <td style="padding: 0.85rem 1.25rem; font-weight: 800; color: #0F172A !important;">10th Std</td>
+              <td style="padding: 0.85rem 1.25rem; color: #1E293B !important; font-weight:700;">{{ student.tenth_board|default:"Not provided" }}</td>
+              <td style="padding: 0.85rem 1.25rem; text-align: right; color: #0F172A !important; font-weight: 800;">
+                {% if student.tenth_percentage %}{{ student.tenth_percentage }}%{% else %}--{% endif %}
+              </td>
+            </tr>
+            <tr style="border: none;">
+              <td style="padding: 0.85rem 1.25rem; font-weight: 800; color: #0F172A !important;">12th Std / Diploma</td>
+              <td style="padding: 0.85rem 1.25rem; color: #1E293B !important; font-weight:700;">{{ student.twelfth_board|default:"Not provided" }}</td>
+              <td style="padding: 0.85rem 1.25rem; text-align: right; color: #0F172A !important; font-weight: 800;">
+                {% if student.twelfth_percentage %}{{ student.twelfth_percentage }}%{% else %}--{% endif %}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Academic Status Section -->
+    <div class="sp-card" style="border: 1.5px solid #475569 !important; background: #FFFFFF !important;">
+      <div class="sp-card-header" style="background: #F8FAFC !important; border-bottom: 1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color: #0F172A !important; font-weight: 800;">⚖️ Academic Status Summary</span>
+      </div>
+      <div class="sp-card-body" style="padding: 0;">
+        <div class="sp-profile-info-card" style="border: none; padding: 0.5rem 1.25rem;">
+          
+          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1.5px solid #CBD5E1;">
+            <div class="sp-info-label" style="font-size: 0.82rem; color: #334155 !important; font-weight: 700;">Current Year</div>
+            <div class="sp-info-value" style="font-size: 0.88rem; color: #0F172A !important; font-weight: 800;">{{ current_year_str }}</div>
+          </div>
+
+          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1.5px solid #CBD5E1;">
+            <div class="sp-info-label" style="font-size: 0.82rem; color: #334155 !important; font-weight: 700;">Current Semester</div>
+            <div class="sp-info-value" style="font-size: 0.88rem; color: #0F172A !important; font-weight: 800;">Semester {{ student.semester }}</div>
+          </div>
+
+          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1.5px solid #CBD5E1;">
+            <div class="sp-info-label" style="font-size: 0.82rem; color: #334155 !important; font-weight: 700;">Current CGPA</div>
+            <div class="sp-info-value" style="font-size: 0.88rem; font-weight: 800; color: #059669 !important;">{{ student.cgpa|default:"--" }}</div>
+          </div>
+
+          <div class="sp-info-row" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border: none;">
+            <div class="sp-info-label" style="font-size: 0.82rem; color: #334155 !important; font-weight: 700;">Total Completed Semesters</div>
+            <div class="sp-info-value" style="font-size: 0.88rem; color: #0F172A !important; font-weight: 800;">{{ completed_count }}</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right Side: Semester Performance Table -->
+  <div style="display: flex; flex-direction: column; gap: 1.75rem;">
+    
+    <!-- SPI Grade Sheet -->
+    <div class="sp-card" style="border: 1.5px solid #475569 !important; background: #FFFFFF !important;">
+      <div class="sp-card-header" style="background: #F8FAFC !important; border-bottom: 1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color: #0F172A !important; font-weight: 800;">📈 Semester SPI/SGPA Transcript</span>
+      </div>
+      <div class="sp-card-body" style="padding: 0;">
+        <table class="sp-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+          <thead>
+            <tr style="border-bottom: 1.5px solid #475569; font-size: 0.8rem; color: #0F172A !important; background:#F8FAFC;">
+              <th style="padding: 0.85rem 1.25rem; font-weight:800;">Semester</th>
+              <th style="padding: 0.85rem 1.25rem; font-weight:800;">SPI / SGPA</th>
+              <th style="padding: 0.85rem 1.25rem; text-align: right; font-weight:800;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for perf in performances %}
+            <tr style="border-bottom: 1.5px solid #CBD5E1;">
+              <td style="padding: 0.85rem 1.25rem; font-weight: 800; color: #0F172A !important;">Semester {{ perf.semester }}</td>
+              <td style="padding: 0.85rem 1.25rem; color: #32867D !important; font-weight: 800;">
+                {% if perf.spi %}{{ perf.spi|floatformat:2 }}{% else %}--{% endif %}
+              </td>
+              <td style="padding: 0.85rem 1.25rem; text-align: right;">
+                <span class="sp-badge {% if perf.status == 'Completed' %}sp-badge-green{% elif perf.status == 'Current' %}sp-badge-sky{% else %}sp-badge-gray{% endif %}" style="font-size: 0.7rem; font-weight:800; padding: 0.15rem 0.55rem; border: 1.5px solid #475569 !important;">
+                  {{ perf.status }}
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Eligibility Detailed Assessment -->
+    <div class="sp-card" style="border: 1.5px solid #475569 !important; background: #FFFFFF !important;">
+      <div class="sp-card-header" style="background: #F8FAFC !important; border-bottom: 1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color: #0F172A !important; font-weight: 800;">🎯 Placement Eligibility Assessment</span>
+      </div>
+      <div class="sp-card-body" style="padding: 1.25rem; display: flex; flex-direction: column; gap: 0.85rem; font-size: 0.85rem;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="color: #334155 !important; font-weight: 700;">Minimum Required CGPA</span>
+          <span style="font-weight: 800; color: #0F172A !important;">{{ min_required_cgpa|floatformat:2 }}</span>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="color: #334155 !important; font-weight: 700;">Current CGPA</span>
+          <span style="font-weight: 800; color: {% if student.cgpa and student.cgpa >= min_required_cgpa %}#059669 !important{% else %}#DC2626 !important{% endif %};">
+            {{ student.cgpa|default:"0.00" }}
+          </span>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="color: #334155 !important; font-weight: 700;">Current Active Backlogs</span>
+          <span style="font-weight: 800; color: {% if student.backlogs == 0 %}#059669 !important{% else %}#DC2626 !important{% endif %};">
+            {{ student.backlogs }}
+          </span>
+        </div>
+
+        <div style="border-top: 1.5px solid #CBD5E1; padding-top: 0.85rem; margin-top: 0.25rem; display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-weight: 800; color: #0F172A !important;">Assessment Status</span>
+          <span class="sp-badge {% if is_eligible %}sp-badge-green{% else %}sp-badge-danger{% endif %}" style="padding: 0.35rem 0.85rem; font-size: 0.78rem; font-weight: 800; border: 1.5px solid #475569 !important;">
+            {% if is_eligible %}PLACEMENT ELIGIBLE{% else %}NOT ELIGIBLE{% endif %}
+          </span>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endif %}
+
+{% endblock %}

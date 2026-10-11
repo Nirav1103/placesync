@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Staff Management | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding: 2rem 1.5rem;">
+    
+    <!-- Header -->
+    <div class="sp-page-header" style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 class="sp-page-title"><i class="fa-solid fa-shield-halved" style="color:#32867D; margin-right:0.3rem;"></i> Staff Management</h1>
+            <p class="sp-page-subtitle">Create, manage, and configure portal staff roles.</p>
+        </div>
+        <a href="{% url 'staff_permissions:staff_create' %}" class="sp-btn sp-btn-primary" style="font-weight:800;"><i class="fa-solid fa-plus"></i> Add Staff</a>
+    </div>
+
+    <!-- Metrics Cards -->
+    <div class="dashboard-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        <div class="sp-card" style="margin-top: 0; padding: 1.25rem; background:#FFFFFF !important; border:1.5px solid #475569 !important; border-radius:8px;">
+            <div style="font-size: 0.75rem; text-transform: uppercase; color: #334155 !important; font-weight: 800; letter-spacing: 0.05em;">Total Staff</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #0F172A !important; margin-top: 0.25rem;">{{ total_staff }}</div>
+        </div>
+        <div class="sp-card" style="margin-top: 0; padding: 1.25rem; background:#FFFFFF !important; border:1.5px solid #475569 !important; border-radius:8px;">
+            <div style="font-size: 0.75rem; text-transform: uppercase; color: #059669 !important; font-weight: 800; letter-spacing: 0.05em;">Active Staff</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #059669 !important; margin-top: 0.25rem;">{{ active_staff }}</div>
+        </div>
+        <div class="sp-card" style="margin-top: 0; padding: 1.25rem; background:#FFFFFF !important; border:1.5px solid #475569 !important; border-radius:8px;">
+            <div style="font-size: 0.75rem; text-transform: uppercase; color: #DC2626 !important; font-weight: 800; letter-spacing: 0.05em;">Inactive Staff</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #DC2626 !important; margin-top: 0.25rem;">{{ inactive_staff }}</div>
+        </div>
+    </div>
+
+    <!-- Filters Panel -->
+    <div class="sp-card" style="padding: 1.25rem; margin-bottom: 1.5rem; margin-top: 0; background:#FFFFFF !important; border:1.5px solid #475569 !important; border-radius:8px;">
+        <form method="get" style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;">
+            
+            <!-- Search field -->
+            <div style="flex: 2; min-width: 200px;">
+                <label class="sp-form-label" style="display: block; font-size: 0.78rem; color: #1E293B !important; margin-bottom: 0.5rem; font-weight: 800;">Search</label>
+                <input type="text" name="q" value="{{ q }}" placeholder="Search by name, username, email..." class="sp-form-control" style="width: 100%; font-weight:600;">
+            </div>
+
+            <!-- Role filter -->
+            <div style="flex: 1; min-width: 150px;">
+                <label class="sp-form-label" style="display: block; font-size: 0.78rem; color: #1E293B !important; margin-bottom: 0.5rem; font-weight: 800;">Role</label>
+                <select name="role" class="sp-form-control" style="width: 100%; font-weight:600;">
+                    <option value="">All Roles</option>
+                    <option value="EDITOR" {% if selected_role == 'EDITOR' %}selected{% endif %}>Editor</option>
+                    <option value="VIEW_ONLY" {% if selected_role == 'VIEW_ONLY' %}selected{% endif %}>View Only</option>
+                </select>
+            </div>
+
+            <!-- Status filter -->
+            <div style="flex: 1; min-width: 150px;">
+                <label class="sp-form-label" style="display: block; font-size: 0.78rem; color: #1E293B !important; margin-bottom: 0.5rem; font-weight: 800;">Status</label>
+                <select name="status" class="sp-form-control" style="width: 100%; font-weight:600;">
+                    <option value="">All Statuses</option>
+                    <option value="active" {% if selected_status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if selected_status == 'inactive' %}selected{% endif %}>Inactive</option>
+                </select>
+            </div>
+
+            <!-- Action buttons -->
+            <div style="display: flex; gap: 0.5rem;">
+                <button type="submit" class="sp-btn sp-btn-primary" style="padding: 0.55rem 1.25rem; font-weight:800;">Apply</button>
+                <a href="{% url 'staff_permissions:staff_list' %}" class="sp-btn sp-btn-secondary" style="padding: 0.55rem 1.25rem; border:1.5px solid #475569 !important; font-weight:800;">Reset</a>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- Table -->
+    <div class="sp-card" style="padding: 0; overflow: hidden; margin-top: 0; background:#FFFFFF !important; border:1.5px solid #475569 !important; border-radius:8px;">
+        <div style="overflow-x: auto;">
+            <table class="sp-table" style="width: 100%; border-collapse: collapse; margin-bottom: 0;">
+                <thead>
+                    <tr style="border-bottom: 1.5px solid #475569; background: #F8FAFC;">
+                        <th style="padding: 1rem 1.25rem; text-align: left; width: 64px; color:#0F172A !important; font-weight:800;">Photo</th>
+                        <th style="padding: 1rem 1.25rem; text-align: left; color:#0F172A !important; font-weight:800;">Name</th>
+                        <th style="padding: 1rem 1.25rem; text-align: left; color:#0F172A !important; font-weight:800;">Username</th>
+                        <th style="padding: 1rem 1.25rem; text-align: left; color:#0F172A !important; font-weight:800;">Email</th>
+                        <th style="padding: 1rem 1.25rem; text-align: center; width: 140px; color:#0F172A !important; font-weight:800;">Role</th>
+                        <th style="padding: 1rem 1.25rem; text-align: center; width: 120px; color:#0F172A !important; font-weight:800;">Status</th>
+                        <th style="padding: 1rem 1.25rem; text-align: center; width: 280px; color:#0F172A !important; font-weight:800;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for staff in page_obj %}
+                        <tr style="border-bottom: 1px solid #CBD5E1; vertical-align: middle;">
+                            
+                            <!-- Photo -->
+                            <td style="padding: 1rem 1.25rem;">
+                                {% if staff.profile_picture %}
+                                    <img src="{{ staff.profile_picture.url }}" alt="Photo" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1.5px solid #475569;">
+                                {% else %}
+                                    <div style="width: 36px; height: 36px; border-radius: 50%; background: #F1F5F9; border: 1.5px solid #475569; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; font-weight: 800; color: #0F172A;">
+                                        {{ staff.user.first_name|first|default:staff.user.username|first|upper }}
+                                    </div>
+                                {% endif %}
+                            </td>
+
+                            <!-- Name -->
+                            <td style="padding: 1rem 1.25rem; font-weight: 800; color: #0F172A !important;">
+                                {{ staff.user.get_full_name|default:staff.user.username }}
+                            </td>
+
+                            <!-- Username -->
+                            <td style="padding: 1rem 1.25rem; color: #1E293B !important; font-weight:600;">
+                                @{{ staff.user.username }}
+                            </td>
+
+                            <!-- Email -->
+                            <td style="padding: 1rem 1.25rem; color: #1E293B !important; font-weight:600;">
+                                {{ staff.user.email }}
+                            </td>
+
+                            <!-- Role -->
+                            <td style="padding: 1rem 1.25rem; text-align: center;">
+                                {% if staff.role == 'EDITOR' %}
+                                    <span class="sp-badge sp-badge-sky">Editor</span>
+                                {% else %}
+                                    <span class="sp-badge sp-badge-gray">View Only</span>
+                                {% endif %}
+                            </td>
+
+                            <!-- Status -->
+                            <td style="padding: 1rem 1.25rem; text-align: center;">
+                                {% if staff.user.is_active %}
+                                    <span style="color: #059669 !important; font-weight: 800; font-size: 0.82rem;"><i class="fa-solid fa-circle" style="font-size:0.5rem; margin-right:0.2rem;"></i> Active</span>
+                                {% else %}
+                                    <span style="color: #DC2626 !important; font-weight: 800; font-size: 0.82rem;"><i class="fa-solid fa-circle" style="font-size:0.5rem; margin-right:0.2rem;"></i> Inactive</span>
+                                {% endif %}
+                            </td>
+
+                            <td style="padding: 1rem 1.25rem; text-align: center;">
+                                <div style="display: flex; gap: 0.35rem; justify-content: center; align-items: center;">
+                                    <a href="{% url 'staff_permissions:staff_detail' pk=staff.pk %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="border:1.5px solid #475569 !important; font-weight:800;"><i class="fa-solid fa-eye"></i> View</a>
+                                    <a href="{% url 'staff_permissions:staff_update' pk=staff.pk %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="border:1.5px solid #475569 !important; font-weight:800;"><i class="fa-solid fa-pen"></i> Edit</a>
+                                    <a href="{% url 'staff_permissions:staff_reset_password' pk=staff.pk %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="border:1.5px solid #475569 !important; font-weight:800;"><i class="fa-solid fa-key"></i> Reset PW</a>
+                                    
+                                    <form method="post" action="{% url 'staff_permissions:staff_delete' pk=staff.pk %}" onsubmit="return confirm('Are you sure you want to permanently delete this staff member? This action cannot be undone.');" style="margin: 0; display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="sp-btn sp-btn-danger sp-btn-xs" style="background:#FEF2F2 !important; color:#DC2626 !important; border:1.5px solid #DC2626 !important; font-weight:800;"><i class="fa-solid fa-trash"></i> Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" style="padding: 3rem 1.25rem; text-align: center; color: #334155 !important; font-weight:600;">
+                                No staff members found.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        {% if page_obj.has_other_pages %}
+            <div style="padding: 1rem; display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; border-top: 1.5px solid #475569;">
+                <div style="font-size: 0.82rem; color: #334155 !important; font-weight:600;">
+                    Showing staff page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if selected_role %}&role={{ selected_role }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="border:1.5px solid #475569 !important; font-weight:800;">&larr; Previous</a>
+                    {% endif %}
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if selected_role %}&role={{ selected_role }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="border:1.5px solid #475569 !important; font-weight:800;">Next &rarr;</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+
+</div>
+{% endblock %}

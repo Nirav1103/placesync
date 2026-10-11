@@ -1,0 +1,213 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}{% if is_edit %}Edit Project | PlaceSync{% else %}Add Project | PlaceSync{% endif %}{% endblock %}
+{% block topbar_title %}{% if is_edit %}Edit Project{% else %}Add Project{% endif %}{% endblock %}
+{% block nav_projects %}active{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════════════
+     Page Header
+════════════════════════════════════════════════════ -->
+<div class="sp-page-header">
+  <div>
+    <h1 class="sp-page-title">{% if is_edit %}✏️ Edit Project{% else %}➕ Add New Project{% endif %}</h1>
+    <p class="sp-page-subtitle">Configure your developer portfolio showcase and calculate your score</p>
+  </div>
+  <div class="sp-page-actions">
+    <a href="{% url 'student_portal:projects_list' %}" class="sp-btn sp-btn-secondary" style="border:1.5px solid #475569 !important;">Cancel</a>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Form Grid
+════════════════════════════════════════════════════ -->
+<div style="max-width: 900px; margin: 0 auto 3rem;">
+  <form method="post" enctype="multipart/form-data" class="sp-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+    {% csrf_token %}
+
+    <div class="sp-card-body" style="padding: 2rem; display:flex; flex-direction:column; gap:2rem;">
+      
+      <!-- Field errors if any -->
+      {% if form.non_field_errors %}
+      <div class="sp-alert sp-alert-error" style="background:#FEF2F2 !important; color:#DC2626 !important; border:1.5px solid #DC2626 !important; font-weight:800;">
+        <span>{{ form.non_field_errors }}</span>
+      </div>
+      {% endif %}
+
+      <!-- SECTION 1: Core Details -->
+      <div>
+        <h3 style="font-family:'Space Grotesk',sans-serif; color:#0F172A !important; font-size:1.15rem; font-weight:800; border-bottom:1.5px solid #475569; padding-bottom:0.5rem; margin-bottom:1.25rem;">
+          📋 Core Project Details
+        </h3>
+        
+        <div class="sp-form-group">
+          <label class="sp-form-label" for="id_title" style="color:#1E293B !important; font-weight:800;">Project Title <span style="color:#DC2626;">*</span></label>
+          {{ form.title }}
+          {% if form.title.errors %}<div style="color:#DC2626; font-size:0.8rem; font-weight:700; margin-top:0.25rem;">{{ form.title.errors }}</div>{% endif %}
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:1rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_category" style="color:#1E293B !important; font-weight:800;">Category <span style="color:#DC2626;">*</span></label>
+            {{ form.category }}
+            {% if form.category.errors %}<div style="color:#DC2626; font-size:0.8rem; font-weight:700; margin-top:0.25rem;">{{ form.category.errors }}</div>{% endif %}
+          </div>
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_project_type" style="color:#1E293B !important; font-weight:800;">Project Type <span style="color:#DC2626;">*</span></label>
+            {{ form.project_type }}
+            {% if form.project_type.errors %}<div style="color:#DC2626; font-size:0.8rem; font-weight:700; margin-top:0.25rem;">{{ form.project_type.errors }}</div>{% endif %}
+          </div>
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_status" style="color:#1E293B !important; font-weight:800;">Status <span style="color:#DC2626;">*</span></label>
+            {{ form.status }}
+            {% if form.status.errors %}<div style="color:#DC2626; font-size:0.8rem; font-weight:700; margin-top:0.25rem;">{{ form.status.errors }}</div>{% endif %}
+          </div>
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_team_type" style="color:#1E293B !important; font-weight:800;">Team or Individual <span style="color:#DC2626;">*</span></label>
+            {{ form.team_type }}
+            {% if form.team_type.errors %}<div style="color:#DC2626; font-size:0.8rem; font-weight:700; margin-top:0.25rem;">{{ form.team_type.errors }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_start_date" style="color:#1E293B !important; font-weight:800;">Start Date</label>
+            {{ form.start_date }}
+          </div>
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_end_date" style="color:#1E293B !important; font-weight:800;">End Date</label>
+            {{ form.end_date }}
+          </div>
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_image" style="color:#1E293B !important; font-weight:800;">Project Image</label>
+            {{ form.image }}
+          </div>
+        </div>
+
+        <div class="sp-form-group">
+          <label class="sp-form-label" for="id_short_description" style="color:#1E293B !important; font-weight:800;">Short Tagline Description <span style="color:#DC2626;">*</span></label>
+          {{ form.short_description }}
+          {% if form.short_description.errors %}<div style="color:#DC2626; font-size:0.8rem; font-weight:700; margin-top:0.25rem;">{{ form.short_description.errors }}</div>{% endif %}
+          <small style="color:#334155 !important; font-size:0.78rem; font-weight:600;">Maximum 500 characters. Summarize the target goal of your project.</small>
+        </div>
+
+        <div class="sp-form-group">
+          <label class="sp-form-label" for="id_detailed_description" style="color:#1E293B !important; font-weight:800;">Detailed Project Description <span style="color:#DC2626;">*</span></label>
+          {{ form.detailed_description }}
+          {% if form.detailed_description.errors %}<div style="color:#DC2626; font-size:0.8rem; font-weight:700; margin-top:0.25rem;">{{ form.detailed_description.errors }}</div>{% endif %}
+          <small style="color:#334155 !important; font-size:0.78rem; font-weight:600;">Explain details of project architectures, deployment structure, and backend services. (+5 points to Score)</small>
+        </div>
+
+        <div class="sp-form-group">
+          <label class="sp-form-label" for="id_technologies" style="color:#1E293B !important; font-weight:800;">Technologies <span style="color:#DC2626;">*</span></label>
+          {{ form.technologies }}
+          {% if form.technologies.errors %}<div style="color:#DC2626; font-size:0.8rem; font-weight:700; margin-top:0.25rem;">{{ form.technologies.errors }}</div>{% endif %}
+          <small style="color:#334155 !important; font-size:0.78rem; font-weight:600;">Comma-separated values e.g. Python, Django, PostgreSQL, HTML, CSS. (+5 points for 5+ technologies)</small>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:2rem; margin-top:0.5rem; background:#F8FAFC; padding:1rem; border-radius:8px; border:1.5px solid #475569;">
+          <div style="display:flex; align-items:center;">
+            {{ form.is_featured }}
+            <label for="id_featured" style="font-size:0.88rem; font-weight:800; color:#0F172A !important; cursor:pointer;">⭐ Mark as Featured Project</label>
+          </div>
+          <p style="font-size:0.78rem; color:#334155 !important; font-weight:600; margin-bottom:0; flex:1;">
+            Featured projects will appear first in recruiters' search results and count for +5 portfolio points. Only one project can be featured.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- SECTION 2: Project Links -->
+      <div>
+        <h3 style="font-family:'Space Grotesk',sans-serif; color:#0F172A !important; font-size:1.15rem; font-weight:800; border-bottom:1.5px solid #475569; padding-bottom:0.5rem; margin-bottom:1.25rem;">
+          🔗 Project Showcase &amp; Repository Links
+        </h3>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_github_url" style="color:#1E293B !important; font-weight:800;">GitHub Repository URL</label>
+            {{ form.github_url }}
+            <small style="color:#334155 !important; font-size:0.78rem; font-weight:600;">(+10 points)</small>
+          </div>
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_live_url" style="color:#1E293B !important; font-weight:800;">Live Demo URL</label>
+            {{ form.live_url }}
+            <small style="color:#334155 !important; font-size:0.78rem; font-weight:600;">(+10 points)</small>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_youtube_url" style="color:#1E293B !important; font-weight:800;">YouTube Video Demo URL</label>
+            {{ form.youtube_url }}
+            <small style="color:#334155 !important; font-size:0.78rem; font-weight:600;">(+5 points)</small>
+          </div>
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_documentation_url" style="color:#1E293B !important; font-weight:800;">Documentation Website URL</label>
+            {{ form.documentation_url }}
+            <small style="color:#334155 !important; font-size:0.78rem; font-weight:600;">(+5 points)</small>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_figma_url" style="color:#1E293B !important; font-weight:800;">Figma Design URL</label>
+            {{ form.figma_url }}
+          </div>
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_google_drive_url" style="color:#1E293B !important; font-weight:800;">Google Drive folder/report URL</label>
+            {{ form.google_drive_url }}
+          </div>
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_portfolio_url" style="color:#1E293B !important; font-weight:800;">Portfolio Website URL</label>
+            {{ form.portfolio_url }}
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_play_store_url" style="color:#1E293B !important; font-weight:800;">Google Play Store App URL</label>
+            {{ form.play_store_url }}
+          </div>
+          <div class="sp-form-group">
+            <label class="sp-form-label" for="id_app_store_url" style="color:#1E293B !important; font-weight:800;">Apple App Store App URL</label>
+            {{ form.app_store_url }}
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SECTION 3: Features & Achievements -->
+      <div>
+        <h3 style="font-family:'Space Grotesk',sans-serif; color:#0F172A !important; font-size:1.15rem; font-weight:800; border-bottom:1.5px solid #475569; padding-bottom:0.5rem; margin-bottom:1.25rem;">
+          💡 Key Features &amp; Project Achievements
+        </h3>
+
+        <div class="sp-form-group">
+          <label class="sp-form-label" for="id_key_features" style="color:#1E293B !important; font-weight:800;">Key Project Features</label>
+          {{ form.key_features }}
+          <small style="color:#334155 !important; font-size:0.78rem; font-weight:600;">Enter multiple features separated by commas e.g. User Authentication, REST API, Payment Gateway.</small>
+        </div>
+
+        <div class="sp-form-group">
+          <label class="sp-form-label" for="id_achievements" style="color:#1E293B !important; font-weight:800;">Achievements &amp; Accolades</label>
+          {{ form.achievements }}
+          <small style="color:#334155 !important; font-size:0.78rem; font-weight:600;">Comma-separated entries e.g. Hackathon Winner, Innovation Award, Final Year Project.</small>
+        </div>
+
+      </div>
+
+      <!-- SUBMIT BUTTONS -->
+      <div style="border-top:1.5px solid #CBD5E1; padding-top:1.5rem; display:flex; gap:1rem; justify-content:flex-end;">
+        <a href="{% url 'student_portal:projects_list' %}" class="sp-btn sp-btn-secondary" style="padding:0.75rem 2rem; border:1.5px solid #475569 !important;">Cancel</a>
+        <button type="submit" class="sp-btn sp-btn-primary" style="padding:0.75rem 2.5rem;">
+          {% if is_edit %}Save Project Changes{% else %}Publish Project Portfolio{% endif %}
+        </button>
+      </div>
+
+    </div>
+  </form>
+</div>
+
+{% endblock %}

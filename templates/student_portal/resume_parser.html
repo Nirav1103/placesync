@@ -1,0 +1,252 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}AI Resume Parser | PlaceSync{% endblock %}
+{% block topbar_title %}AI Resume Parser{% endblock %}
+{% block nav_parser %}active{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════════════
+     Page Header
+════════════════════════════════════════════════════ -->
+<div class="sp-page-header">
+  <div>
+    <h1 class="sp-page-title">⚡ AI Resume Parser &amp; Entity Extractor</h1>
+    <p class="sp-page-subtitle">Automatically extract skills, education, projects, experience, and certificates from your uploaded PDF resumes and synchronize them with your profile.</p>
+  </div>
+  <div class="sp-page-actions">
+    <a href="{% url 'student_portal:resume_dashboard' %}" class="sp-btn sp-btn-secondary">📄 Manage Resumes</a>
+    <a href="{% url 'student_portal:ats_analysis' %}" class="sp-btn sp-btn-secondary">🤖 ATS Analysis</a>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Resume Selector & Parsing Action Bar
+════════════════════════════════════════════════════ -->
+<div class="sp-card" style="margin-bottom:1.75rem;padding:1.25rem 1.5rem;">
+  <form method="post" action="{% url 'student_portal:resume_parser' %}" style="display:flex;flex-wrap:wrap;gap:1rem;align-items:center;justify-content:space-between;">
+    {% csrf_token %}
+    <div style="display:flex;align-items:center;gap:1rem;flex:1;min-width:280px;">
+      <label for="resume_id" style="font-weight:600;color:#fff;font-size:.9rem;white-space:nowrap;">Select Uploaded Resume:</label>
+      <select name="resume_id" id="resume_id" class="sp-form-input" style="margin-bottom:0;flex:1;" onchange="window.location.href='{% url 'student_portal:resume_parser' %}?resume_id=' + this.value">
+        {% for r in all_resumes %}
+          <option value="{{ r.pk }}" {% if selected_resume and selected_resume.pk == r.pk %}selected{% endif %}>
+            {{ r.display_name }} {% if r.is_default %}(⭐ Default){% endif %} — {{ r.uploaded_at|date:"M d, Y" }}
+          </option>
+        {% empty %}
+          <option value="">No resumes uploaded yet</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      {% if all_resumes %}
+        <button type="submit" class="sp-btn sp-btn-primary" style="box-shadow:0 0 15px rgba(124,58,237,0.4);">
+          🤖 Run AI Parser &amp; Sync Profile
+        </button>
+      {% else %}
+        <a href="{% url 'student_portal:resume_dashboard' %}" class="sp-btn sp-btn-primary">📤 Upload a Resume First</a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+
+{% if selected_resume %}
+
+<!-- ══════════════════════════════════════════════════
+     Extraction Status & Metadata Bar
+════════════════════════════════════════════════════ -->
+<div class="sp-stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.75rem;gap:1.25rem;">
+  
+  <!-- Extraction Status -->
+  <div class="sp-stat">
+    <div class="sp-stat-icon si-v">⚡</div>
+    <div class="sp-stat-label">Extraction Status</div>
+    <div style="margin-top:.25rem;">
+      {% if selected_resume.parser_status == 'COMPLETED' %}
+        <span class="sp-badge sp-badge-green" style="font-size:.85rem;padding:.3rem .8rem;">✓ COMPLETED</span>
+      {% elif selected_resume.parser_status == 'PENDING' %}
+        <span class="sp-badge sp-badge-amber" style="font-size:.85rem;padding:.3rem .8rem;">⏳ PENDING</span>
+      {% else %}
+        <span class="sp-badge sp-badge-rose" style="font-size:.85rem;padding:.3rem .8rem;">❌ FAILED</span>
+      {% endif %}
+    </div>
+    <div class="sp-stat-sub" style="margin-top:.4rem;">automated PDF parsing</div>
+  </div>
+
+  <!-- Extraction Date -->
+  <div class="sp-stat">
+    <div class="sp-stat-icon si-g">📅</div>
+    <div class="sp-stat-label">Extraction Date</div>
+    <div class="sp-stat-value" style="font-size:1.15rem;margin-top:.25rem;">
+      {% if selected_resume.parsed_at %}{{ selected_resume.parsed_at|date:"M d, Y · H:i" }}{% else %}Not parsed yet{% endif %}
+    </div>
+    <div class="sp-stat-sub good">last synchronized</div>
+  </div>
+
+  <!-- Confidence Score -->
+  <div class="sp-stat">
+    <div class="sp-stat-icon si-s">🎯</div>
+    <div class="sp-stat-label">Confidence Score</div>
+    <div class="sp-stat-value" style="font-size:1.6rem;color:#c4b5fd;">
+      {{ selected_resume.parser_confidence }}<span style="font-size:.85rem;color:var(--txt-3);">%</span>
+    </div>
+    <div class="sp-bar-wrap" style="height:4px;margin-top:.5rem;">
+      <div class="sp-bar-fill bar-violet" style="width:{{ selected_resume.parser_confidence }}%;"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Extracted Skills Breakdown Cards
+════════════════════════════════════════════════════ -->
+<div class="sp-card" style="margin-bottom:1.75rem;">
+  <div class="sp-card-header">
+    <span class="sp-card-title">💡 Extracted Skills Breakdown ({{ all_skills|length }} Total Skills Found)</span>
+    <span class="sp-badge sp-badge-sky">AI Categorized</span>
+  </div>
+  <div class="sp-card-body" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:1.25rem;">
+    
+    <!-- Programming Languages -->
+    <div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);padding:1rem;">
+      <div style="font-size:.8rem;font-weight:700;color:var(--txt-2);margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem;">
+        <span>💻</span> Programming Languages
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:.35rem;">
+        {% for lang in prog_langs %}
+          <span class="sp-badge sp-badge-violet" style="font-size:.74rem;">{{ lang }}</span>
+        {% empty %}
+          <span style="font-size:.76rem;color:var(--txt-3);">None detected</span>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Frameworks & Databases -->
+    <div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);padding:1rem;">
+      <div style="font-size:.8rem;font-weight:700;color:var(--txt-2);margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem;">
+        <span>⚙️</span> Frameworks &amp; Databases
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:.35rem;">
+        {% for sk in all_skills %}
+          {% if sk not in prog_langs and sk not in tools and sk not in soft_skills %}
+            <span class="sp-badge sp-badge-sky" style="font-size:.74rem;">{{ sk }}</span>
+          {% endif %}
+        {% empty %}
+          <span style="font-size:.76rem;color:var(--txt-3);">None detected</span>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Tools & Cloud -->
+    <div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);padding:1rem;">
+      <div style="font-size:.8rem;font-weight:700;color:var(--txt-2);margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem;">
+        <span>🔧</span> Tools &amp; Cloud Platforms
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:.35rem;">
+        {% for tool in tools %}
+          <span class="sp-badge sp-badge-amber" style="font-size:.74rem;">{{ tool }}</span>
+        {% empty %}
+          <span style="font-size:.76rem;color:var(--txt-3);">None detected</span>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Soft Skills -->
+    <div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);padding:1rem;">
+      <div style="font-size:.8rem;font-weight:700;color:var(--txt-2);margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem;">
+        <span>🤝</span> Soft Skills &amp; Methodologies
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:.35rem;">
+        {% for soft in soft_skills %}
+          <span class="sp-badge sp-badge-green" style="font-size:.74rem;">{{ soft }}</span>
+        {% empty %}
+          <span style="font-size:.76rem;color:var(--txt-3);">None detected</span>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Extracted Entities Grid (Education, Experience, Projects, Certifications)
+════════════════════════════════════════════════════ -->
+<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:1.25rem;margin-bottom:2.5rem;">
+  
+  <!-- Education Details -->
+  <div class="sp-card">
+    <div class="sp-card-header">
+      <span class="sp-card-title">🎓 Extracted Education</span>
+    </div>
+    <div class="sp-card-body">
+      {% if education %}
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.5rem;">
+          {% for ed in education %}
+            <li style="font-size:.8rem;color:var(--txt-1);background:rgba(255,255,255,.03);padding:.4rem .75rem;border-radius:var(--r-sm);">{{ ed }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p style="font-size:.8rem;color:var(--txt-3);margin:0;">No explicit education items parsed.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Experience Details -->
+  <div class="sp-card">
+    <div class="sp-card-header">
+      <span class="sp-card-title">💼 Extracted Experience</span>
+    </div>
+    <div class="sp-card-body">
+      {% if experience %}
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.5rem;">
+          {% for exp in experience %}
+            <li style="font-size:.8rem;color:var(--txt-1);background:rgba(255,255,255,.03);padding:.4rem .75rem;border-radius:var(--r-sm);">{{ exp }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p style="font-size:.8rem;color:var(--txt-3);margin:0;">No work/internship items parsed.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Extracted Projects -->
+  <div class="sp-card">
+    <div class="sp-card-header">
+      <span class="sp-card-title">🔨 Extracted Projects</span>
+    </div>
+    <div class="sp-card-body">
+      {% if projects %}
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.5rem;">
+          {% for proj in projects %}
+            <li style="font-size:.8rem;color:var(--txt-1);background:rgba(255,255,255,.03);padding:.4rem .75rem;border-radius:var(--r-sm);">{{ proj }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p style="font-size:.8rem;color:var(--txt-3);margin:0;">No technical projects parsed.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Extracted Certifications -->
+  <div class="sp-card">
+    <div class="sp-card-header">
+      <span class="sp-card-title">🏆 Extracted Certifications</span>
+    </div>
+    <div class="sp-card-body">
+      {% if certificates %}
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.5rem;">
+          {% for cert in certificates %}
+            <li style="font-size:.8rem;color:var(--txt-1);background:rgba(255,255,255,.03);padding:.4rem .75rem;border-radius:var(--r-sm);">{{ cert }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p style="font-size:.8rem;color:var(--txt-3);margin:0;">No credentials parsed.</p>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

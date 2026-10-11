@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}Company Verification Dashboard | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem;">
+
+    <!-- Header -->
+    <div class="dashboard-header" style="border-bottom: none; margin-bottom: 1.5rem;">
+        <div>
+            <h1 class="dashboard-title">Company Verification Dashboard</h1>
+            <p class="dashboard-welcome">Perform background checks, email matches, address audits, and verify corporate partners.</p>
+        </div>
+        <div>
+            <a href="{% url 'companies:list' %}" class="btn btn-secondary">&larr; Back to Directory</a>
+        </div>
+    </div>
+
+    <!-- Statistics Panel -->
+    <div class="dashboard-grid" style="margin-bottom: 2rem; grid-template-columns: repeat(4, 1fr);">
+        <!-- Total -->
+        <div class="stats-card">
+            <p class="stats-label">Total Companies</p>
+            <h2 class="stats-value" style="color: #fff;">{{ total_count }}</h2>
+            <p class="stats-desc">Total registered in directory</p>
+        </div>
+        <!-- Verified -->
+        <div class="stats-card">
+            <p class="stats-label">Verified</p>
+            <h2 class="stats-value" style="color: var(--success);">{{ verified_count }}</h2>
+            <p class="stats-desc">Passed all security checks</p>
+        </div>
+        <!-- Pending -->
+        <div class="stats-card">
+            <p class="stats-label">Pending Verification</p>
+            <h2 class="stats-value" style="color: var(--warning);">{{ pending_count }}</h2>
+            <p class="stats-desc">Awaiting background audit</p>
+        </div>
+        <!-- Rejected -->
+        <div class="stats-card">
+            <p class="stats-label">Rejected</p>
+            <h2 class="stats-value" style="color: var(--danger);">{{ rejected_count }}</h2>
+            <p class="stats-desc">Failed credentials checks</p>
+        </div>
+    </div>
+
+    <!-- Filter Console -->
+    <div class="card-panel" style="margin-top: 0; padding: 1rem; margin-bottom: 1.5rem;">
+        <form method="get" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin: 0;">
+            <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-secondary);">Filter Verification Status:</span>
+            
+            <a href="{% url 'companies:verification_dashboard' %}" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.85rem; {% if not selected_status %}background: var(--primary); border-color: var(--primary);{% endif %}">
+                All Statuses
+            </a>
+            <a href="{% url 'companies:verification_dashboard' %}?status=PENDING" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.85rem; {% if selected_status == 'PENDING' %}background: var(--warning); border-color: var(--warning); color: #000;{% endif %}">
+                ⏳ Pending ({{ pending_count }})
+            </a>
+            <a href="{% url 'companies:verification_dashboard' %}?status=VERIFIED" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.85rem; {% if selected_status == 'VERIFIED' %}background: var(--success); border-color: var(--success);{% endif %}">
+                ✔️ Verified ({{ verified_count }})
+            </a>
+            <a href="{% url 'companies:verification_dashboard' %}?status=REJECTED" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.85rem; {% if selected_status == 'REJECTED' %}background: var(--danger); border-color: var(--danger);{% endif %}">
+                ✖️ Rejected ({{ rejected_count }})
+            </a>
+        </form>
+    </div>
+
+    <!-- Listing Panel -->
+    <div class="card-panel" style="margin-top: 0;">
+        <h3 class="panel-title" style="border-bottom: 1px solid var(--card-border); padding-bottom: 0.75rem; margin-bottom: 1.5rem;">Partner Audit Board</h3>
+        
+        {% if companies %}
+            <div class="table-wrapper">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 25%;">Company</th>
+                                <th style="width: 20%;">Website & Email Details</th>
+                                <th style="width: 15%;">Location Address</th>
+                                <th style="width: 15%; text-align: center;">Trust Score</th>
+                                <th style="width: 12%; text-align: center;">Verification Status</th>
+                                <th style="width: 13%; text-align: right;">Auditing Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for company in companies %}
+                                <tr>
+                                    <td>
+                                        <div style="display: flex; gap: 0.75rem; align-items: center;">
+                                            <div style="width: 40px; height: 40px; border-radius: var(--radius-sm); border: 1px solid var(--card-border); background: rgba(255,255,255,0.02); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+                                                {% if company.logo %}
+                                                    <img src="{{ company.logo.url }}" alt="{{ company.name }} logo" style="width: 100%; height: 100%; object-fit: contain;">
+                                                {% else %}
+                                                    <span style="font-size: 0.95rem; font-weight: 700; color: var(--primary);">{{ company.name|slice:":2"|upper }}</span>
+                                                {% endif %}
+                                            </div>
+                                            <div>
+                                                <strong style="color: #fff;">{{ company.name }}</strong>
+                                                <div style="font-size: 0.75rem; color: var(--text-muted);">Added on: {{ company.created_at|date:"Y-m-d" }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if company.website %}
+                                            <div style="font-size: 0.85rem;"><a href="{{ company.website }}" target="_blank" style="color: var(--primary); text-decoration: none;">🔗 {{ company.website|cut:"https://"|cut:"http://" }}</a></div>
+                                        {% endif %}
+                                        {% if company.hr_email %}
+                                            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.2rem;">✉️ {{ company.hr_email }}</div>
+                                        {% endif %}
+                                    </td>
+                                    <td style="font-size: 0.85rem; color: var(--text-secondary);">
+                                        📍 {{ company.location|default:"-" }}
+                                    </td>
+                                    <td>
+                                        <!-- Trust Score colored progress bar -->
+                                        <div style="display: flex; align-items: center; gap: 0.35rem; justify-content: center;">
+                                            <span style="font-size: 0.8rem; font-weight: 600; color: #fff;">{{ company.trust_score }}%</span>
+                                            <div style="width: 50px; background: rgba(255,255,255,0.05); height: 6px; border-radius: 3px; overflow: hidden;">
+                                                <div style="width: {{ company.trust_score }}%; background: {% if company.trust_score >= 75 %}var(--success){% elif company.trust_score >= 50 %}var(--warning){% else %}var(--danger){% endif %}; height: 100%;"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        {% if company.verification_status == 'VERIFIED' %}
+                                            <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.25);">Verified</span>
+                                        {% elif company.verification_status == 'REJECTED' %}
+                                            <span class="badge" style="background: rgba(244, 63, 94, 0.1); color: var(--danger); border-color: rgba(244, 63, 94, 0.25);">Rejected</span>
+                                        {% else %}
+                                            <span class="badge" style="background: rgba(245, 158, 11, 0.1); color: var(--warning); border-color: rgba(245, 158, 11, 0.25);">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <a href="{% url 'companies:verify_audit' pk=company.pk %}" class="btn btn-secondary btn-xs" style="background: rgba(99, 102, 241, 0.05); color: #a5b4fc; border-color: rgba(99, 102, 241, 0.2);" title="Run Verification Audits">🛡️ Audit Checks</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <p style="text-align: center; color: var(--text-secondary); font-style: italic; padding: 3rem 0; margin: 0;">
+                No partner companies found in this list.
+            </p>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

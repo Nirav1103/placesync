@@ -1,0 +1,875 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlaceSync - Connecting Colleges, Students, and Companies Through Smart Campus Recruitment</title>
+    
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Landing Page Styling -->
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+</head>
+<body>
+
+    <!-- ══════════════════════════════════════════════════
+         1. Sticky Navigation Bar
+         ══════════════════════════════════════════════════ -->
+    <nav class="navbar-wrapper">
+        <div class="container navbar">
+            <a href="#home" class="logo-wrapper">
+                <div class="logo-icon">P</div>
+                <span class="logo-text">PlaceSync</span>
+            </a>
+            
+            <!-- Mobile Menu Toggle Hack -->
+            <input type="checkbox" id="menu-toggle" class="menu-toggle-checkbox">
+            <label for="menu-toggle" class="menu-toggle-label">
+                <i class="fa-solid fa-bars"></i>
+            </label>
+            
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#features" class="nav-link">Features</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#workflow" class="nav-link">How It Works</a></li>
+                <li><a href="#faq" class="nav-link">FAQ</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+            
+            <div class="nav-actions">
+                <a href="{% url 'accounts:student_login' %}" class="btn btn-outline-violet">Student Login</a>
+                <a href="{% url 'accounts:login' %}" class="btn btn-outline-violet">College Login</a>
+                <a href="#contact" class="btn btn-primary">Request Access</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ══════════════════════════════════════════════════
+         2. Hero Section
+         ══════════════════════════════════════════════════ -->
+    <header id="home" class="hero-section">
+        <div class="container hero-grid">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> The Smart Campus Recruitment Standard
+                </div>
+                <h1 class="hero-title">
+                    One Platform for Complete <span>Campus Placement</span> Management
+                </h1>
+                <p class="hero-desc">
+                    PlaceSync connects Colleges, Students, and Companies into one intelligent recruitment platform that simplifies campus hiring from student registration to final placement.
+                </p>
+                <div class="hero-buttons">
+                    <a href="#features" class="btn btn-primary">Explore Platform</a>
+                    <a href="#contact" class="btn btn-secondary">Get Started</a>
+                </div>
+            </div>
+            
+            <div class="hero-illustration">
+                <!-- Premium SaaS Orchestration Inline SVG -->
+                <svg class="floating-svg" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#7c3aed" />
+                            <stop offset="100%" stop-color="#4f46e5" />
+                        </linearGradient>
+                        <linearGradient id="tealGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#06b6d4" />
+                            <stop offset="100%" stop-color="#0891b2" />
+                        </linearGradient>
+                        <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#1e1b4b" stop-opacity="0.6" />
+                            <stop offset="100%" stop-color="#0f172a" stop-opacity="0.8" />
+                        </linearGradient>
+                    </defs>
+                    
+                    <!-- Background Glow Circles -->
+                    <circle cx="250" cy="250" r="160" fill="url(#purpleGrad)" opacity="0.05" />
+                    <circle cx="250" cy="250" r="220" stroke="url(#purpleGrad)" stroke-width="1.5" stroke-dasharray="8 8" opacity="0.15" />
+                    
+                    <!-- Global Hub Center Node -->
+                    <circle cx="250" cy="250" r="45" fill="url(#purpleGrad)" />
+                    <circle cx="250" cy="250" r="55" stroke="#7c3aed" stroke-width="2" opacity="0.5" />
+                    <path d="M238 250H262M250 238V262" stroke="#fff" stroke-width="4" stroke-linecap="round" />
+                    
+                    <!-- Connective Networking Lines -->
+                    <line x1="250" y1="250" x2="110" y2="130" stroke="#7c3aed" stroke-width="2" opacity="0.4" />
+                    <line x1="250" y1="250" x2="390" y2="130" stroke="#7c3aed" stroke-width="2" opacity="0.4" />
+                    <line x1="250" y1="250" x2="390" y2="370" stroke="#06b6d4" stroke-width="2" opacity="0.4" />
+                    <line x1="250" y1="250" x2="110" y2="370" stroke="#06b6d4" stroke-width="2" opacity="0.4" />
+                    
+                    <!-- Card 1: Student Profile (Top Left) -->
+                    <g transform="translate(40, 60)">
+                        <rect width="140" height="90" rx="12" fill="url(#glowGrad)" stroke="rgba(124,58,237,0.3)" stroke-width="1.5" />
+                        <!-- Avatar -->
+                        <circle cx="30" cy="35" r="14" fill="#7c3aed" />
+                        <circle cx="30" cy="32" r="6" fill="#fff" />
+                        <path d="M20 44C20 40 24 38 30 38C36 38 40 40 40 44" fill="#fff" />
+                        <!-- Text Lines -->
+                        <rect x="54" y="24" width="70" height="6" rx="3" fill="#fff" />
+                        <rect x="54" y="36" width="50" height="5" rx="2.5" fill="#a78bfa" />
+                        <rect x="54" y="46" width="35" height="4" rx="2" fill="#6b7280" />
+                        <!-- Skill tags -->
+                        <rect x="16" y="66" width="42" height="12" rx="4" fill="rgba(16,185,129,0.12)" stroke="rgba(16,185,129,0.3)" />
+                        <rect x="64" y="66" width="60" height="12" rx="4" fill="rgba(6,182,212,0.12)" stroke="rgba(6,182,212,0.3)" />
+                    </g>
+                    
+                    <!-- Card 2: Placement Drive (Top Right) -->
+                    <g transform="translate(320, 60)">
+                        <rect width="140" height="90" rx="12" fill="url(#glowGrad)" stroke="rgba(6,182,212,0.3)" stroke-width="1.5" />
+                        <rect x="16" y="18" width="80" height="8" rx="4" fill="#fff" />
+                        <rect x="16" y="32" width="108" height="5" rx="2.5" fill="#6b7280" />
+                        <rect x="16" y="42" width="90" height="5" rx="2.5" fill="#6b7280" />
+                        <!-- Hired Stamp Badge -->
+                        <rect x="16" y="60" width="50" height="16" rx="4" fill="rgba(16,185,129,0.15)" />
+                        <text x="24" y="72" fill="#34d399" font-size="8" font-weight="700">HIRED</text>
+                        <!-- LPA Value -->
+                        <text x="80" y="72" fill="#fbbf24" font-size="9" font-weight="800">18.5 LPA</text>
+                    </g>
+                    
+                    <!-- Card 3: Calendar Event (Bottom Left) -->
+                    <g transform="translate(40, 310)">
+                        <rect width="140" height="90" rx="12" fill="url(#glowGrad)" stroke="rgba(6,182,212,0.3)" stroke-width="1.5" />
+                        <!-- Calendar grid icon -->
+                        <rect x="16" y="18" width="22" height="22" rx="4" fill="#06b6d4" />
+                        <rect x="20" y="26" width="4" height="4" fill="#fff" />
+                        <rect x="28" y="26" width="4" height="4" fill="#fff" />
+                        <rect x="20" y="32" width="4" height="4" fill="#fff" />
+                        <rect x="28" y="32" width="4" height="4" fill="#fff" />
+                        
+                        <rect x="46" y="20" width="75" height="7" rx="3.5" fill="#fff" />
+                        <rect x="46" y="32" width="55" height="5" rx="2.5" fill="#6b7280" />
+                        <!-- Timeline alert info -->
+                        <rect x="16" y="58" width="108" height="18" rx="4" fill="rgba(124,58,237,0.1)" />
+                        <text x="22" y="70" fill="#c4b5fd" font-size="8" font-weight="700">Tech Interview Today</text>
+                    </g>
+                    
+                    <!-- Card 4: Stats Analytics Chart (Bottom Right) -->
+                    <g transform="translate(320, 310)">
+                        <rect width="140" height="90" rx="12" fill="url(#glowGrad)" stroke="rgba(124,58,237,0.3)" stroke-width="1.5" />
+                        <text x="16" y="24" fill="#fff" font-size="9" font-weight="700">Recruitment Ratio</text>
+                        <!-- Trend Graph SVG path -->
+                        <path d="M20 70 L45 55 L70 62 L95 40 L120 28" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="120" cy="28" r="3.5" fill="#fff" stroke="#10b981" stroke-width="2" />
+                        <path d="M20 70 L45 55 L70 62 L95 40 L120 28 L120 75 L20 75 Z" fill="url(#purpleGrad)" opacity="0.1" />
+                        <!-- Ratio Percentage -->
+                        <text x="102" y="22" fill="#34d399" font-size="9" font-weight="800">+94%</text>
+                    </g>
+                </svg>
+            </div>
+        </div>
+    </header>
+
+    <!-- ══════════════════════════════════════════════════
+         3. Platform Overview
+         ══════════════════════════════════════════════════ -->
+    <section id="about" class="section-padding stats-bar-wrapper">
+        <div class="container">
+            <div class="section-title-block">
+                <span class="section-tag">Overview</span>
+                <h2 class="section-title">A Centralized Smart Hub for the Entire Placement Ecosystem</h2>
+                <p class="section-desc">
+                    PlaceSync is designed to bridges gaps by providing tailored tools for Colleges, Students, and Companies to execute, track, and monitor placement activities on a single secure network.
+                </p>
+            </div>
+            
+            <div class="overview-grid">
+                <div class="overview-card">
+                    <div class="overview-icon">🎓</div>
+                    <h3 class="overview-name">Colleges &amp; Universities</h3>
+                    <p class="overview-desc">
+                        Manage all academic batches, import student datasets, track applications live, build reports, and verify recruiter companies with absolute transparency.
+                    </p>
+                </div>
+                <div class="overview-card">
+                    <div class="overview-icon">🧑‍🎓</div>
+                    <h3 class="overview-name">Students &amp; Candidates</h3>
+                    <p class="overview-desc">
+                        Create academic profiles, upload resumes for ATS analysis, view matching placement drives, track schedules in a customized calendar, and secure dream offers.
+                    </p>
+                </div>
+                <div class="overview-card">
+                    <div class="overview-icon">🏢</div>
+                    <h3 class="overview-name">Recruiting Companies</h3>
+                    <p class="overview-desc">
+                        Publish job and internship placement drives, screen eligible student profiles, coordinate interview stages, and output hiring statistics.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         4. Three User Panels
+         ══════════════════════════════════════════════════ -->
+    <section class="section-padding">
+        <div class="container panels-wrapper">
+            
+            <!-- Panel 1: College Admin -->
+            <div class="panel-row">
+                <div class="panel-content">
+                    <span class="panel-badge badge-college">College Administration</span>
+                    <h3 class="panel-title">End-to-End Institutional Control</h3>
+                    <p class="panel-desc">
+                        Empower your university's Training and Placement Cell with automated administrative tools. Ditch spreadsheets for robust database orchestration.
+                    </p>
+                    <ul class="panel-features-list">
+                        <li class="panel-feature-item">
+                            <i class="fa-solid fa-circle-check" style="color: #22d3ee;"></i> Student Management
+                        </li>
+                        <li class="panel-feature-item">
+                            <i class="fa-solid fa-circle-check" style="color: #22d3ee;"></i> Bulk CSV Imports
+                        </li>
+                        <li class="panel-feature-item">
+                            <i class="fa-solid fa-circle-check" style="color: #22d3ee;"></i> Batch &amp; Dept Setup
+                        </li>
+                        <li class="panel-feature-item">
+                            <i class="fa-solid fa-circle-check" style="color: #22d3ee;"></i> Manage Active Drives
+                        </li>
+                        <li class="panel-feature-item">
+                            <i class="fa-solid fa-circle-check" style="color: #22d3ee;"></i> Company Verification
+                        </li>
+                        <li class="panel-feature-item">
+                            <i class="fa-solid fa-circle-check" style="color: #22d3ee;"></i> Comprehensive Reports
+                        </li>
+                        <li class="panel-feature-item" style="grid-column: span 2;">
+                            <i class="fa-solid fa-circle-check" style="color: #22d3ee;"></i> Interactive Analytics Dashboards
+                        </li>
+                    </ul>
+                </div>
+                <div class="panel-illustration">
+                    <!-- Inline SVG representing Admin Panel Dashboard Interface mockup -->
+                    <svg class="panel-mockup" viewBox="0 0 400 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="400" height="240" rx="8" fill="#111827" stroke="rgba(255,255,255,0.06)" />
+                        <!-- Header -->
+                        <rect x="15" y="15" width="80" height="12" rx="4" fill="#1f2937" />
+                        <rect x="250" y="15" width="55" height="12" rx="6" fill="rgba(6,182,212,0.15)" />
+                        <rect x="315" y="15" width="70" height="12" rx="6" fill="#7c3aed" />
+                        <!-- Line separator -->
+                        <line x1="15" y1="40" x2="385" y2="40" stroke="rgba(255,255,255,0.04)" stroke-width="1" />
+                        <!-- Main grid layout -->
+                        <rect x="15" y="55" width="115" height="75" rx="6" fill="#1e1b4b" stroke="rgba(124,58,237,0.15)" />
+                        <rect x="145" y="55" width="115" height="75" rx="6" fill="#0f172a" />
+                        <rect x="275" y="55" width="110" height="75" rx="6" fill="#0f172a" />
+                        <!-- Mock chart in left card -->
+                        <circle cx="72" cy="92" r="22" stroke="rgba(255,255,255,0.05)" stroke-width="5" fill="none" />
+                        <circle cx="72" cy="92" r="22" stroke="#7c3aed" stroke-width="5" stroke-dasharray="100 40" fill="none" />
+                        <!-- Tables or rows under -->
+                        <rect x="15" y="145" width="370" height="22" rx="4" fill="rgba(255,255,255,0.02)" />
+                        <rect x="25" y="152" width="120" height="8" rx="4" fill="#fff" opacity="0.7" />
+                        <rect x="330" y="152" width="45" height="8" rx="4" fill="#10b981" />
+                        <rect x="15" y="175" width="370" height="22" rx="4" fill="rgba(255,255,255,0.02)" />
+                        <rect x="25" y="182" width="90" height="8" rx="4" fill="#fff" opacity="0.7" />
+                        <rect x="330" y="182" width="45" height="8" rx="4" fill="#f43f5e" />
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- Panel 2: Student -->
+            <div class="panel-row">
+                <div class="panel-content">
+                    <span class="panel-badge badge-student">Student Hub</span>
+                    <h3 class="panel-title">Accelerate Your Placement Potential</h3>
+                    <p class="panel-desc">
+                        Provide candidates with personal landing portals containing resume checks, missing skill trackers, placement calendars, and automated salary range predictions.
+                    </p>
+                    <ul class="panel-features-list">
+                        <li class="panel-feature-item">
+                            <i class="fa-solid fa-circle-check" style="color: #a78bfa;"></i> Custom User Profile
+                        </li>
+                        <li class="panel-feature-item">
+                            <i class="fa-solid fa-circle-check" style="color: #a78bfa;"></i> Resume Management
+                        </li>
+                        <li class="panel-feature-item">
+                            <i class="fa-solid fa-circle-check" style="color: #a78bfa;"></i> Python ATS Analysis
+                        </li>
+                        <li class="panel-feature-item">
+                            <i class="fa-solid fa-circle-check" style="color: #a78bfa;"></i> Skill Valuation Projections
+                        </li>
+                        <li class="panel-feature-item">
+                            <i class="fa-solid fa-circle-check" style="color: #a78bfa;"></i> Career Passport PDFs
+                        </li>
+                        <li class="panel-feature-item">
+                            <i class="fa-solid fa-circle-check" style="color: #a78bfa;"></i> Easy Job Apply
+                        </li>
+                        <li class="panel-feature-item" style="grid-column: span 2;">
+                            <i class="fa-solid fa-circle-check" style="color: #a78bfa;"></i> Integrated Drive Notifications &amp; Calendar
+                        </li>
+                    </ul>
+                </div>
+                <div class="panel-illustration">
+                    <!-- Inline SVG representing Student Panel Dashboard Interface mockup -->
+                    <svg class="panel-mockup" viewBox="0 0 400 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="400" height="240" rx="8" fill="#111827" stroke="rgba(255,255,255,0.06)" />
+                        <!-- Header -->
+                        <rect x="15" y="15" width="90" height="12" rx="4" fill="#1f2937" />
+                        <circle cx="370" cy="21" r="10" fill="#7c3aed" />
+                        <!-- Body Grid -->
+                        <rect x="15" y="45" width="220" height="110" rx="6" fill="#0f172a" />
+                        <!-- ATS Score Meter -->
+                        <rect x="250" y="45" width="135" height="110" rx="6" fill="#1e1b4b" stroke="rgba(124,58,237,0.15)" />
+                        <circle cx="317" cy="90" r="28" stroke="rgba(255,255,255,0.04)" stroke-width="6" fill="none" />
+                        <circle cx="317" cy="90" r="28" stroke="#a78bfa" stroke-width="6" stroke-dasharray="140 40" fill="none" />
+                        <text x="306" y="94" fill="#fff" font-size="12" font-weight="800">82%</text>
+                        <text x="303" y="132" fill="#c4b5fd" font-size="7" font-weight="700">ATS SCORE</text>
+                        <!-- List below -->
+                        <rect x="15" y="170" width="370" height="18" rx="4" fill="rgba(255,255,255,0.02)" />
+                        <rect x="25" y="176" width="140" height="6" rx="3" fill="#fff" opacity="0.6" />
+                        <rect x="15" y="195" width="370" height="18" rx="4" fill="rgba(255,255,255,0.02)" />
+                        <rect x="25" y="201" width="100" height="6" rx="3" fill="#fff" opacity="0.6" />
+                    </svg>
+                </div>
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         5. Platform Workflow
+         ══════════════════════════════════════════════════ -->
+    <section id="workflow" class="section-padding stats-bar-wrapper">
+        <div class="container">
+            <div class="section-title-block">
+                <span class="section-tag">Execution Workflow</span>
+                <h2 class="section-title">Visualizing the Placement Journey</h2>
+                <p class="section-desc">
+                    Follow the streamlined lifecycle of a placement drive as coordinates and events transition dynamically between panels.
+                </p>
+            </div>
+            
+            <div class="timeline-wrapper">
+                <div class="timeline-line"></div>
+                
+                <!-- Step 1 -->
+                <div class="timeline-item">
+                    <div class="timeline-card">
+                        <span class="timeline-step">Step 01</span>
+                        <h4 class="timeline-title">College Registers</h4>
+                        <p class="timeline-desc">The university administration establishes college profiles, configuring departments and grading ranges.</p>
+                    </div>
+                    <div class="timeline-empty"></div>
+                    <div class="timeline-marker"></div>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="timeline-item">
+                    <div class="timeline-empty"></div>
+                    <div class="timeline-card">
+                        <span class="timeline-step">Step 02</span>
+                        <h4 class="timeline-title">Student Accounts Initialized</h4>
+                        <p class="timeline-desc">Admin imports student data via Excel/CSV sheets, auto-creating authenticated student portal entries.</p>
+                    </div>
+                    <div class="timeline-marker"></div>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="timeline-item">
+                    <div class="timeline-card">
+                        <span class="timeline-step">Step 03</span>
+                        <h4 class="timeline-title">Students Build Profiles</h4>
+                        <p class="timeline-desc">Candidates log in to complete academic histories, edit programming skill categories, and upload resumes.</p>
+                    </div>
+                    <div class="timeline-empty"></div>
+                    <div class="timeline-marker"></div>
+                </div>
+                
+                <!-- Step 4 -->
+                <div class="timeline-item">
+                    <div class="timeline-card">
+                        <span class="timeline-step">Step 04</span>
+                        <h4 class="timeline-title">Administrative Audit</h4>
+                        <p class="timeline-desc">College TPO Cell reviews partner companies, updating trust status and verifying credibility scores.</p>
+                    </div>
+                    <div class="timeline-empty"></div>
+                    <div class="timeline-marker"></div>
+                </div>
+                
+                <!-- Step 5 -->
+                <div class="timeline-item">
+                    <div class="timeline-empty"></div>
+                    <div class="timeline-card">
+                        <span class="timeline-step">Step 05</span>
+                        <h4 class="timeline-title">Placement Drives Posted</h4>
+                        <p class="timeline-desc">Placement drives are published in the portal with CGPA, Department, and Skill eligibility requirements.</p>
+                    </div>
+                    <div class="timeline-marker"></div>
+                </div>
+                
+                <!-- Step 6 -->
+                <div class="timeline-item">
+                    <div class="timeline-card">
+                        <span class="timeline-step">Step 06</span>
+                        <h4 class="timeline-title">Candidates Apply</h4>
+                        <p class="timeline-desc">Eligible students receive automated notifications, review detail cards, apply, and sync dates to calendars.</p>
+                    </div>
+                    <div class="timeline-empty"></div>
+                    <div class="timeline-marker"></div>
+                </div>
+                
+                <!-- Step 7 -->
+                <div class="timeline-item">
+                    <div class="timeline-empty"></div>
+                    <div class="timeline-card">
+                        <span class="timeline-step">Step 07</span>
+                        <h4 class="timeline-title">Interviews and Screening</h4>
+                        <p class="timeline-desc">Candidates are shortlisted, interviews coordinated, and application stages tracked live.</p>
+                    </div>
+                    <div class="timeline-marker"></div>
+                </div>
+                
+                <!-- Step 8 -->
+                <div class="timeline-item">
+                    <div class="timeline-card">
+                        <span class="timeline-step">Step 08</span>
+                        <h4 class="timeline-title">Final Offer Release</h4>
+                        <p class="timeline-desc">Offers are published, student statuses transition, analytics update, and career passports compile.</p>
+                    </div>
+                    <div class="timeline-empty"></div>
+                    <div class="timeline-marker"></div>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         6. Key Features Section
+         ══════════════════════════════════════════════════ -->
+    <section id="features" class="section-padding">
+        <div class="container">
+            <div class="section-title-block">
+                <span class="section-tag">Key Features</span>
+                <h2 class="section-title">Built with All Core Recruitment Features</h2>
+                <p class="section-desc">
+                    Explore the complete suite of features that makes PlaceSync the premium standard for campus placements.
+                </p>
+            </div>
+            
+            <div class="features-grid">
+                <!-- Feature 1 -->
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i class="fa-solid fa-graduation-cap"></i></div>
+                    <div class="feature-info">
+                        <h4 class="feature-title">College Dashboard</h4>
+                        <p class="feature-desc">Complete administrative overview of batches, departments, placement rates, and active drives.</p>
+                    </div>
+                </div>
+                <!-- Feature 2 -->
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i class="fa-solid fa-user-tie"></i></div>
+                    <div class="feature-info">
+                        <h4 class="feature-title">Student Dashboard</h4>
+                        <p class="feature-desc">Personal portal highlighting applications, notifications, calendar timelines, and scores.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i class="fa-solid fa-file-csv"></i></div>
+                    <div class="feature-info">
+                        <h4 class="feature-title">CSV Bulk Upload</h4>
+                        <p class="feature-desc">Import batches of student credentials and details instantly from Excel sheets.</p>
+                    </div>
+                </div>
+                <!-- Feature 5 -->
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i class="fa-solid fa-user-plus"></i></div>
+                    <div class="feature-info">
+                        <h4 class="feature-title">Auto Account Creation</h4>
+                        <p class="feature-desc">Instantly registers students during imports, prompting password updates on login.</p>
+                    </div>
+                </div>
+                <!-- Feature 6 -->
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i class="fa-solid fa-brain"></i></div>
+                    <div class="feature-info">
+                        <h4 class="feature-title">Python ATS Analyzer</h4>
+                        <p class="feature-desc">Parses resume text using python parsing modules to score formatting and layout matches.</p>
+                    </div>
+                </div>
+                <!-- Feature 7 -->
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i class="fa-solid fa-lightbulb"></i></div>
+                    <div class="feature-info">
+                        <h4 class="feature-title">Career Suggestions</h4>
+                        <p class="feature-desc">Pinpoints missing keywords in resume templates, generating profile optimization tips.</p>
+                    </div>
+                </div>
+                <!-- Feature 8 -->
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i class="fa-solid fa-briefcase"></i></div>
+                    <div class="feature-info">
+                        <h4 class="feature-title">Placement Drive Controls</h4>
+                        <p class="feature-desc">College admins publish and verify placement drives for specific criteria restrictions.</p>
+                    </div>
+                </div>
+                <!-- Feature 9 -->
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div class="feature-info">
+                        <h4 class="feature-title">Company Verification</h4>
+                        <p class="feature-desc">Verify recruiter profiles, inspect trust history, and flag fraudulent portals.</p>
+                    </div>
+                </div>
+                <!-- Feature 10 -->
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i class="fa-solid fa-magnifying-glass-jobs"></i></div>
+                    <div class="feature-info">
+                        <h4 class="feature-title">Job &amp; Internship Portal</h4>
+                        <p class="feature-desc">Unified portal showing active, closed, and upcoming campus opportunities.</p>
+                    </div>
+                </div>
+                <!-- Feature 11 -->
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i class="fa-solid fa-calendar-days"></i></div>
+                    <div class="feature-info">
+                        <h4 class="feature-title">Interview Coordinator</h4>
+                        <p class="feature-desc">Track tech and HR stages, setting reminders and release windows for candidates.</p>
+                    </div>
+                </div>
+                <!-- Feature 12 -->
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i class="fa-solid fa-file-pdf"></i></div>
+                    <div class="feature-info">
+                        <h4 class="feature-title">Placement Reports</h4>
+                        <p class="feature-desc">Generate CSV or PDF reports on hiring status, average packages, and batch stats.</p>
+                    </div>
+                </div>
+                <!-- Feature 13 -->
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i class="fa-solid fa-chart-line"></i></div>
+                    <div class="feature-info">
+                        <h4 class="feature-title">Analytics Dashboard</h4>
+                        <p class="feature-desc">Track trends in hiring, packages, stipends, and department performance metrics.</p>
+                    </div>
+                </div>
+                <!-- Feature 14 -->
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i class="fa-solid fa-wand-magic"></i></div>
+                    <div class="feature-info">
+                        <h4 class="feature-title">Opportunity Scraping</h4>
+                        <p class="feature-desc">Discovers latest off-campus openings using integrated python scraping utilities.</p>
+                    </div>
+                </div>
+                <!-- Feature 15 -->
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i class="fa-solid fa-bell"></i></div>
+                    <div class="feature-info">
+                        <h4 class="feature-title">Real-Time Notifications</h4>
+                        <p class="feature-desc">Alerts students immediately when new eligible drives publish or dates shift.</p>
+                    </div>
+                </div>
+                <!-- Feature 16 -->
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i class="fa-solid fa-message"></i></div>
+                    <div class="feature-info">
+                        <h4 class="feature-title">Direct Messaging</h4>
+                        <p class="feature-desc">Direct communications lines between administration officers and student portals.</p>
+                    </div>
+                </div>
+                <!-- Feature 17 -->
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i class="fa-solid fa-lock"></i></div>
+                    <div class="feature-info">
+                        <h4 class="feature-title">Secure Portal Login</h4>
+                        <p class="feature-desc">Secure credential management with strict role validations and password resets.</p>
+                    </div>
+                </div>
+                <!-- Feature 18 -->
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i class="fa-solid fa-mobile-screen"></i></div>
+                    <div class="feature-info">
+                        <h4 class="feature-title">Responsive Design</h4>
+                        <p class="feature-desc">Beautiful grids adjust perfectly for laptops, tablets, and mobile screens.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         7. Why Choose PlaceSync
+         ══════════════════════════════════════════════════ -->
+    <section class="section-padding stats-bar-wrapper">
+        <div class="container">
+            <div class="section-title-block">
+                <span class="section-tag">Value Proposition</span>
+                <h2 class="section-title">Why Colleges &amp; Recruiters Choose Us</h2>
+                <p class="section-desc">
+                    Discover the core benefits of switching your placement ecosystem to PlaceSync.
+                </p>
+            </div>
+            
+            <div class="benefits-grid">
+                <!-- Card 1 -->
+                <div class="benefit-card">
+                    <div class="benefit-icon">🌐</div>
+                    <h4 class="benefit-title">Centralized Platform</h4>
+                    <p class="benefit-desc">No more fragmented emails or disconnected files. Everything lives in one place.</p>
+                </div>
+                <!-- Card 2 -->
+                <div class="benefit-card">
+                    <div class="benefit-icon">⚡</div>
+                    <h4 class="benefit-title">Efficient Placement</h4>
+                    <p class="benefit-desc">Automation cuts admin screening workloads by up to 75%.</p>
+                </div>
+                <!-- Card 3 -->
+                <div class="benefit-card">
+                    <div class="benefit-icon">⏱️</div>
+                    <h4 class="benefit-title">Time Saving</h4>
+                    <p class="benefit-desc">Automated eligibility checks and quick notifications speed up hiring cycles.</p>
+                </div>
+                <!-- Card 4 -->
+                <div class="benefit-card">
+                    <div class="benefit-icon">🔔</div>
+                    <h4 class="benefit-title">Real-Time Alerts</h4>
+                    <p class="benefit-desc">Instant alerts keep candidates updated, preventing missed deadlines.</p>
+                </div>
+                <!-- Card 5 -->
+                <div class="benefit-card">
+                    <div class="benefit-icon">📈</div>
+                    <h4 class="benefit-title">Career Acceleration</h4>
+                    <p class="benefit-desc">Help candidates build optimized resumes with automated suggestions.</p>
+                </div>
+                <!-- Card 6 -->
+                <div class="benefit-card">
+                    <div class="benefit-icon">🤝</div>
+                    <h4 class="benefit-title">Recruiter Relations</h4>
+                    <p class="benefit-desc">Direct dashboard portals help recruiter companies screen and communicate.</p>
+                </div>
+                <!-- Card 7 -->
+                <div class="benefit-card">
+                    <div class="benefit-icon">🛡️</div>
+                    <h4 class="benefit-title">Secure &amp; Verified</h4>
+                    <p class="benefit-desc">Verification screens recruiter credentials to safeguard student applications.</p>
+                </div>
+                <!-- Card 8 -->
+                <div class="benefit-card">
+                    <div class="benefit-icon">✨</div>
+                    <h4 class="benefit-title">Modern Dashboards</h4>
+                    <p class="benefit-desc">Clean visual metrics and widgets provide clear data monitoring.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         8. Statistics Section
+         ══════════════════════════════════════════════════ -->
+    <section class="stats-bar-wrapper">
+        <div class="container stats-bar-grid">
+            <div class="stats-bar-card">
+                <div class="stats-bar-val">1,000+</div>
+                <div class="stats-bar-label">Active Students</div>
+            </div>
+            <div class="stats-bar-card">
+                <div class="stats-bar-val">50+</div>
+                <div class="stats-bar-label">Partner Colleges</div>
+            </div>
+            <div class="stats-bar-card">
+                <div class="stats-bar-val">300+</div>
+                <div class="stats-bar-label">Top Corporations</div>
+            </div>
+            <div class="stats-bar-card">
+                <div class="stats-bar-val">500+</div>
+                <div class="stats-bar-label">Offers Secured</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         9. FAQ Section (Accordion with zero JS)
+         ══════════════════════════════════════════════════ -->
+    <section id="faq" class="section-padding">
+        <div class="container">
+            <div class="section-title-block">
+                <span class="section-tag">Got Questions?</span>
+                <h2 class="section-title">Frequently Asked Questions</h2>
+                <p class="section-desc">
+                    Find quick answers to common questions about accounts, resumes, and corporate recruiting.
+                </p>
+            </div>
+            
+            <div class="faq-accordion">
+                <!-- Q1 -->
+                <details class="faq-item">
+                    <summary class="faq-summary">What is PlaceSync?</summary>
+                    <div class="faq-content">
+                        PlaceSync is a centralized Training and Placement Cell management system designed to connect educational institutions, graduating students, and hiring companies to streamline campus recruitment drives, resumes, and scheduling.
+                    </div>
+                </details>
+                <!-- Q2 -->
+                <details class="faq-item">
+                    <summary class="faq-summary">Who is the platform for?</summary>
+                    <div class="faq-content">
+                        PlaceSync features dedicated portals for College Placement Officers (to manage drives, departments, and metrics) and candidates/students (to apply and build their portfolio).
+                    </div>
+                </details>
+                <!-- Q3 -->
+                <details class="faq-item">
+                    <summary class="faq-summary">How are students added?</summary>
+                    <div class="faq-content">
+                        Colleges can import student records directly from Excel/CSV spreadsheets. Once imported, students instantly receive login credentials via their enrollment numbers, prompting password updates on their first login.
+                    </div>
+                </details>
+                <!-- Q4 -->
+                <details class="faq-item">
+                    <summary class="faq-summary">How do placement drives work?</summary>
+                    <div class="faq-content">
+                        College admins establish drive details with specific criteria limits. Eligible students apply directly via their portals. Admins can then track application stages, download reports, and filter profiles.
+                    </div>
+                </details>
+                <!-- Q5 -->
+                <details class="faq-item">
+                    <summary class="faq-summary">Can students upload resumes?</summary>
+                    <div class="faq-content">
+                        Yes, students can upload PDF resumes, download or delete versions, and check text parsing.
+                    </div>
+                </details>
+                <!-- Q6 -->
+                <details class="faq-item">
+                    <summary class="faq-summary">How is the ATS Score generated?</summary>
+                    <div class="faq-content">
+                        Our integrated python parsing algorithms read the text inside the uploaded resume, matching it against industry standards, checking section completions, and highlighting missing keywords.
+                    </div>
+                </details>
+                <!-- Q7 -->
+                <details class="faq-item">
+                    <summary class="faq-summary">Is the platform secure?</summary>
+                    <div class="faq-content">
+                        Absolutely. All users log in via role-validated accounts. Student profiles and academic records are visible only to verified colleges.
+                    </div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         10. Contact Section
+         ══════════════════════════════════════════════════ -->
+    <section id="contact" class="section-padding stats-bar-wrapper">
+        <div class="container contact-grid">
+            <div class="contact-card">
+                <h3 class="contact-title">Send a Message</h3>
+                <form class="contact-form" action="#" method="POST" onsubmit="event.preventDefault(); alert('Thank you for contacting PlaceSync! Our team will get back to you shortly.');">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="contact_name">Full Name</label>
+                            <input type="text" id="contact_name" class="form-input" placeholder="Enter name" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="contact_email">Email Address</label>
+                            <input type="email" id="contact_email" class="form-input" placeholder="Enter email" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="contact_subject">Subject</label>
+                        <input type="text" id="contact_subject" class="form-input" placeholder="E.g., University Partnership" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="contact_message">Your Message</label>
+                        <textarea id="contact_message" class="form-input form-textarea" placeholder="Describe your request..." required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="padding:0.85rem; margin-top:0.5rem; justify-content:center;">Send Message &nbsp; <i class="fa-solid fa-paper-plane"></i></button>
+                </form>
+            </div>
+            
+            <div class="contact-info-col">
+                <h3 class="info-lead">Ready to automate your placement cell? Let's connect.</h3>
+                
+                <div class="info-list">
+                    <!-- Email -->
+                    <div class="info-item">
+                        <div class="info-icon-box"><i class="fa-solid fa-envelope"></i></div>
+                        <div>
+                            <div class="info-title">Write To Us</div>
+                            <div class="info-val">support@placesync.edu</div>
+                        </div>
+                    </div>
+                    <!-- Phone -->
+                    <div class="info-item">
+                        <div class="info-icon-box"><i class="fa-solid fa-phone"></i></div>
+                        <div>
+                            <div class="info-title">Call Our Helpline</div>
+                            <div class="info-val">+91 (22) 2576-4782</div>
+                        </div>
+                    </div>
+                    <!-- Location -->
+                    <div class="info-item">
+                        <div class="info-icon-box"><i class="fa-solid fa-location-dot"></i></div>
+                        <div>
+                            <div class="info-title">Head Office Location</div>
+                            <div class="info-val">TPO Towers, Tech Campus, Mumbai, MH, India</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         11. Footer
+         ══════════════════════════════════════════════════ -->
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-logo-desc">
+                <div class="logo-wrapper">
+                    <div class="logo-icon">P</div>
+                    <span class="logo-text">PlaceSync</span>
+                </div>
+                <p class="footer-desc">Connecting colleges, students, and companies through smart campus recruitment solutions.</p>
+                
+                <div class="footer-socials">
+                    <a href="#" class="social-icon-box"><i class="fa-brands fa-linkedin-in"></i></a>
+                    <a href="#" class="social-icon-box"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#" class="social-icon-box"><i class="fa-brands fa-github"></i></a>
+                </div>
+            </div>
+            
+            <div>
+                <h4 class="footer-title">Platform</h4>
+                <ul class="footer-links">
+                    <li><a href="#home" class="footer-link">Home</a></li>
+                    <li><a href="#features" class="footer-link">Features</a></li>
+                    <li><a href="#workflow" class="footer-link">How It Works</a></li>
+                    <li><a href="#faq" class="footer-link">FAQ</a></li>
+                </ul>
+            </div>
+            
+            <div>
+                <h4 class="footer-title">Support</h4>
+                <ul class="footer-links">
+                    <li><a href="#contact" class="footer-link">Contact Sales</a></li>
+                    <li><a href="#contact" class="footer-link">Help Desk</a></li>
+                    <li><a href="{% url 'accounts:login' %}" class="footer-link">Admin Portal</a></li>
+                    <li><a href="{% url 'accounts:student_login' %}" class="footer-link">Student Portal</a></li>
+                </ul>
+            </div>
+            
+            <div>
+                <h4 class="footer-title">College Admin</h4>
+                <p class="footer-desc" style="max-width:300px; margin-bottom:1rem;">Placement directories and datasets are verified by registered colleges. Onboard your university to get started.</p>
+                <a href="{% url 'accounts:register' %}" class="btn btn-outline-violet" style="padding:0.5rem 1rem; font-size:0.78rem;">College Onboarding</a>
+            </div>
+        </div>
+        
+        <div class="container footer-bottom">
+            <div class="footer-copyright">&copy; 2026 PlaceSync. All Rights Reserved.</div>
+            <div class="footer-bottom-links">
+                <a href="#" class="footer-bottom-link">Privacy Policy</a>
+                <a href="#" class="footer-bottom-link">Terms &amp; Conditions</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

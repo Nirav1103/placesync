@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load staff_tags %}
+
+{% block title %}{{ college.name }} Profile | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem;">
+    
+    <!-- Profile Page Header -->
+    <div class="sp-page-header" style="margin-bottom: 1rem;">
+        <div>
+            <h1 class="sp-page-title">College Profile</h1>
+            <p class="sp-page-subtitle">View and manage your college's public profile information</p>
+        </div>
+        <div>
+            {% if request.user|can_edit_filter %}
+            <a href="{% url 'colleges:profile_edit' %}" class="sp-btn sp-btn-primary" style="font-weight:800;">Edit Profile</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Main Layout Grid -->
+    <div style="display: grid; grid-template-columns: 320px 1fr; gap: 2rem; align-items: start; margin-top: 1rem;">
+        
+        <!-- Left Column: Identity & Socials -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            
+            <!-- Identity Card -->
+            <div class="sp-card" style="text-align: center; display: flex; flex-direction: column; align-items: center; padding: 2.5rem 1.5rem; background:#FFFFFF !important; border:1.5px solid #475569 !important; border-radius:8px;">
+                <div style="width: 120px; height: 120px; border-radius: 12px; background: #F8FAFC; border: 1.5px solid #475569; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 1.5rem;">
+                    {% if college.logo %}
+                        <img src="{{ college.logo.url }}" alt="{{ college.name }} Logo" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                        <!-- Visual fallback for missing logo -->
+                        <span style="font-size: 3rem; font-weight: 800; color: #32867D !important;">{{ college.code }}</span>
+                    {% endif %}
+                </div>
+                <h2 style="font-family:'Space Grotesk',sans-serif; font-size: 1.25rem; font-weight: 800; color: #0F172A !important; margin-bottom: 0.5rem; line-height: 1.3;">{{ college.name }}</h2>
+                <p style="color: #334155 !important; font-size: 0.9rem; font-weight:600; margin-bottom: 1rem;">Code: {{ college.code }}</p>
+                
+                {% if college.university %}
+                    <span class="sp-badge sp-badge-violet" style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight:800;">
+                        Affiliated with {{ college.university }}
+                    </span>
+                {% endif %}
+            </div>
+
+            <!-- Social Links Card -->
+            <div class="sp-card" style="padding: 1.5rem; background:#FFFFFF !important; border:1.5px solid #475569 !important; border-radius:8px;">
+                <h3 style="font-family:'Space Grotesk',sans-serif; font-size: 1rem; font-weight: 800; color: #0F172A !important; border-bottom: 1.5px solid #475569; padding-bottom: 0.5rem; margin-bottom: 1rem;">Social Channels</h3>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    {% if college.linkedin %}
+                        <a href="{{ college.linkedin }}" target="_blank" class="nav-link" style="display: flex; align-items: center; gap: 0.5rem; color: #0284C7 !important; font-size: 0.9rem; font-weight: 800; text-decoration:none;">
+                            <span>LinkedIn Profile &rarr;</span>
+                        </a>
+                    {% endif %}
+                    {% if college.twitter %}
+                        <a href="{{ college.twitter }}" target="_blank" class="nav-link" style="display: flex; align-items: center; gap: 0.5rem; color: #0284C7 !important; font-size: 0.9rem; font-weight: 800; text-decoration:none;">
+                            <span>Twitter / X &rarr;</span>
+                        </a>
+                    {% endif %}
+                    {% if college.instagram %}
+                        <a href="{{ college.instagram }}" target="_blank" class="nav-link" style="display: flex; align-items: center; gap: 0.5rem; color: #E11D48 !important; font-size: 0.9rem; font-weight: 800; text-decoration:none;">
+                            <span>Instagram &rarr;</span>
+                        </a>
+                    {% endif %}
+                    {% if not college.linkedin and not college.twitter and not college.instagram %}
+                        <p style="color: #334155 !important; font-size: 0.85rem; font-style: italic; font-weight:600;">No social handles added yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Info details & Gallery -->
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
+            
+            <!-- Details Panel -->
+            <div class="sp-card" style="margin-top: 0; padding: 2rem; background:#FFFFFF !important; border:1.5px solid #475569 !important; border-radius:8px;">
+                <h3 class="sp-card-title" style="border-bottom: 1.5px solid #475569; padding-bottom: 0.75rem; margin-bottom: 1.5rem; color:#0F172A !important; font-weight:800;">College Information</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div>
+                        <p style="font-size: 0.8rem; text-transform: uppercase; color: #334155 !important; font-weight:800; margin-bottom: 0.25rem;">Website</p>
+                        {% if college.website %}
+                            <a href="{{ college.website }}" target="_blank" style="color: #32867D !important; text-decoration: none; font-weight: 800; font-size: 0.95rem;">{{ college.website }}</a>
+                        {% else %}
+                            <p style="color: #334155 !important; font-style: italic; font-size: 0.95rem; font-weight:600;">Not specified</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <p style="font-size: 0.8rem; text-transform: uppercase; color: #334155 !important; font-weight:800; margin-bottom: 0.25rem;">Email Address</p>
+                        {% if college.email %}
+                            <a href="mailto:{{ college.email }}" style="color: #0F172A !important; text-decoration: none; font-size: 0.95rem; font-weight:800;">{{ college.email }}</a>
+                        {% else %}
+                            <p style="color: #334155 !important; font-style: italic; font-size: 0.95rem; font-weight:600;">Not specified</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <p style="font-size: 0.8rem; text-transform: uppercase; color: #334155 !important; font-weight:800; margin-bottom: 0.25rem;">Phone Number</p>
+                        {% if college.phone %}
+                            <p style="color: #0F172A !important; font-size: 0.95rem; font-weight:800;">{{ college.phone }}</p>
+                        {% else %}
+                            <p style="color: #334155 !important; font-style: italic; font-size: 0.95rem; font-weight:600;">Not specified</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <p style="font-size: 0.8rem; text-transform: uppercase; color: #334155 !important; font-weight:800; margin-bottom: 0.25rem;">Address</p>
+                        {% if college.address %}
+                            <p style="color: #0F172A !important; font-size: 0.95rem; line-height: 1.4; font-weight:700;">{{ college.address|linebreaksbr }}</p>
+                        {% else %}
+                            <p style="color: #334155 !important; font-style: italic; font-size: 0.95rem; font-weight:600;">Not specified</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gallery Panel -->
+            <div class="sp-card" style="margin-top: 0; padding: 2rem; background:#FFFFFF !important; border:1.5px solid #475569 !important; border-radius:8px;">
+                <h3 class="sp-card-title" style="border-bottom: 1.5px solid #475569; padding-bottom: 0.75rem; margin-bottom: 1.5rem; color:#0F172A !important; font-weight:800;">Campus Images</h3>
+                
+                {% if campus_images %}
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem;">
+                        {% for img in campus_images %}
+                            <div style="border-radius: 8px; border: 1.5px solid #475569; background: #FFFFFF; overflow: hidden; display: flex; flex-direction: column;">
+                                <div style="height: 140px; overflow: hidden;">
+                                    <img src="{{ img.image.url }}" alt="Campus Image {{ img.id }}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                </div>
+                                {% if img.caption %}
+                                    <div style="padding: 0.75rem; font-size: 0.8rem; color: #1E293B !important; font-weight:700; text-align: center; border-top: 1.5px solid #475569;">
+                                        {{ img.caption }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div style="text-align: center; padding: 3rem 0; border: 1.5px solid #475569 !important; border-radius: 8px; background: #FFFFFF !important;">
+                        <p style="color: #334155 !important; margin-bottom: 1rem; font-size: 0.95rem; font-weight:600;">No campus photos uploaded yet.</p>
+                        {% if request.user|can_edit_filter %}
+                        <a href="{% url 'colleges:profile_edit' %}" class="sp-btn sp-btn-secondary" style="font-size: 0.85rem; border:1.5px solid #475569 !important; font-weight:800;">Upload Photos</a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,181 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Drive Detail: {{ drive.role }} | PlaceSync{% endblock %}
+{% block topbar_title %}Drive Details{% endblock %}
+{% block nav_drives %}active{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════════════
+     Page Header
+════════════════════════════════════════════════════ -->
+<div class="sp-page-header">
+  <div>
+    <div style="display:flex;align-items:center;gap:.625rem;margin-bottom:.65rem;">
+      <span class="sp-badge {% if drive.drive_type == 'JOB' %}sp-badge-violet{% else %}sp-badge-sky{% endif %}">{{ drive.get_drive_type_display }}</span>
+      <span class="sp-badge sp-badge-gray">{{ drive.get_job_mode_display }}</span>
+      <span class="sp-badge {% if drive.status == 'ACTIVE' %}sp-badge-green{% elif drive.status == 'UPCOMING' %}sp-badge-amber{% else %}sp-badge-gray{% endif %}">{{ drive.get_status_display }}</span>
+    </div>
+    <h1 class="sp-page-title" style="margin-bottom:.35rem;">{{ drive.role }}</h1>
+    <p class="sp-page-subtitle">Opportunity at <strong style="color:#0F172A !important;font-weight:800;">{{ drive.company.name }}</strong> · {{ drive.company.industry|default:"Technology" }}</p>
+  </div>
+  <div class="sp-page-actions" style="display:flex;gap:.5rem;">
+    <!-- Bookmark Button -->
+    <form method="post" action="{% url 'student_portal:bookmark_toggle' drive.pk %}" style="margin:0;">
+      {% csrf_token %}
+      <button type="submit" class="sp-btn sp-btn-secondary" style="font-size:.9rem;padding:.5rem 1rem;border:1.5px solid #475569 !important;">
+        {% if is_bookmarked %}⭐ Bookmarked{% else %}☆ Bookmark{% endif %}
+      </button>
+    </form>
+    <a href="{% url 'student_portal:drives' %}" class="sp-btn sp-btn-secondary" style="border:1.5px solid #475569 !important;">← Back to Drives</a>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Two-Column Details Layout
+════════════════════════════════════════════════════ -->
+<div style="display:grid;grid-template-columns:1fr 340px;gap:1.5rem;align-items:start;">
+
+  <!-- ─── LEFT COLUMN: Criteria & Process ─── -->
+  <div style="display:flex;flex-direction:column;gap:1.5rem;">
+    
+    <!-- Eligibility Verification Panel -->
+    <div class="sp-card" style="border:1.5px solid #475569 !important;background:#FFFFFF !important;">
+      <div class="sp-card-header" style="background:#F8FAFC !important;border-bottom:1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color:#0F172A !important;font-weight:800;">🛡️ Automated Eligibility Checklist</span>
+      </div>
+      <div class="sp-card-body">
+        <div style="display:flex;flex-direction:column;gap:1rem;">
+          {% for key, check in checklist.items %}
+            <div style="display:flex;align-items:start;gap:.875rem;padding-bottom:.875rem;border-bottom:1.5px solid #CBD5E1;">
+              <div style="font-size:1.25rem;line-height:1;margin-top:.1rem;">
+                {% if check.status %}
+                  <span style="color:#059669;" title="Passed">✅</span>
+                {% else %}
+                  <span style="color:#DC2626;" title="Failed">❌</span>
+                {% endif %}
+              </div>
+              <div style="flex:1;">
+                <div style="font-weight:800;font-size:.9rem;color:#0F172A !important;margin-bottom:.2rem;">{{ check.name }}</div>
+                <div style="font-size:.82rem;font-weight:700;" class="{% if check.status %}good{% else %}warn{% endif %}">{{ check.desc }}</div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        {% if is_eligible %}
+          <div style="margin-top:1.25rem;padding:1rem;background:#D1FAE5;border:1.5px solid #059669;border-radius:8px;display:flex;align-items:center;gap:.75rem;">
+            <div style="font-size:1.5rem;">🎉</div>
+            <div style="font-size:.84rem;color:#065F46;font-weight:800;">You meet all criteria and are fully eligible to apply for this drive.</div>
+          </div>
+        {% else %}
+          <div style="margin-top:1.25rem;padding:1rem;background:#FEE2E2;border:1.5px solid #DC2626;border-radius:8px;display:flex;align-items:center;gap:.75rem;">
+            <div style="font-size:1.5rem;">⚠️</div>
+            <div style="font-size:.84rem;color:#991B1B;font-weight:800;">You are currently ineligible. Review the failed criteria above before applying.</div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Job Details & Selection Process -->
+    <div class="sp-card" style="border:1.5px solid #475569 !important;background:#FFFFFF !important;">
+      <div class="sp-card-header" style="background:#F8FAFC !important;border-bottom:1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color:#0F172A !important;font-weight:800;">📖 Selection Process &amp; Rounds</span>
+      </div>
+      <div class="sp-card-body">
+        {% if drive.selection_process %}
+          <div style="font-size:.88rem;color:#1E293B !important;font-weight:600;line-height:1.65;white-space:pre-line;">
+            {{ drive.selection_process }}
+          </div>
+        {% else %}
+          <div style="font-size:.84rem;color:#334155 !important;font-weight:600;">No custom selection process detailed. Standard rounds (Shortlisting -> Tests -> Interviews) apply.</div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ─── RIGHT COLUMN: Application & Meta ─── -->
+  <div style="display:flex;flex-direction:column;gap:1.5rem;">
+    
+    <!-- Application Tracking Card -->
+    <div class="sp-card" style="border:1.5px solid #475569 !important;background:#FFFFFF !important;">
+      <div class="sp-card-header" style="background:#F8FAFC !important;border-bottom:1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color:#0F172A !important;font-weight:800;">🎯 Application Status</span>
+      </div>
+      <div class="sp-card-body" style="text-align:center;">
+        {% if application %}
+          <div style="font-size:.78rem;color:#334155 !important;text-transform:uppercase;font-weight:800;letter-spacing:.05em;margin-bottom:.5rem;">Your Tracking Status</div>
+          
+          <div style="margin-bottom:1.25rem;">
+            {% if application.status == 'APPLIED' %}
+              <span class="sp-badge sp-badge-violet" style="font-size:.9rem;padding:.35rem 1rem;">Applied</span>
+              <p style="font-size:.82rem;color:#1E293B !important;font-weight:600;margin-top:.75rem;line-height:1.5;">Your application has been received and is waiting TPO shortlisting checks.</p>
+            {% elif application.status == 'SHORTLISTED' %}
+              <span class="sp-badge sp-badge-sky" style="font-size:.9rem;padding:.35rem 1rem;">Shortlisted 📅</span>
+              <p style="font-size:.82rem;color:#1E293B !important;font-weight:600;margin-top:.75rem;line-height:1.5;">Congratulations! You have been shortlisted. Prepare for your test and interview rounds.</p>
+            {% elif application.status == 'SELECTED' %}
+              <span class="sp-badge sp-badge-green" style="font-size:.9rem;padding:.35rem 1rem;">Selected 🎉</span>
+              <p style="font-size:.82rem;color:#1E293B !important;font-weight:600;margin-top:.75rem;line-height:1.5;">Excellent work! You have received a placement offer from {{ drive.company.name }}.</p>
+            {% elif application.status == 'REJECTED' %}
+              <span class="sp-badge sp-badge-gray" style="font-size:.9rem;padding:.35rem 1rem;">Not Selected</span>
+              <p style="font-size:.82rem;color:#1E293B !important;font-weight:600;margin-top:.75rem;line-height:1.5;">Your application was not selected. Keep applying to other active placement drives.</p>
+            {% endif %}
+          </div>
+          
+          <div style="font-size:.76rem;color:#334155 !important;font-weight:700;border-top:1.5px solid #CBD5E1;padding-top:.75rem;">
+            Applied on {{ application.applied_at|date:"M d, Y · H:i" }}
+          </div>
+
+        {% elif drive.status != 'ACTIVE' %}
+          <span class="sp-badge sp-badge-gray" style="font-size:.9rem;padding:.35rem 1rem;">Drive Closed</span>
+          <p style="font-size:.82rem;color:#334155 !important;font-weight:600;margin-top:.75rem;line-height:1.5;">Applications are closed for this drive as it is completed or upcoming.</p>
+        
+        {% elif not is_eligible %}
+          <div style="padding:1rem;background:#FEF2F2;border:1.5px solid #DC2626;border-radius:8px;margin-bottom:.5rem;">
+            <div style="font-size:.84rem;color:#DC2626;font-weight:800;margin-bottom:.35rem;">Application Blocked</div>
+            <div style="font-size:.78rem;color:#1E293B !important;font-weight:600;line-height:1.45;">You do not satisfy the criteria for this drive. Complete skills or CGPA improvements to unlock.</div>
+          </div>
+        
+        {% else %}
+          <p style="font-size:.84rem;color:#1E293B !important;font-weight:600;line-height:1.5;margin-bottom:1.25rem;">Applying will submit your active profile details and resume to the TPO.</p>
+          <form method="post" action="{% url 'student_portal:apply' drive.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="sp-btn sp-btn-primary sp-btn-block">Apply for Role</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Drive Overview Card -->
+    <div class="sp-card" style="border:1.5px solid #475569 !important;background:#FFFFFF !important;">
+      <div class="sp-card-header" style="background:#F8FAFC !important;border-bottom:1.5px solid #475569 !important;">
+        <span class="sp-card-title" style="color:#0F172A !important;font-weight:800;">🏢 Opportunity Summary</span>
+      </div>
+      <div class="sp-card-body" style="font-size:.84rem;display:flex;flex-direction:column;gap:.75rem;">
+        <div style="display:flex;justify-content:space-between;border-bottom:1.5px solid #CBD5E1;padding-bottom:.5rem;">
+          <span style="color:#334155 !important;font-weight:700;">Package / Stipend</span>
+          <strong style="color:#0F172A !important;font-weight:800;">
+            {% if drive.package_amount %}
+              {% if drive.drive_type == 'JOB' %}{{ drive.package_amount }} LPA{% else %}₹{{ drive.package_amount }}/mo{% endif %}
+            {% else %}
+              N/A
+            {% endif %}
+          </strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1.5px solid #CBD5E1;padding-bottom:.5rem;">
+          <span style="color:#334155 !important;font-weight:700;">Company Website</span>
+          <a href="{{ drive.company.website|default:'#' }}" target="_blank" style="color:#32867D !important;font-weight:800;">Visit Site ↗</a>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span style="color:#334155 !important;font-weight:700;">Required Skills</span>
+          <span style="text-align:right;color:#0F172A !important;font-weight:800;">{{ drive.required_skills|default:"None specified" }}</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}

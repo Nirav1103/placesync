@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Import Students - {{ batch.name }} | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem;">
+    
+    <!-- Header -->
+    <div class="dashboard-header" style="border-bottom: none; margin-bottom: 1.5rem;">
+        <div>
+            <h1 class="dashboard-title">Import Student Data</h1>
+            <p class="dashboard-welcome">Batch: <strong style="color: #fff;">{{ batch.name }}</strong></p>
+        </div>
+        <div>
+            <a href="{% url 'batches:dashboard' pk=batch.pk %}" class="btn btn-secondary">&larr; Back to Dashboard</a>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; align-items: start;">
+        
+        <!-- Left: Upload Form & Errors -->
+        <div class="card-panel" style="margin-top: 0;">
+            <h3 class="panel-title" style="border-bottom: 1px solid var(--card-border); padding-bottom: 0.75rem; margin-bottom: 1.5rem;">Upload Student CSV</h3>
+
+            {% if errors %}
+                <div style="background: rgba(244, 63, 94, 0.15); border-left: 4px solid var(--danger); border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1.5rem;">
+                    <h4 style="color: #fda4af; font-size: 0.95rem; font-weight: 700; margin-bottom: 0.5rem;">Validation Errors (Found {{ errors|length }} issues)</h4>
+                    <ul style="color: #fda4af; font-size: 0.85rem; padding-left: 1.25rem; margin-bottom: 0;">
+                        {% for error in errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+
+                <!-- Default Password Field -->
+                <div class="form-group">
+                    <label class="form-label" for="default_password">Default Password for Students *</label>
+                    <input type="text" name="default_password" id="default_password" class="form-input" placeholder="e.g. Welcome@123" required>
+                    <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">
+                        All imported students will be initialized with this password and **forced to update it** upon their very first login.
+                    </span>
+                </div>
+
+                <!-- CSV File Picker -->
+                <div class="form-group" style="margin-top: 1.5rem;">
+                    <label class="form-label" for="csv_file">Select Student CSV File *</label>
+                    <input type="file" name="csv_file" id="csv_file" class="form-input" accept=".csv" required style="padding: 0.5rem;">
+                    <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">
+                        Select a comma-separated values file (.csv) containing the columns listed in the guidelines panel.
+                    </span>
+                </div>
+
+                <div style="margin-top: 2.5rem; display: flex; gap: 1rem;">
+                    <button type="submit" class="btn btn-primary" style="padding: 0.85rem 1.5rem;">Upload & Validate CSV</button>
+                    <a href="{% url 'batches:dashboard' pk=batch.pk %}" class="btn btn-secondary" style="padding: 0.85rem 1.5rem;">Cancel</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Right: CSV Formatting Schema Instructions -->
+        <div class="card-panel" style="margin-top: 0; background: rgba(255, 255, 255, 0.01);">
+            <h3 class="panel-title" style="border-bottom: 1px solid var(--card-border); padding-bottom: 0.75rem; margin-bottom: 1rem; font-size: 1.05rem;">CSV Formatting Schema</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                Your CSV file columns must match the headers specified below. You can copy the following template header:
+            </p>
+            
+            <div style="background: rgba(0, 0, 0, 0.2); border: 1px solid var(--card-border); border-radius: var(--radius-sm); padding: 0.75rem; font-family: monospace; font-size: 0.8rem; color: #fff; margin-bottom: 1.5rem; overflow-x: auto; white-space: nowrap;">
+                Enrollment Number,Student Name,Email,Phone,Department,Semester,Division,SPI,CPI,CGPA,Current Backlogs,Passing Year
+            </div>
+
+            <h4 style="font-size: 0.85rem; font-weight: 700; margin-bottom: 0.5rem; color: #fff;">Schema Guidelines:</h4>
+            <ul style="font-size: 0.8rem; color: var(--text-secondary); padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                <li><code>Enrollment Number</code>: (Required) Serves as student ID and login username.</li>
+                <li><code>Student Name</code>: (Required) Full candidate name.</li>
+                <li><code>Email</code>: (Required) Candidate email address (must be unique).</li>
+                <li><code>Phone</code>: (Optional) Candidate contact number.</li>
+                <li><code>Department</code>: (Optional) Code of department.</li>
+                <li><code>Semester</code>: (Optional) Current active semester (e.g. 1 to 8).</li>
+                <li><code>Division</code>: (Optional) e.g. A, B, C.</li>
+                <li><code>SPI / CPI / CGPA</code>: (Optional) Academic grades (Decimals out of 10.00).</li>
+                <li><code>Current Backlogs</code>: (Optional) Number of active backlogs (Defaults to 0).</li>
+                <li><code>Passing Year</code>: (Optional) e.g. 2027.</li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

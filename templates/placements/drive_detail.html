@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ drive.role }} Drive Details | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem;">
+
+    <!-- Header -->
+    <div class="dashboard-header" style="border-bottom: none; margin-bottom: 2rem;">
+        <div>
+            <h1 class="dashboard-title">
+                {{ drive.get_drive_type_display }}: {{ drive.role }}
+            </h1>
+            <p class="dashboard-welcome">Partner Company: <strong style="color: #fff;">{{ drive.company.name }}</strong></p>
+        </div>
+        <div>
+            <a href="{% url 'placements:list' %}" class="btn btn-secondary">&larr; Back to Listings</a>
+        </div>
+    </div>
+
+    <!-- Layout Grid -->
+    <div style="display: grid; grid-template-columns: 320px 1fr; gap: 1.5rem; align-items: start;">
+        
+        <!-- Left: Drive Properties Panel -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            
+            <!-- Quick Specs -->
+            <div class="card-panel" style="margin-top: 0; padding: 1.25rem;">
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;">⚙️ Specifications</h3>
+                <div style="display: flex; flex-direction: column; gap: 1rem; font-size: 0.85rem;">
+                    <div>
+                        <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 0.15rem;">Compensation</span>
+                        <strong style="color: #fff; font-size: 1.05rem;">
+                            {% if drive.package_amount %}
+                                {% if drive.drive_type == 'JOB' %}{{ drive.package_amount }} LPA{% else %}{{ drive.package_amount }}/mo{% endif %}
+                            {% else %}
+                                Not Specified
+                            {% endif %}
+                        </strong>
+                    </div>
+                    <div>
+                        <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 0.15rem;">Job Mode</span>
+                        <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.25);">{{ drive.get_job_mode_display }}</span>
+                    </div>
+                    <div>
+                        <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 0.15rem;">Application Deadline</span>
+                        <span style="color: #fff; font-weight: 600;">📅 {{ drive.deadline|default:"Not Specified" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Eligibility Sidebar Rules -->
+            <div class="card-panel" style="margin-top: 0; padding: 1.25rem;">
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;">🛡️ Eligibility Rules</h3>
+                <div style="display: flex; flex-direction: column; gap: 0.85rem; font-size: 0.85rem;">
+                    <div>
+                        <span style="font-size: 0.72rem; color: var(--text-muted); display: block;">Min CGPA Cutoff</span>
+                        <span style="color: #fff; font-weight: 600;">{{ drive.min_cgpa }}</span>
+                    </div>
+                    <div>
+                        <span style="font-size: 0.72rem; color: var(--text-muted); display: block;">Max Backlogs Allowed</span>
+                        <span style="color: #fff; font-weight: 600;">{{ drive.max_backlogs }} active</span>
+                    </div>
+                    <div>
+                        <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Eligible Branches</span>
+                        {% if drive.eligible_departments.exists %}
+                            <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+                                {% for dept in drive.eligible_departments.all %}
+                                    <span class="badge" style="background: rgba(255,255,255,0.05); color: #fff; border-color: var(--card-border); font-size: 0.72rem;">{{ dept.code }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <span style="color: var(--success); font-weight: 600;">All Departments</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Admin vs Student Workspace -->
+        <div>
+            
+            <!-- ADMIN WORKSPACE -->
+            {% if is_admin %}
+                
+                <!-- Drive description / Selection process info -->
+                <div class="card-panel" style="margin-top: 0; margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;">📜 Selection Process Overview</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; white-space: pre-line;">
+                        {{ drive.selection_process|default:"No selection details defined." }}
+                    </p>
+                </div>
+
+                <!-- Applications tracking table -->
+                <div class="card-panel" style="margin-top: 0;">
+                    <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;">👥 Student Applications Tracking</h3>
+                    
+                    {% if applications %}
+                        <div class="table-wrapper">
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Student</th>
+                                            <th>Roll No</th>
+                                            <th>Branch</th>
+                                            <th style="text-align: center;">CGPA</th>
+                                            <th style="text-align: center;">Backlogs</th>
+                                            <th>Resume</th>
+                                            <th style="text-align: center;">Status</th>
+                                            <th style="text-align: right;">Evaluation Controls</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for app in applications %}
+                                            <tr>
+                                                <td>
+                                                    <strong style="color: #fff;">{{ app.student.name }}</strong>
+                                                </td>
+                                                <td>{{ app.student.roll_number }}</td>
+                                                <td>{{ app.student.department.code }}</td>
+                                                <td style="text-align: center; color: #fff; font-weight: 600;">{{ app.student.cgpa }}</td>
+                                                <td style="text-align: center;">{{ app.student.backlogs }}</td>
+                                                <td>
+                                                    {% if app.resume %}
+                                                        <a href="{{ app.resume.url }}" target="_blank" style="color: var(--primary); text-decoration: none; font-size: 0.8rem;">📥 View Resume</a>
+                                                    {% else %}
+                                                        <span style="color: var(--text-muted); font-size: 0.8rem; font-style: italic;">No attachment</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td style="text-align: center;">
+                                                    {% if app.status == 'SELECTED' %}
+                                                        <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.25);">Selected</span>
+                                                    {% elif app.status == 'SHORTLISTED' %}
+                                                        <span class="badge" style="background: rgba(59, 130, 246, 0.1); color: var(--info); border-color: rgba(59, 130, 246, 0.25);">Shortlisted</span>
+                                                    {% elif app.status == 'REJECTED' %}
+                                                        <span class="badge" style="background: rgba(244, 63, 94, 0.1); color: var(--danger); border-color: rgba(244, 63, 94, 0.25);">Rejected</span>
+                                                    {% else %}
+                                                        <span class="badge" style="background: rgba(255,255,255,0.05); color: #fff; border-color: var(--card-border);">Applied</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td style="text-align: right;">
+                                                    <div style="display: flex; gap: 0.25rem; justify-content: flex-end;">
+                                                        <!-- Shortlist -->
+                                                        <form action="{% url 'placements:update_status' app_pk=app.pk new_status='SHORTLISTED' %}" method="post" style="margin: 0;">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-secondary btn-xs" style="background: rgba(59,130,246,0.05); color: var(--info); border-color: rgba(59,130,246,0.2);">Shortlist</button>
+                                                        </form>
+                                                        <!-- Select -->
+                                                        <form action="{% url 'placements:update_status' app_pk=app.pk new_status='SELECTED' %}" method="post" style="margin: 0;">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-secondary btn-xs" style="background: rgba(16,185,129,0.05); color: var(--success); border-color: rgba(16,185,129,0.2);">Select</button>
+                                                        </form>
+                                                        <!-- Reject -->
+                                                        <form action="{% url 'placements:update_status' app_pk=app.pk new_status='REJECTED' %}" method="post" style="margin: 0;">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-secondary btn-xs btn-danger-text">Reject</button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p style="text-align: center; color: var(--text-secondary); font-style: italic; padding: 2rem 0; margin: 0;">
+                            No student applications submitted yet.
+                        </p>
+                    {% endif %}
+                </div>
+
+            <!-- STUDENT WORKSPACE -->
+            {% else %}
+                
+                <!-- Eligibility Check card checklist -->
+                <div class="card-panel" style="margin-top: 0; margin-bottom: 1.5rem; padding: 1.5rem; background: rgba(255, 255, 255, 0.01); border-color: var(--card-border);">
+                    <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">🔐 Eligibility Audit Checklist</h3>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 0.85rem; font-size: 0.9rem;">
+                        
+                        <!-- Check 1: Department -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.02); padding-bottom: 0.5rem;">
+                            <span>Branch Cutoff ({{ student.department.code }})</span>
+                            <span>
+                                {% if dept_ok %}
+                                    <span style="color: var(--success); font-weight: 600;">✔️ Verified Eligible</span>
+                                {% else %}
+                                    <span style="color: var(--danger); font-weight: 600;">❌ Not Eligible</span>
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <!-- Check 2: CGPA -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.02); padding-bottom: 0.5rem;">
+                            <span>CGPA Cutoff (Required: &ge; {{ drive.min_cgpa }} | Yours: {{ student.cgpa|default:"-" }})</span>
+                            <span>
+                                {% if cgpa_ok %}
+                                    <span style="color: var(--success); font-weight: 600;">✔️ Verified Eligible</span>
+                                {% else %}
+                                    <span style="color: var(--danger); font-weight: 600;">❌ Below Cutoff</span>
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <!-- Check 3: Backlogs -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.02); padding-bottom: 0.5rem;">
+                            <span>Active Backlogs Limit (Allowed: &le; {{ drive.max_backlogs }} | Yours: {{ student.backlogs }})</span>
+                            <span>
+                                {% if backlogs_ok %}
+                                    <span style="color: var(--success); font-weight: 600;">✔️ Verified Eligible</span>
+                                {% else %}
+                                    <span style="color: var(--danger); font-weight: 600;">❌ Exceeds Limit</span>
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <!-- Check 4: Deadline -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.25rem;">
+                            <span>Timeline Registration (Deadline: {{ drive.deadline|default:"Not Specified" }})</span>
+                            <span>
+                                {% if deadline_ok %}
+                                    <span style="color: var(--success); font-weight: 600;">✔️ Active</span>
+                                {% else %}
+                                    <span style="color: var(--danger); font-weight: 600;">❌ Deadline Passed</span>
+                                {% endif %}
+                            </span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Selection Process Details -->
+                <div class="card-panel" style="margin-top: 0; margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;">📜 Selection Process Overview</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; white-space: pre-line;">
+                        {{ drive.selection_process|default:"No selection details defined." }}
+                    </p>
+                </div>
+
+                <!-- Submit Apply / Application status panel -->
+                <div class="card-panel" style="margin-top: 0;">
+                    <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;">✍️ Job Application Workspace</h3>
+                    
+                    {% if application %}
+                        <!-- Already applied -->
+                        <div style="background: rgba(99, 102, 241, 0.05); border-left: 4px solid var(--primary); border-radius: var(--radius-sm); padding: 1.25rem; margin-top: 0.5rem;">
+                            <h4 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 0.35rem; margin-top: 0;">Application Submitted!</h4>
+                            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem; margin-top: 0;">
+                                Your application has been logged on {{ application.applied_at|date:"Y-m-d H:i" }}.
+                            </p>
+                            
+                            <div>
+                                <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Current Recruitment Stage:</span>
+                                {% if application.status == 'SELECTED' %}
+                                    <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.25); font-size: 0.85rem; padding: 0.35rem 0.75rem;">🎉 SELECTED &amp; PLACED!</span>
+                                {% elif application.status == 'SHORTLISTED' %}
+                                    <span class="badge" style="background: rgba(59, 130, 246, 0.1); color: var(--info); border-color: rgba(59, 130, 246, 0.25); font-size: 0.85rem; padding: 0.35rem 0.75rem;">⏳ SHORTLISTED FOR INTERVIEWS</span>
+                                {% elif application.status == 'REJECTED' %}
+                                    <span class="badge" style="background: rgba(244, 63, 94, 0.1); color: var(--danger); border-color: rgba(244, 63, 94, 0.25); font-size: 0.85rem; padding: 0.35rem 0.75rem;">✖️ APPLICATION REJECTED</span>
+                                {% else %}
+                                    <span class="badge" style="background: rgba(255, 255, 255, 0.05); color: #fff; border-color: var(--card-border); font-size: 0.85rem; padding: 0.35rem 0.75rem;">APPLICATION RECEIVED</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% elif is_eligible %}
+                        <!-- Eligible and not applied -->
+                        <form action="{% url 'placements:apply' pk=drive.pk %}" method="post" enctype="multipart/form-data" novalidate style="display: flex; flex-direction: column; gap: 1rem; margin-top: 0.5rem;">
+                            {% csrf_token %}
+                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; margin-top: 0;">
+                                You meet all eligibility cutoffs! Upload your custom resume file to complete application.
+                            </p>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="id_resume">Attachment Resume Document (PDF / DOCX)</label>
+                                {{ form.resume }}
+                                {% if form.resume.errors %}
+                                    <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.resume.errors.0 }}</span>
+                                {% endif %}
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem; align-self: flex-start; margin-top: 0.5rem;">🚀 Submit Application</button>
+                        </form>
+                    {% else %}
+                        <!-- Not eligible -->
+                        <div style="background: rgba(244, 63, 94, 0.1); border-left: 4px solid var(--danger); border-radius: var(--radius-sm); padding: 1rem; margin-top: 0.5rem;">
+                            <h4 style="font-size: 0.95rem; font-weight: 700; color: #fecdd3; margin-bottom: 0.25rem; margin-top: 0;">Application Blocked</h4>
+                            <p style="font-size: 0.85rem; color: #fda4af; margin: 0;">
+                                You do not meet the minimum eligibility cutoffs to apply for this drive. Please audit check criteria rules.
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}

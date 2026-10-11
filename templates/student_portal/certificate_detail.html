@@ -1,0 +1,105 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}{{ certificate.title }} | PlaceSync{% endblock %}
+{% block topbar_title %}Certificate Details{% endblock %}
+{% block nav_certs %}active{% endblock %}
+
+{% block content %}
+
+<!-- Page Header / Back Button -->
+<div class="sp-page-header">
+  <div>
+    <a href="{% if is_recruiter %}{% url 'student_portal:recruiter_certificates' student.id %}{% else %}{% url 'student_portal:certificates_list' %}{% endif %}" class="sp-btn sp-btn-secondary sp-btn-sm" style="margin-bottom: 0.75rem; border:1.5px solid #475569 !important;">⬅️ Back to List</a>
+    <h1 class="sp-page-title">{{ certificate.title }}</h1>
+    <p class="sp-page-subtitle">Credential issued by {{ certificate.issuing_organization }}</p>
+  </div>
+  <div class="sp-page-actions" style="display: flex; gap: 0.5rem;">
+    
+    <!-- View External URL (if provided) -->
+    {% if certificate.certificate_url %}
+    <a href="{{ certificate.certificate_url }}" target="_blank" class="sp-btn sp-btn-secondary" style="border:1.5px solid #475569 !important;">🔗 Open Verification Link</a>
+    {% endif %}
+
+    <!-- Download file directly -->
+    <a href="{{ certificate.certificate_file.url }}" download class="sp-btn sp-btn-secondary" style="border:1.5px solid #475569 !important;">📥 Download File</a>
+    
+    <!-- Edit & Delete options for own student -->
+    {% if not is_recruiter %}
+    <a href="{% url 'student_portal:certificate_edit' certificate.pk %}" class="sp-btn sp-btn-primary">✏️ Edit</a>
+    <a href="{% url 'student_portal:certificate_delete' certificate.pk %}" class="sp-btn sp-btn-danger" style="background:#FEF2F2 !important; color:#DC2626 !important; border:1.5px solid #DC2626 !important; font-weight:800;">🗑️ Delete</a>
+    {% endif %}
+
+  </div>
+</div>
+
+<!-- Details & Preview Grid -->
+<div style="display: grid; grid-template-columns: 1.2fr 2fr; gap: 1.75rem; margin-bottom: 3rem; align-items: start;">
+  
+  <!-- Left Side: Metadata Card -->
+  <div class="sp-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+    <div class="sp-card-header" style="background:#F8FAFC !important; border-bottom:1.5px solid #475569 !important;">
+      <span class="sp-card-title" style="color:#0F172A !important; font-weight:800;">📋 Credentials Detail</span>
+    </div>
+    <div class="sp-card-body" style="padding: 1.25rem; display: flex; flex-direction: column; gap: 1.1rem;">
+      
+      <div>
+        <span style="font-size: 0.78rem; color: #334155 !important; font-weight:700; display: block; margin-bottom: 0.2rem;">Certificate Title</span>
+        <span style="font-size: 1rem; color: #0F172A !important; font-weight: 800;">{{ certificate.title }}</span>
+      </div>
+
+      <div>
+        <span style="font-size: 0.78rem; color: #334155 !important; font-weight:700; display: block; margin-bottom: 0.2rem;">Issuing Organization</span>
+        <span style="font-size: 0.95rem; color: #1E293B !important; font-weight: 800;">{{ certificate.issuing_organization }}</span>
+      </div>
+
+      <div>
+        <span style="font-size: 0.78rem; color: #334155 !important; font-weight:700; display: block; margin-bottom: 0.2rem;">Purpose Category</span>
+        <span class="sp-badge sp-badge-violet">
+          {{ certificate.get_purpose_display }}
+        </span>
+      </div>
+
+      <div>
+        <span style="font-size: 0.78rem; color: #334155 !important; font-weight:700; display: block; margin-bottom: 0.2rem;">Issue Date</span>
+        <span style="font-size: 0.95rem; color: #0F172A !important; font-weight: 800;">{{ certificate.issue_date|date:"F d, Y" }}</span>
+      </div>
+
+      {% if certificate.certificate_url %}
+      <div>
+        <span style="font-size: 0.78rem; color: #334155 !important; font-weight:700; display: block; margin-bottom: 0.2rem;">Verification Link</span>
+        <a href="{{ certificate.certificate_url }}" target="_blank" style="font-size: 0.88rem; color: #32867D !important; text-decoration: none; word-break: break-all; font-weight:800;">
+          {{ certificate.certificate_url }}
+        </a>
+      </div>
+      {% endif %}
+
+      <div style="border-top: 1.5px solid #CBD5E1; padding-top: 1rem; margin-top: 0.5rem;">
+        <span style="font-size: 0.78rem; color: #334155 !important; font-weight:700; display: block; margin-bottom: 0.2rem;">File Name</span>
+        <span style="font-size: 0.82rem; color: #1E293B !important; font-weight:600; overflow-wrap: break-word;">{{ certificate.certificate_file.name }}</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Right Side: Document Live Preview -->
+  <div class="sp-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+    <div class="sp-card-header" style="background:#F8FAFC !important; border-bottom:1.5px solid #475569 !important;">
+      <span class="sp-card-title" style="color:#0F172A !important; font-weight:800;">👁️ Document Preview</span>
+    </div>
+    <div class="sp-card-body" style="padding: 1rem;">
+      
+      <!-- Check file extension using slicing -->
+      {% if certificate.certificate_file.name|slice:"-4:"|lower == ".pdf" %}
+        <iframe src="{{ certificate.certificate_file.url }}" style="width: 100%; height: 550px; border: 1.5px solid #475569; border-radius: 8px; background: #FFFFFF;"></iframe>
+      {% else %}
+        <div style="text-align: center; padding: 1rem; background: #F8FAFC; border-radius: 8px; border: 1.5px solid #475569; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 400px;">
+          <img src="{{ certificate.certificate_file.url }}" alt="{{ certificate.title }}" style="max-width: 100%; max-height: 520px; border-radius: 6px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete {{ company.name }} | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 5rem; padding-bottom: 5rem; max-width: 600px;">
+    <div class="card-panel" style="margin-top: 0; text-align: center; border-color: rgba(239, 68, 68, 0.2);">
+        
+        <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+        
+        <h2 style="font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem;">
+            Delete Company Profile?
+        </h2>
+        
+        <p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 2rem;">
+            Are you sure you want to delete partner company <strong style="color: #fff;">{{ company.name }}</strong> from the portal database?
+            This will permanently erase all HR contact records, placement terms, and history logs associated with this company.
+        </p>
+
+        <form method="post" style="display: flex; gap: 1rem; justify-content: center;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary" style="background: var(--danger); box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3); padding: 0.75rem 2rem;">
+                🔥 Delete Permanently
+            </button>
+            <a href="{% url 'companies:list' %}" class="btn btn-secondary" style="padding: 0.75rem 2rem;">
+                Cancel
+            </a>
+        </form>
+
+    </div>
+</div>
+{% endblock %}

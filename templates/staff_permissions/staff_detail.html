@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Staff Details - {{ staff.user.get_full_name }} | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding: 2rem 1.5rem; max-width: 800px;">
+    
+    <!-- Header -->
+    <div class="dashboard-header" style="border-bottom: none; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 class="dashboard-title">🧑 Staff Details</h1>
+            <p class="dashboard-welcome">View detailed account information for this staff profile.</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+            <a href="{% url 'staff_permissions:staff_update' pk=staff.pk %}" class="btn btn-primary" style="padding: 0.55rem 1.25rem;">✏️ Edit Staff</a>
+            <a href="{% url 'staff_permissions:staff_list' %}" class="btn btn-secondary" style="padding: 0.55rem 1.25rem;">&larr; Back</a>
+        </div>
+    </div>
+
+    <!-- Details Card -->
+    <div class="card-panel" style="margin-top: 0; padding: 2.5rem; display: flex; flex-direction: column; gap: 2rem;">
+        
+        <!-- Profile Picture and Title -->
+        <div style="display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;">
+            {% if staff.profile_picture %}
+                <img src="{{ staff.profile_picture.url }}" alt="Profile Photo" style="width: 96px; height: 96px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
+            {% else %}
+                <div style="width: 96px; height: 96px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: var(--text-muted); font-weight: 700;">
+                    {{ staff.user.first_name|first|default:staff.user.username|first|upper }}
+                </div>
+            {% endif %}
+            <div>
+                <h2 style="font-size: 1.8rem; font-weight: 700; color: #fff; margin: 0;">{{ staff.user.get_full_name|default:staff.user.username }}</h2>
+                <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary); font-size: 1.05rem;">
+                    Portal Role: 
+                    {% if staff.role == 'EDITOR' %}
+                        <span style="font-weight: 600; color: var(--primary);">Editor</span>
+                    {% else %}
+                        <span style="font-weight: 600; color: var(--text-secondary);">View Only</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <!-- Meta Details Table/Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; border-top: 1px solid var(--card-border); padding-top: 2rem;">
+            
+            <!-- Username -->
+            <div>
+                <span style="color: var(--text-muted); display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Username</span>
+                <strong style="color: #fff; font-size: 1.1rem; display: block; margin-top: 0.25rem;">@{{ staff.user.username }}</strong>
+            </div>
+
+            <!-- Email -->
+            <div>
+                <span style="color: var(--text-muted); display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Email Address</span>
+                <strong style="color: #fff; font-size: 1.1rem; display: block; margin-top: 0.25rem;">{{ staff.user.email }}</strong>
+            </div>
+
+            <!-- Status -->
+            <div>
+                <span style="color: var(--text-muted); display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Account Status</span>
+                <strong style="font-size: 1.1rem; display: block; margin-top: 0.25rem;">
+                    {% if staff.user.is_active %}
+                        <span style="color: var(--success);">🟢 Active</span>
+                    {% else %}
+                        <span style="color: var(--danger);">🔴 Inactive</span>
+                    {% endif %}
+                </strong>
+            </div>
+
+            <!-- Date Added -->
+            <div>
+                <span style="color: var(--text-muted); display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Date Added</span>
+                <strong style="color: #fff; font-size: 1.1rem; display: block; margin-top: 0.25rem;">{{ staff.created_at|date:"Y-m-d H:i" }}</strong>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

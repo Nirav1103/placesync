@@ -1,0 +1,53 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Delete Resume | PlaceSync{% endblock %}
+{% block topbar_title %}Delete Resume{% endblock %}
+{% block nav_resume %}active{% endblock %}
+
+{% block content %}
+
+<div style="max-width:480px;margin:3rem auto;">
+  <div class="sp-card">
+    <div class="sp-card-header">
+      <span class="sp-card-title" style="color:var(--red);">🗑️ Delete Document Version</span>
+    </div>
+    <div class="sp-card-body">
+
+      <!-- Document Preview Details -->
+      <div style="padding:1.25rem;background:rgba(244,63,94,.06);border:1px solid rgba(244,63,94,.2);border-radius:var(--r-md);margin-bottom:1.5rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;">
+          <div>
+            <div style="font-size:1rem;font-weight:700;color:#fff;word-break:break-all;">{{ resume.filename }}</div>
+            <div style="font-size:.8rem;color:var(--txt-2);margin-top:.15rem;">{{ resume.get_resume_type_display }} v{{ resume.version }}</div>
+          </div>
+          {% if resume.is_active %}
+            <span class="sp-badge sp-badge-green">Active</span>
+          {% else %}
+            <span class="sp-badge sp-badge-gray">Archived</span>
+          {% endif %}
+        </div>
+        <div style="font-size:.78rem;color:var(--txt-3);margin-top:.5rem;">Uploaded on {{ resume.uploaded_at|date:"M d, Y · H:i" }}</div>
+        <div style="font-size:.78rem;color:var(--txt-3);margin-top:.25rem;">ATS Score: <strong style="color:#c4b5fd;">{{ resume.ats_score }}/100</strong></div>
+      </div>
+
+      <p style="font-size:.875rem;color:var(--txt-2);line-height:1.6;margin-bottom:1.5rem;">
+        Are you sure you want to permanently delete this version of your {{ resume.get_resume_type_display|lower }}?
+        {% if resume.is_active %}
+          <br><strong style="color:var(--amber);">Warning: This is your currently active version. The next newest version will be marked active.</strong>
+        {% endif %}
+      </p>
+
+      <div style="display:flex;gap:.75rem;">
+        <form method="post" action="{% url 'student_portal:resume_delete' resume.pk %}" style="flex:1;">
+          {% csrf_token %}
+          <button type="submit" class="sp-btn sp-btn-danger sp-btn-block">Yes, Delete</button>
+        </form>
+        <a href="{% url 'student_portal:resume_dashboard' %}" class="sp-btn sp-btn-secondary" style="flex:1;text-align:center;">
+          Cancel
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

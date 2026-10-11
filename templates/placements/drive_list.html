@@ -1,0 +1,300 @@
+{% extends 'base.html' %}
+{% load staff_tags %}
+
+{% block title %}Placement & Internship Drives | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem;">
+
+    <!-- Admin View -->
+    {% if is_admin %}
+        
+        <!-- Header -->
+        <div class="dashboard-header" style="border-bottom: none; margin-bottom: 1.5rem;">
+            <div>
+                <h1 class="dashboard-title">Recruitment Drives</h1>
+                <p class="dashboard-welcome">Launch and manage placement drives, student applications, and selection lists.</p>
+            </div>
+            <div>
+                {% if request.user|can_edit_filter %}
+                <a href="{% url 'placements:create' %}" class="btn btn-primary">🚀 Launch Drive</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Statistics Panel -->
+        <div class="dashboard-grid" style="margin-bottom: 2rem; grid-template-columns: repeat(4, 1fr);">
+            <div class="stats-card">
+                <p class="stats-label">Total Drives</p>
+                <h2 class="stats-value" style="color: #fff;">{{ total_count }}</h2>
+                <p class="stats-desc">Jobs & Internships</p>
+            </div>
+            <div class="stats-card">
+                <p class="stats-label">Active Drives</p>
+                <h2 class="stats-value" style="color: var(--success);">{{ active_count }}</h2>
+                <p class="stats-desc">Currently accepting applications</p>
+            </div>
+            <div class="stats-card">
+                <p class="stats-label">Job Drives</p>
+                <h2 class="stats-value" style="color: var(--info);">{{ jobs_count }}</h2>
+                <p class="stats-desc">Full-time opportunities</p>
+            </div>
+            <div class="stats-card">
+                <p class="stats-label">Internship Drives</p>
+                <h2 class="stats-value" style="color: #a5b4fc;">{{ internships_count }}</h2>
+                <p class="stats-desc">Undergraduate internships</p>
+            </div>
+        </div>
+
+        <!-- Admin Table -->
+        <div class="card-panel" style="margin-top: 0; padding: 1.5rem;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                <h3 class="panel-title" style="margin: 0; border: none; padding: 0;">Launched Drives</h3>
+                
+                <form method="get" style="display: flex; gap: 0.5rem; margin: 0;">
+                    <input type="text" name="q" value="{{ q }}" placeholder="Search role or company..." class="form-input" style="font-size: 0.85rem; padding: 0.4rem 0.85rem; width: 220px;">
+                    <button type="submit" class="btn btn-primary" style="padding: 0.4rem 1rem; font-size: 0.85rem;">Filter</button>
+                    {% if q %}
+                        <a href="{% url 'placements:list' %}" class="btn btn-secondary" style="padding: 0.4rem 1rem; font-size: 0.85rem;">Clear</a>
+                    {% endif %}
+                </form>
+            </div>
+
+            {% if drives %}
+                <div class="table-wrapper">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 20%;">Company</th>
+                                    <th style="width: 20%;">Role / Position</th>
+                                    <th style="width: 15%;">Drive Type</th>
+                                    <th style="width: 12%;">Compensation</th>
+                                    <th style="width: 13%;">Deadline</th>
+                                    <th style="width: 10%;">Status</th>
+                                    <th style="width: 10%; text-align: right;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for drive in drives %}
+                                    <tr>
+                                        <td>
+                                            <strong style="color: #fff;">{{ drive.company.name }}</strong>
+                                        </td>
+                                        <td style="color: #fff; font-weight: 600;">
+                                            {{ drive.role }}
+                                        </td>
+                                        <td>
+                                            {% if drive.drive_type == 'JOB' %}
+                                                <span class="badge" style="background: rgba(59, 130, 246, 0.1); color: var(--info); border-color: rgba(59, 130, 246, 0.25);">Full-time Job</span>
+                                            {% else %}
+                                                <span class="badge" style="background: rgba(99, 102, 241, 0.1); color: #a5b4fc; border-color: rgba(99, 102, 241, 0.25);">Internship</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if drive.package_amount %}
+                                                {% if drive.drive_type == 'JOB' %}
+                                                    💵 {{ drive.package_amount }} LPA
+                                                {% else %}
+                                                    💸 {{ drive.package_amount }}/mo
+                                                {% endif %}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            📅 {{ drive.deadline|default:"Not Specified" }}
+                                        </td>
+                                        <td>
+                                            {% if drive.status == 'ACTIVE' %}
+                                                <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.25);">Active</span>
+                                            {% elif drive.status == 'UPCOMING' %}
+                                                <span class="badge" style="background: rgba(245, 158, 11, 0.1); color: var(--warning); border-color: rgba(245, 158, 11, 0.25);">Upcoming</span>
+                                            {% else %}
+                                                <span class="badge" style="background: rgba(255,255,255,0.05); color: var(--text-muted); border-color: var(--card-border);">Completed</span>
+                                            {% endif %}
+                                        </td>
+                                        <td style="text-align: right;">
+                                            <a href="{% url 'placements:detail' pk=drive.pk %}" class="btn btn-secondary btn-xs" title="Manage student applications">👥 Manage</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% else %}
+                <p style="text-align: center; color: var(--text-secondary); font-style: italic; padding: 2rem 0; margin: 0;">
+                    No placement drives created yet. Click "Launch Drive" above.
+                </p>
+            {% endif %}
+        </div>
+
+    <!-- Student View -->
+    {% else %}
+        
+        <!-- Header -->
+        <div class="dashboard-header" style="border-bottom: none; margin-bottom: 2rem;">
+            <div>
+                <h1 class="dashboard-title">Placements &amp; Internships</h1>
+                <p class="dashboard-welcome">View eligibility, apply to partner drives, and track your recruitment status.</p>
+            </div>
+        </div>
+
+        <!-- Student Section 1: My Applications -->
+        <div class="card-panel" style="margin-top: 0; padding: 1.5rem; margin-bottom: 2rem;">
+            <h3 class="panel-title" style="border-bottom: 1px solid var(--card-border); padding-bottom: 0.75rem; margin-bottom: 1.5rem;">📁 My Application Tracking</h3>
+            
+            {% if my_applications %}
+                <div class="table-wrapper">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 25%;">Company</th>
+                                    <th style="width: 25%;">Role</th>
+                                    <th style="width: 15%;">Drive Type</th>
+                                    <th style="width: 15%;">Compensation</th>
+                                    <th style="width: 10%;">Applied Date</th>
+                                    <th style="width: 10%; text-align: center;">Tracking Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for app in my_applications %}
+                                    <tr>
+                                        <td>
+                                            <strong style="color: #fff;">{{ app.drive.company.name }}</strong>
+                                        </td>
+                                        <td style="color: #fff; font-weight: 600;">
+                                            {{ app.drive.role }}
+                                        </td>
+                                        <td>
+                                            {% if app.drive.drive_type == 'JOB' %}
+                                                <span class="badge" style="background: rgba(59, 130, 246, 0.1); color: var(--info); border-color: rgba(59, 130, 246, 0.25);">Full-time Job</span>
+                                            {% else %}
+                                                <span class="badge" style="background: rgba(99, 102, 241, 0.1); color: #a5b4fc; border-color: rgba(99, 102, 241, 0.25);">Internship</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if app.drive.package_amount %}
+                                                {% if app.drive.drive_type == 'JOB' %}
+                                                    💵 {{ app.drive.package_amount }} LPA
+                                                {% else %}
+                                                    💸 {{ app.drive.package_amount }}/mo
+                                                {% endif %}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ app.applied_at|date:"Y-m-d" }}
+                                        </td>
+                                        <td style="text-align: center;">
+                                            {% if app.status == 'SELECTED' %}
+                                                <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.25);">✔️ Selected</span>
+                                            {% elif app.status == 'SHORTLISTED' %}
+                                                <span class="badge" style="background: rgba(59, 130, 246, 0.1); color: var(--info); border-color: rgba(59, 130, 246, 0.25);">⏳ Shortlisted</span>
+                                            {% elif app.status == 'REJECTED' %}
+                                                <span class="badge" style="background: rgba(244, 63, 94, 0.1); color: var(--danger); border-color: rgba(244, 63, 94, 0.25);">✖️ Rejected</span>
+                                            {% else %}
+                                                <span class="badge" style="background: rgba(255, 255, 255, 0.05); color: #fff; border-color: var(--card-border);">Applied</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% else %}
+                <p style="text-align: center; color: var(--text-secondary); font-style: italic; padding: 2rem 0; margin: 0;">
+                    You have not submitted applications to any drives yet.
+                </p>
+            {% endif %}
+        </div>
+
+        <!-- Student Section 2: Active Drives -->
+        <div class="card-panel" style="margin-top: 0; padding: 1.5rem;">
+            <h3 class="panel-title" style="border-bottom: 1px solid var(--card-border); padding-bottom: 0.75rem; margin-bottom: 1.5rem;">🚀 Available Opportunities</h3>
+            
+            {% if drives %}
+                <div class="table-wrapper">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 20%;">Company</th>
+                                    <th style="width: 20%;">Role</th>
+                                    <th style="width: 15%;">Drive Type</th>
+                                    <th style="width: 12%;">Compensation</th>
+                                    <th style="width: 13%;">Deadline</th>
+                                    <th style="width: 12%;">Eligibility</th>
+                                    <th style="width: 8%; text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in drives %}
+                                    <tr>
+                                        <td>
+                                            <strong style="color: #fff;">{{ item.drive.company.name }}</strong>
+                                        </td>
+                                        <td style="color: #fff; font-weight: 600;">
+                                            {{ item.drive.role }}
+                                        </td>
+                                        <td>
+                                            {% if item.drive.drive_type == 'JOB' %}
+                                                <span class="badge" style="background: rgba(59, 130, 246, 0.1); color: var(--info); border-color: rgba(59, 130, 246, 0.25);">Full-time Job</span>
+                                            {% else %}
+                                                <span class="badge" style="background: rgba(99, 102, 241, 0.1); color: #a5b4fc; border-color: rgba(99, 102, 241, 0.25);">Internship</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if item.drive.package_amount %}
+                                                {% if item.drive.drive_type == 'JOB' %}
+                                                    💵 {{ item.drive.package_amount }} LPA
+                                                {% else %}
+                                                    💸 {{ item.drive.package_amount }}/mo
+                                                {% endif %}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            📅 {{ item.drive.deadline|default:"Not Specified" }}
+                                        </td>
+                                        <td>
+                                            {% if item.is_eligible %}
+                                                <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.25);">Eligible</span>
+                                            {% else %}
+                                                <span class="badge" style="background: rgba(244, 63, 94, 0.1); color: var(--danger); border-color: rgba(244, 63, 94, 0.25);" title="{{ item.reasons|join:', ' }}">
+                                                    Not Eligible ⚠️
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td style="text-align: right;">
+                                            {% if item.already_applied %}
+                                                <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;">Submitted</span>
+                                            {% else %}
+                                                <a href="{% url 'placements:detail' pk=item.drive.pk %}" class="btn btn-secondary btn-xs" style="{% if item.is_eligible %}background: var(--primary); border-color: var(--primary); color: #fff;{% endif %}">
+                                                    Apply &rarr;
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% else %}
+                <p style="text-align: center; color: var(--text-secondary); font-style: italic; padding: 2rem 0; margin: 0;">
+                    No available placement opportunities at this moment.
+                </p>
+            {% endif %}
+        </div>
+
+    {% endif %}
+
+</div>
+{% endblock %}

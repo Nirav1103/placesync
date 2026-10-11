@@ -1,0 +1,87 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}My Applications | PlaceSync{% endblock %}
+{% block topbar_title %}My Applications{% endblock %}
+{% block nav_applications %}active{% endblock %}
+
+{% block content %}
+
+<div class="sp-page-header">
+  <div>
+    <h1 class="sp-page-title">My Applications</h1>
+    <p class="sp-page-subtitle">Track all your placement and internship applications</p>
+  </div>
+  <div class="sp-page-actions">
+    <a href="?status=APPLIED"      class="sp-btn {% if status_filter == 'APPLIED' %}sp-btn-primary{% else %}sp-btn-secondary{% endif %} sp-btn-sm">Applied</a>
+    <a href="?status=SHORTLISTED"  class="sp-btn {% if status_filter == 'SHORTLISTED' %}sp-btn-primary{% else %}sp-btn-secondary{% endif %} sp-btn-sm">Shortlisted</a>
+    <a href="?status=SELECTED"     class="sp-btn {% if status_filter == 'SELECTED' %}sp-btn-primary{% else %}sp-btn-secondary{% endif %} sp-btn-sm">Selected</a>
+    <a href="?status=REJECTED"     class="sp-btn {% if status_filter == 'REJECTED' %}sp-btn-primary{% else %}sp-btn-secondary{% endif %} sp-btn-sm">Rejected</a>
+    <a href="."                    class="sp-btn sp-btn-secondary sp-btn-sm">All</a>
+  </div>
+</div>
+
+{% if applications %}
+<div class="sp-card">
+  <div class="sp-table-wrap">
+    <table class="sp-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Company</th>
+          <th>Role</th>
+          <th>Drive Type</th>
+          <th>Package</th>
+          <th>Status</th>
+          <th>Applied On</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for app in applications %}
+        <tr>
+          <td style="color:var(--txt-3);">{{ forloop.counter }}</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:.625rem;">
+              <div style="width:28px;height:28px;border-radius:6px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff;flex-shrink:0;">
+                {{ app.drive.company.name|slice:":2"|upper }}
+              </div>
+              <span style="font-weight:600;color:#fff;">{{ app.drive.company.name }}</span>
+            </div>
+          </td>
+          <td style="font-weight:500;color:var(--txt-1);">{{ app.drive.role }}</td>
+          <td>
+            <span class="sp-badge {% if app.drive.drive_type == 'JOB' %}sp-badge-violet{% else %}sp-badge-sky{% endif %}">
+              {{ app.drive.get_drive_type_display }}
+            </span>
+          </td>
+          <td style="color:#c4b5fd;font-weight:600;">
+            {% if app.drive.package_amount %}
+              {% if app.drive.drive_type == 'JOB' %}{{ app.drive.package_amount }} LPA{% else %}₹{{ app.drive.package_amount }}/mo{% endif %}
+            {% else %}—{% endif %}
+          </td>
+          <td>
+            <span class="sp-badge
+              {% if app.status == 'SELECTED' %}sp-badge-green
+              {% elif app.status == 'SHORTLISTED' %}sp-badge-violet
+              {% elif app.status == 'REJECTED' %}sp-badge-red
+              {% else %}sp-badge-amber{% endif %}">
+              {{ app.get_status_display }}
+            </span>
+          </td>
+          <td style="color:var(--txt-3);font-size:.8rem;">{{ app.applied_at|date:"M d, Y" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% else %}
+<div class="sp-empty" style="padding:4rem 2rem;">
+  <div class="sp-empty-icon">📋</div>
+  <div class="sp-empty-text">No applications found</div>
+  <div class="sp-empty-sub">Apply to placement drives to track your progress here.</div>
+  <a href="{% url 'student_portal:drives' %}" class="sp-btn sp-btn-primary" style="margin-top:1.25rem;">Browse Drives</a>
+</div>
+{% endif %}
+
+{% endblock %}

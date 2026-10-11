@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Departments | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem;">
+
+    <!-- Dashboard Header -->
+    <div class="sp-page-header" style="margin-bottom: 1.5rem;">
+        <div>
+            <h1 class="sp-page-title">Departments</h1>
+            <p class="sp-page-subtitle">Manage academic departments of your college</p>
+        </div>
+        <div>
+            <a href="{% url 'departments:create' %}" class="sp-btn sp-btn-primary" style="font-weight:800;">Add Department</a>
+        </div>
+    </div>
+
+    <!-- Search Toolbar -->
+    <form method="get" class="search-bar" style="margin-bottom:1.5rem; display:flex; gap:0.5rem;">
+        <input type="text" name="q" value="{{ q }}" placeholder="Search by name, code, or HOD..." class="sp-form-control" style="font-size: 0.9rem; font-weight:600; flex:1;">
+        <button type="submit" class="sp-btn sp-btn-primary" style="padding: 0.75rem 1.25rem; font-weight:800;">Search</button>
+        {% if q %}
+            <a href="{% url 'departments:list' %}" class="sp-btn sp-btn-secondary" style="padding: 0.75rem 1.25rem; border:1.5px solid #475569 !important; font-weight:800;">Clear</a>
+        {% endif %}
+    </form>
+
+    <!-- Table Section -->
+    {% if departments_data %}
+        <div class="sp-card" style="background:#FFFFFF !important; border:1.5px solid #475569 !important; padding:1.25rem; border-radius:8px;">
+            <div class="table-wrapper">
+                <div class="table-responsive">
+                    <table class="sp-table" style="width:100%; border-collapse:collapse;">
+                        <thead>
+                            <tr style="background:#F8FAFC; border-bottom:1.5px solid #475569;">
+                                <th style="width: 12%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align:left;">Code</th>
+                                <th style="width: 25%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align:left;">Department Name</th>
+                                <th style="width: 20%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align:left;">HOD (Head)</th>
+                                <th style="width: 10%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align: center;">Students</th>
+                                <th style="width: 10%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align: center;">Batches</th>
+                                <th style="width: 13%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align: center;">Placement %</th>
+                                <th style="width: 10%; padding:0.75rem; color:#0F172A !important; font-weight:800; text-align: right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in departments_data %}
+                                <tr style="border-bottom:1px solid #CBD5E1;">
+                                    <td style="padding:0.75rem;">
+                                        <span class="sp-badge sp-badge-violet" style="font-weight:800;">{{ item.dept.code }}</span>
+                                    </td>
+                                    <td style="padding:0.75rem; color: #0F172A !important; font-weight: 800;">
+                                        {{ item.dept.name }}
+                                    </td>
+                                    <td style="padding:0.75rem; color: #1E293B !important; font-weight: 600;">
+                                        {% if item.dept.department_head %}
+                                            <i class="fa-solid fa-user-tie" style="color:#0F172A; margin-right:0.25rem;"></i> {{ item.dept.department_head }}
+                                        {% else %}
+                                            <span style="color: #334155 !important; font-style: italic; font-weight:600;">Not assigned</span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="padding:0.75rem; text-align: center; color: #1E293B !important; font-weight: 700;">
+                                        {{ item.total_students }}
+                                    </td>
+                                    <td style="padding:0.75rem; text-align: center; color: #1E293B !important; font-weight: 700;">
+                                        {{ item.total_batches }}
+                                    </td>
+                                    <td style="padding:0.75rem; text-align: center; font-weight: 800;">
+                                        <span class="sp-badge {% if item.placement_pct >= 70 %}sp-badge-green{% elif item.placement_pct >= 40 %}sp-badge-amber{% else %}sp-badge-sky{% endif %}">
+                                            {{ item.placement_pct }}%
+                                        </span>
+                                    </td>
+                                    <td style="padding:0.75rem;">
+                                        <div class="table-actions" style="display:flex; justify-content: flex-end; gap:0.35rem;">
+                                            <a href="{% url 'departments:edit' pk=item.dept.pk %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="border:1.5px solid #475569 !important; font-weight:800;">Edit</a>
+                                            <a href="{% url 'departments:delete' pk=item.dept.pk %}" class="sp-btn sp-btn-danger sp-btn-xs" style="background:#FEF2F2 !important; color:#DC2626 !important; border:1.5px solid #DC2626 !important; font-weight:800;">Delete</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <!-- Empty State Panel -->
+        <div class="sp-card" style="text-align: center; padding: 4rem 2rem; border: 1.5px solid #475569 !important; background: #FFFFFF !important; margin-top: 1.5rem;">
+            <p style="color: #334155 !important; margin-bottom: 1.5rem; font-size: 1rem; font-weight:600;">
+                {% if q %}
+                    No departments match your search query: <strong style="color: #0F172A !important;">"{{ q }}"</strong>
+                {% else %}
+                    No departments have been added to your college profile yet.
+                {% endif %}
+            </p>
+            {% if q %}
+                <a href="{% url 'departments:list' %}" class="sp-btn sp-btn-secondary" style="border:1.5px solid #475569 !important; font-weight:800;">Clear Search</a>
+            {% else %}
+                <a href="{% url 'departments:create' %}" class="sp-btn sp-btn-primary" style="font-weight:800;">Add Your First Department</a>
+            {% endif %}
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

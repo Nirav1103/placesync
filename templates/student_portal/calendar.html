@@ -1,0 +1,98 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Placement Calendar | PlaceSync{% endblock %}
+{% block topbar_title %}Placement Calendar{% endblock %}
+{% block nav_calendar %}active{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════════════
+     Page Header
+════════════════════════════════════════════════════ -->
+<div class="sp-page-header">
+  <div>
+    <h1 class="sp-page-title">📅 Placement Milestone Calendar</h1>
+    <p class="sp-page-subtitle">Track important PPTs, test schedules, and interview panel timings</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     Timeline Groups Layout (HTML/CSS Dashboard Only)
+════════════════════════════════════════════════════ -->
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;align-items:start;margin-bottom:2rem;">
+
+  <!-- ─── COLUMN 1: Today ─── -->
+  <div style="display:flex;flex-direction:column;gap:1rem;">
+    <div style="background:#FFFFFF !important;border:1.5px solid #DC2626 !important;border-radius:8px;padding:0.85rem 1rem;display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-weight:800;color:#DC2626 !important;font-size:0.95rem;">📅 Today</span>
+      <span class="sp-badge sp-badge-red">{{ today_events.count }}</span>
+    </div>
+
+    {% if today_events %}
+      {% for ev in today_events %}
+        {% include "student_portal/calendar_event_card.html" with event=ev %}
+      {% endfor %}
+    {% else %}
+      <div style="background:#FFFFFF !important;border:1.5px dashed #475569 !important;border-radius:8px;padding:2.5rem 1.25rem;text-align:center;color:#334155 !important;font-size:0.82rem;font-weight:700;">
+        No milestones scheduled today.
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- ─── COLUMN 2: Tomorrow ─── -->
+  <div style="display:flex;flex-direction:column;gap:1rem;">
+    <div style="background:#FFFFFF !important;border:1.5px solid #D97706 !important;border-radius:8px;padding:0.85rem 1rem;display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-weight:800;color:#D97706 !important;font-size:0.95rem;">🌅 Tomorrow</span>
+      <span class="sp-badge sp-badge-amber">{{ tomorrow_events.count }}</span>
+    </div>
+
+    {% if tomorrow_events %}
+      {% for ev in tomorrow_events %}
+        {% include "student_portal/calendar_event_card.html" with event=ev %}
+      {% endfor %}
+    {% else %}
+      <div style="background:#FFFFFF !important;border:1.5px dashed #475569 !important;border-radius:8px;padding:2.5rem 1.25rem;text-align:center;color:#334155 !important;font-size:0.82rem;font-weight:700;">
+        No milestones tomorrow.
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- ─── COLUMN 3: This Week ─── -->
+  <div style="display:flex;flex-direction:column;gap:1rem;">
+    <div style="background:#FFFFFF !important;border:1.5px solid #0284C7 !important;border-radius:8px;padding:0.85rem 1rem;display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-weight:800;color:#0284C7 !important;font-size:0.95rem;">🗓️ This Week</span>
+      <span class="sp-badge sp-badge-sky">{{ this_week_events.count }}</span>
+    </div>
+
+    {% if this_week_events %}
+      {% for ev in this_week_events %}
+        {% include "student_portal/calendar_event_card.html" with event=ev %}
+      {% endfor %}
+    {% else %}
+      <div style="background:#FFFFFF !important;border:1.5px dashed #475569 !important;border-radius:8px;padding:2.5rem 1.25rem;text-align:center;color:#334155 !important;font-size:0.82rem;font-weight:700;">
+        No milestones this week.
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- ─── COLUMN 4: Upcoming ─── -->
+  <div style="display:flex;flex-direction:column;gap:1rem;">
+    <div style="background:#FFFFFF !important;border:1.5px solid #059669 !important;border-radius:8px;padding:0.85rem 1rem;display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-weight:800;color:#059669 !important;font-size:0.95rem;">🚀 Upcoming</span>
+      <span class="sp-badge sp-badge-green">{{ upcoming_events.count }}</span>
+    </div>
+
+    {% if upcoming_events %}
+      {% for ev in upcoming_events %}
+        {% include "student_portal/calendar_event_card.html" with event=ev %}
+      {% endfor %}
+    {% else %}
+      <div style="background:#FFFFFF !important;border:1.5px dashed #475569 !important;border-radius:8px;padding:2.5rem 1.25rem;text-align:center;color:#334155 !important;font-size:0.82rem;font-weight:700;">
+        No upcoming milestones.
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+
+{% endblock %}

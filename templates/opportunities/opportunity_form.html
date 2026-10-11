@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Opportunity | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem; max-width: 700px;">
+    
+    <!-- Header -->
+    <div class="dashboard-header" style="border-bottom: none; margin-bottom: 1.5rem;">
+        <div>
+            <h1 class="dashboard-title">Edit Discovered Opportunity</h1>
+            <p class="dashboard-welcome">Update parsed details for company <strong style="color: #fff;">{{ opportunity.company_name }}</strong></p>
+        </div>
+        <div>
+            <a href="{% url 'opportunities:list' %}" class="btn btn-secondary">&larr; Back to Listings</a>
+        </div>
+    </div>
+
+    <!-- Edit Panel -->
+    <div class="card-panel" style="margin-top: 0;">
+        <form method="post" style="display: flex; flex-direction: column; gap: 1.5rem;">
+            {% csrf_token %}
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <!-- Company Name -->
+                <div class="form-group">
+                    <label class="form-label" for="id_company_name">Company Name</label>
+                    {{ form.company_name }}
+                    {% if form.company_name.errors %}
+                        <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.company_name.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <!-- Role -->
+                <div class="form-group">
+                    <label class="form-label" for="id_role">Role / Position Title</label>
+                    {{ form.role }}
+                    {% if form.role.errors %}
+                        <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.role.errors.0 }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <!-- Package -->
+                <div class="form-group">
+                    <label class="form-label" for="id_package">Package / CTC offered</label>
+                    {{ form.package }}
+                    {% if form.package.errors %}
+                        <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.package.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <!-- Location -->
+                <div class="form-group">
+                    <label class="form-label" for="id_location">Job Location</label>
+                    {{ form.location }}
+                    {% if form.location.errors %}
+                        <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.location.errors.0 }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem;">
+                <!-- Deadline -->
+                <div class="form-group">
+                    <label class="form-label" for="id_deadline">Application Deadline</label>
+                    {{ form.deadline }}
+                    {% if form.deadline.errors %}
+                        <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.deadline.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <!-- Source URL -->
+                <div class="form-group">
+                    <label class="form-label" for="id_source">Source URL</label>
+                    {{ form.source }}
+                    {% if form.source.errors %}
+                        <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.source.errors.0 }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; border-top: 1px solid var(--card-border); padding-top: 1.5rem; margin-top: 1rem;">
+                <button type="submit" class="btn btn-primary" style="padding: 0.85rem 2rem;">Save Changes</button>
+                <a href="{% url 'opportunities:list' %}" class="btn btn-secondary" style="padding: 0.85rem 1.5rem;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

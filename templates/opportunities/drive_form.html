@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Placement Drive | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem; max-width: 700px;">
+    
+    <!-- Header -->
+    <div class="dashboard-header" style="border-bottom: none; margin-bottom: 1.5rem;">
+        <div>
+            <h1 class="dashboard-title">Launch Placement Drive</h1>
+            <p class="dashboard-welcome">Creating recruiting drive from verified opportunity: <strong style="color: #fff;">{{ opportunity.role }} at {{ opportunity.company_name }}</strong></p>
+        </div>
+        <div>
+            <a href="{% url 'opportunities:list' %}" class="btn btn-secondary">&larr; Cancel</a>
+        </div>
+    </div>
+
+    <!-- Panel Form -->
+    <div class="card-panel" style="margin-top: 0;">
+        <form method="post" style="display: flex; flex-direction: column; gap: 1.5rem;">
+            {% csrf_token %}
+            
+            <!-- Company -->
+            <div class="form-group">
+                <label class="form-label" for="id_company">Select Company Partner *</label>
+                {{ form.company }}
+                {% if form.company.errors %}
+                    <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.company.errors.0 }}</span>
+                {% endif %}
+                <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">
+                    💡 If the company is not in the dropdown, it has been auto-imported during this step. You can select it from the list.
+                </span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <!-- Role -->
+                <div class="form-group">
+                    <label class="form-label" for="id_role">Role Title *</label>
+                    {{ form.role }}
+                    {% if form.role.errors %}
+                        <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.role.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <!-- Package -->
+                <div class="form-group">
+                    <label class="form-label" for="id_package_amount">CTC Package Amount (LPA)</label>
+                    {{ form.package_amount }}
+                    {% if form.package_amount.errors %}
+                        <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.package_amount.errors.0 }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <!-- Job Mode -->
+                <div class="form-group">
+                    <label class="form-label" for="id_job_mode">Job Mode</label>
+                    {{ form.job_mode }}
+                    {% if form.job_mode.errors %}
+                        <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.job_mode.errors.0 }}</span>
+                    {% endif %}
+                </div>
+
+                <!-- Status -->
+                <div class="form-group">
+                    <label class="form-label" for="id_status">Drive Status</label>
+                    {{ form.status }}
+                    {% if form.status.errors %}
+                        <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.status.errors.0 }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Deadline -->
+            <div class="form-group">
+                <label class="form-label" for="id_deadline">Application Deadline</label>
+                {{ form.deadline }}
+                {% if form.deadline.errors %}
+                    <span style="font-size: 0.75rem; color: var(--danger); display: block; margin-top: 0.25rem;">{{ form.deadline.errors.0 }}</span>
+                {% endif %}
+                <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">
+                    Format: YYYY-MM-DD
+                </span>
+            </div>
+
+            <!-- Buttons -->
+            <div style="display: flex; gap: 1rem; border-top: 1px solid var(--card-border); padding-top: 1.5rem; margin-top: 1rem;">
+                <button type="submit" class="btn btn-primary" style="padding: 0.85rem 2.5rem;">🚀 Launch Drive</button>
+                <a href="{% url 'opportunities:list' %}" class="btn btn-secondary" style="padding: 0.85rem 1.5rem;">Cancel</a>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}

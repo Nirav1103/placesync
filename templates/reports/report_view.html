@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem;">
+
+    <!-- Header -->
+    <div class="dashboard-header" style="border-bottom: none; margin-bottom: 1.5rem;">
+        <div>
+            <h1 class="dashboard-title">{{ title }}</h1>
+            <p class="dashboard-welcome">Review live analytics stats and export compiled summaries.</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <a href="{% url 'reports:dashboard' %}" class="btn btn-secondary">&larr; Back to Reports</a>
+            <!-- Exports -->
+            <a href="{% url 'reports:export_report' report_type=report_type export_format='csv' %}" class="btn btn-secondary" style="background: rgba(59,130,246,0.05); color: var(--info); border-color: rgba(59,130,246,0.2);">📥 Export CSV</a>
+            <a href="{% url 'reports:export_report' report_type=report_type export_format='pdf' %}" class="btn btn-primary" style="box-shadow: 0 4px 14px rgba(99,102,241,0.25);">📥 Export PDF (ReportLab)</a>
+        </div>
+    </div>
+
+    <!-- Metrics Stats Cards Row -->
+    {% if metrics %}
+        <div class="dashboard-grid" style="margin-bottom: 2rem; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+            {% for m in metrics %}
+                <div class="stats-card">
+                    <p class="stats-label">{{ m.label }}</p>
+                    <h2 class="stats-value" style="color: #fff; font-size: 1.65rem;">{{ m.value }}</h2>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Report Table Logs -->
+    <div class="card-panel" style="margin-top: 0; padding: 1.5rem;">
+        <h3 class="panel-title" style="border-bottom: 1px solid var(--card-border); padding-bottom: 0.75rem; margin-bottom: 1.5rem;">Audit Logs &amp; Detailed Rows</h3>
+
+        {% if data %}
+            <div class="table-wrapper">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                {% for h in headers %}
+                                    <th>{{ h }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in data %}
+                                <tr>
+                                    {% for cell in row %}
+                                        <td>
+                                            {% if forloop.first %}
+                                                <strong style="color: #fff;">{{ cell }}</strong>
+                                            {% else %}
+                                                {{ cell|default:"-" }}
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <p style="text-align: center; color: var(--text-secondary); font-style: italic; padding: 3rem 0; margin: 0;">
+                No matching logs or records compiled in database.
+            </p>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

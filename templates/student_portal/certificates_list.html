@@ -1,0 +1,186 @@
+{% extends 'student_portal/base.html' %}
+
+{% block title %}Certificates | PlaceSync{% endblock %}
+{% block topbar_title %}{% if is_recruiter %}{{ student.name }}'s Certificates{% else %}Certificates{% endif %}{% endblock %}
+{% block nav_certs %}active{% endblock %}
+{% block page_body_class %}page-certificates{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="sp-page-header">
+  <div>
+    <h1 class="sp-page-title">📜 Certificates</h1>
+    <p class="sp-page-subtitle">Store all your course, workshop, hackathon and internship certificates in one secure place.</p>
+  </div>
+  {% if not is_recruiter %}
+  <div class="sp-page-actions">
+    <a href="{% url 'student_portal:certificate_create' %}" class="sp-btn sp-btn-primary" style="padding:.625rem 1.35rem; font-size:.875rem;">➕ Add Certificate</a>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Summary Cards -->
+<div class="sp-stats" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 1.75rem; gap: 1rem;">
+  
+  <div class="sp-stat" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+    <div class="sp-stat-icon si-v" style="background:#F8FAFC !important; border:1.5px solid #475569 !important; color:#0F172A !important;">📜</div>
+    <div class="sp-stat-label" style="color:#1E293B !important; font-weight:800;">Total Certificates</div>
+    <div class="sp-stat-value" style="color:#0F172A !important; font-weight:800;">{{ total_count }}</div>
+  </div>
+
+  <div class="sp-stat" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+    <div class="sp-stat-icon si-g" style="background:#F8FAFC !important; border:1.5px solid #475569 !important; color:#32867D !important;">🎓</div>
+    <div class="sp-stat-label" style="color:#1E293B !important; font-weight:800;">Courses</div>
+    <div class="sp-stat-value" style="color:#32867D !important; font-weight:800;">{{ courses_count }}</div>
+  </div>
+
+  <div class="sp-stat" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+    <div class="sp-stat-icon si-s" style="background:#F8FAFC !important; border:1.5px solid #475569 !important; color:#059669 !important;">🏆</div>
+    <div class="sp-stat-label" style="color:#1E293B !important; font-weight:800;">Hackathons</div>
+    <div class="sp-stat-value" style="color:#059669 !important; font-weight:800;">{{ hackathons_count }}</div>
+  </div>
+
+  <div class="sp-stat" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+    <div class="sp-stat-icon si-a" style="background:#F8FAFC !important; border:1.5px solid #475569 !important; color:#0284C7 !important;">🛠️</div>
+    <div class="sp-stat-label" style="color:#1E293B !important; font-weight:800;">Workshops</div>
+    <div class="sp-stat-value" style="color:#0284C7 !important; font-weight:800;">{{ workshops_count }}</div>
+  </div>
+
+</div>
+
+<!-- Search & Filters -->
+<div class="sp-card" style="margin-bottom: 1.75rem; border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+  <div class="sp-card-body" style="padding: 1.25rem;">
+    <form method="get" 
+          action="{% if is_recruiter %}{% url 'student_portal:recruiter_certificates' student.id %}{% else %}{% url 'student_portal:certificates_list' %}{% endif %}" 
+          style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 0.75rem; align-items: end;">
+      
+      <!-- Search Query -->
+      <div class="sp-form-group" style="margin-bottom: 0;">
+        <label class="sp-form-label" for="filter_q" style="color:#1E293B !important; font-weight:800;">Search Certificates</label>
+        <input type="text" name="q" id="filter_q" class="sp-form-control" placeholder="Title, organization, purpose..." value="{{ q }}">
+      </div>
+
+      <!-- Filter by Purpose -->
+      <div class="sp-form-group" style="margin-bottom: 0;">
+        <label class="sp-form-label" for="filter_purpose" style="color:#1E293B !important; font-weight:800;">Purpose</label>
+        <select name="purpose" id="filter_purpose" class="sp-form-control">
+          <option value="">All Purposes</option>
+          {% for val, label in purposes %}
+          <option value="{{ val }}" {% if selected_purpose == val %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Filter by Year -->
+      <div class="sp-form-group" style="margin-bottom: 0;">
+        <label class="sp-form-label" for="filter_year" style="color:#1E293B !important; font-weight:800;">Year</label>
+        <select name="year" id="filter_year" class="sp-form-control">
+          <option value="">All Years</option>
+          {% for yr in years %}
+          <option value="{{ yr }}" {% if selected_year == yr|stringformat:"i" %}selected{% endif %}>{{ yr }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Sort By -->
+      <div class="sp-form-group" style="margin-bottom: 0;">
+        <label class="sp-form-label" for="filter_sort" style="color:#1E293B !important; font-weight:800;">Sort By</label>
+        <select name="sort" id="filter_sort" class="sp-form-control">
+          <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>Newest Issue Date</option>
+          <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>Oldest Issue Date</option>
+        </select>
+      </div>
+
+      <!-- Submit Form -->
+      <button type="submit" class="sp-btn sp-btn-primary" style="padding: 0.65rem 1.25rem;">🔍 Apply</button>
+
+    </form>
+  </div>
+</div>
+
+<!-- Table list -->
+<div class="sp-card" style="border:1.5px solid #475569 !important; background:#FFFFFF !important;">
+  <div class="sp-card-body" style="padding: 0;">
+    {% if page_obj %}
+    <div style="overflow-x: auto;">
+      <table class="sp-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+          <tr style="border-bottom: 1.5px solid #475569 !important; background:#F8FAFC !important;">
+            <th style="padding: 1rem 1.5rem; color:#0F172A !important; font-weight:800; text-transform:uppercase; font-size:.78rem;">Certificate Title</th>
+            <th style="padding: 1rem 1.5rem; color:#0F172A !important; font-weight:800; text-transform:uppercase; font-size:.78rem;">Organization</th>
+            <th style="padding: 1rem 1.5rem; color:#0F172A !important; font-weight:800; text-transform:uppercase; font-size:.78rem;">Purpose</th>
+            <th style="padding: 1rem 1.5rem; color:#0F172A !important; font-weight:800; text-transform:uppercase; font-size:.78rem;">Issue Date</th>
+            <th style="padding: 1rem 1.5rem; color:#0F172A !important; font-weight:800; text-transform:uppercase; font-size:.78rem; text-align: right;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cert in page_obj %}
+          <tr style="border-bottom: 1.5px solid #CBD5E1;">
+            <td style="padding: 1.1rem 1.5rem; font-weight: 800; color: #0F172A !important; font-size:.9rem;">{{ cert.title }}</td>
+            <td style="padding: 1.1rem 1.5rem; color: #1E293B !important; font-weight:700; font-size:.86rem;">{{ cert.issuing_organization }}</td>
+            <td style="padding: 1.1rem 1.5rem;">
+              <span class="sp-badge sp-badge-violet">
+                {{ cert.get_purpose_display }}
+              </span>
+            </td>
+            <td style="padding: 1.1rem 1.5rem; color: #334155 !important; font-weight:700; font-size: 0.86rem;">{{ cert.issue_date|date:"M d, Y" }}</td>
+            <td style="padding: 1.1rem 1.5rem; text-align: right;">
+              <div style="display:flex;gap:.4rem;justify-content:flex-end;">
+                {% if cert.certificate_file %}
+                  <a href="{% url 'student_portal:certificate_preview' cert.pk %}" target="_blank" class="sp-btn sp-btn-secondary sp-btn-xs" style="border:1.5px solid #475569 !important;">👁️ Preview</a>
+                  <a href="{% url 'student_portal:certificate_download' cert.pk %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="border:1.5px solid #475569 !important;">📥 Download</a>
+                {% endif %}
+                {% if not is_recruiter %}
+                  <a href="{% url 'student_portal:certificate_edit' cert.pk %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="border:1.5px solid #475569 !important;">✏️ Edit</a>
+                  <a href="{% url 'student_portal:certificate_delete' cert.pk %}" class="sp-btn sp-btn-danger sp-btn-xs" style="background:#FEF2F2 !important; color:#DC2626 !important; border:1.5px solid #DC2626 !important; font-weight:800;">🗑️ Delete</a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-top: 1.5px solid #CBD5E1; background:#F8FAFC !important;">
+      <span style="font-size: 0.84rem; color: #334155 !important; font-weight:700;">
+        Showing page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+      </span>
+      <div style="display: flex; gap: 0.5rem;">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if selected_purpose %}&purpose={{ selected_purpose }}{% endif %}{% if selected_year %}&year={{ selected_year }}{% endif %}{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="border:1.5px solid #475569 !important;">◀️ Previous</a>
+        {% endif %}
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if selected_purpose %}&purpose={{ selected_purpose }}{% endif %}{% if selected_year %}&year={{ selected_year }}{% endif %}{% if selected_sort %}&sort={{ selected_sort }}{% endif %}" class="sp-btn sp-btn-secondary sp-btn-xs" style="border:1.5px solid #475569 !important;">Next ▶️</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="sp-empty" style="padding: 4.5rem 2rem; text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: 1.25rem;">📜</div>
+      <h3 style="font-family: 'Space Grotesk', sans-serif; color: #0F172A !important; font-size: 1.25rem; font-weight: 800; margin-bottom: 0.4rem;">
+        No certificates found
+      </h3>
+      <p style="font-size: 0.88rem; color: #334155 !important; font-weight:600; max-width: 380px; margin: 0 auto 1.5rem; line-height: 1.6;">
+        {% if is_recruiter %}
+        This student has not uploaded any credentials matching your filters.
+        {% else %}
+        Keep all your course completions, hackathon participation, and internship verification credentials organized in one professional spot.
+        {% endif %}
+      </p>
+      {% if not is_recruiter %}
+      <a href="{% url 'student_portal:certificate_create' %}" class="sp-btn sp-btn-primary sp-btn-sm">Add Certificate</a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

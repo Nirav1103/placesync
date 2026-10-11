@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Register your college on PlaceSync — Training &amp; Placement Cell Management Portal">
+    <title>Register College | PlaceSync</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=9.1">
+</head>
+<body>
+
+<div class="auth-container">
+    <div class="auth-card">
+
+        <div class="auth-logo">
+            <div class="auth-logo-icon"><i class="fa-solid fa-building-columns"></i></div>
+            <div class="auth-logo-text">Place<span>Sync</span></div>
+        </div>
+
+        <a href="{% url 'home' %}" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+
+        <h1 class="auth-title">Register College</h1>
+        <p class="auth-subtitle">Set up your Training &amp; Placement Cell</p>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert">
+                    {% for error in form.non_field_errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- College Information -->
+            <div class="auth-section-header">
+                <i class="fa-solid fa-university"></i> College Information
+            </div>
+
+            <div class="sp-form-group" style="margin-bottom:1.25rem;">
+                <label class="sp-form-label" for="{{ form.college_name.id_for_label }}" style="color:#334155; font-weight:600; font-size:0.82rem; display:block; margin-bottom:0.4rem;">{{ form.college_name.label }}</label>
+                {{ form.college_name }}
+                {% if form.college_name.errors %}
+                    <ul class="form-error">{% for e in form.college_name.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+                {% endif %}
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.5rem;">
+                <div class="sp-form-group">
+                    <label class="sp-form-label" for="{{ form.college_code.id_for_label }}" style="color:#334155; font-weight:600; font-size:0.82rem; display:block; margin-bottom:0.4rem;">{{ form.college_code.label }}</label>
+                    {{ form.college_code }}
+                    {% if form.college_code.errors %}
+                        <ul class="form-error">{% for e in form.college_code.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </div>
+                <div class="sp-form-group">
+                    <label class="sp-form-label" for="{{ form.college_website.id_for_label }}" style="color:#334155; font-weight:600; font-size:0.82rem; display:block; margin-bottom:0.4rem;">{{ form.college_website.label }}</label>
+                    {{ form.college_website }}
+                    {% if form.college_website.errors %}
+                        <ul class="form-error">{% for e in form.college_website.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Admin Credentials -->
+            <div class="auth-section-header" style="margin-top:0.5rem;">
+                <i class="fa-solid fa-user-shield"></i> Admin Credentials
+            </div>
+
+            <div class="sp-form-group" style="margin-bottom:1.25rem;">
+                <label class="sp-form-label" for="{{ form.username.id_for_label }}" style="color:#334155; font-weight:600; font-size:0.82rem; display:block; margin-bottom:0.4rem;">{{ form.username.label }}</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <ul class="form-error">{% for e in form.username.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+                {% endif %}
+            </div>
+
+            <div class="sp-form-group" style="margin-bottom:1.25rem;">
+                <label class="sp-form-label" for="{{ form.email.id_for_label }}" style="color:#334155; font-weight:600; font-size:0.82rem; display:block; margin-bottom:0.4rem;">{{ form.email.label }}</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <ul class="form-error">{% for e in form.email.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+                {% endif %}
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.75rem;">
+                <div class="sp-form-group">
+                    <label class="sp-form-label" for="{{ form.password.id_for_label }}" style="color:#334155; font-weight:600; font-size:0.82rem; display:block; margin-bottom:0.4rem;">{{ form.password.label }}</label>
+                    {{ form.password }}
+                    {% if form.password.errors %}
+                        <ul class="form-error">{% for e in form.password.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </div>
+                <div class="sp-form-group">
+                    <label class="sp-form-label" for="{{ form.confirm_password.id_for_label }}" style="color:#334155; font-weight:600; font-size:0.82rem; display:block; margin-bottom:0.4rem;">{{ form.confirm_password.label }}</label>
+                    {{ form.confirm_password }}
+                    {% if form.confirm_password.errors %}
+                        <ul class="form-error">{% for e in form.confirm_password.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </div>
+            </div>
+
+            <button type="submit" class="auth-btn-primary">
+                Register &amp; Get Started <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </form>
+
+        <div class="auth-divider"><span>Already registered?</span></div>
+
+        <a href="{% url 'accounts:login' %}" class="auth-btn-secondary">
+            Sign In
+        </a>
+
+    </div>
+</div>
+
+</body>
+</html>

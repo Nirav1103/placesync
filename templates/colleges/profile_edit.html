@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile | PlaceSync{% endblock %}
+
+{% block content %}
+<div class="container" style="flex: 1; padding-top: 2rem; padding-bottom: 3rem;">
+    
+    <!-- Header -->
+    <div class="dashboard-header" style="border-bottom: none; margin-bottom: 1rem;">
+        <div>
+            <h1 class="dashboard-title">Edit College Profile</h1>
+            <p class="dashboard-welcome">Update details for <strong style="color: #fff;">{{ college.name }}</strong></p>
+        </div>
+        <div>
+            <a href="{% url 'colleges:profile_detail' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </div>
+
+    <!-- Main Edit Form -->
+    <form method="post" enctype="multipart/form-data" novalidate style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1rem;">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="non-field-errors" style="grid-column: span 2;">
+                {% for error in form.non_field_errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Left Column: General & Contact Info -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            
+            <div class="card-panel" style="margin-top: 0; padding: 2rem;">
+                <h3 class="panel-title" style="border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem; margin-bottom: 1.25rem;">General Information</h3>
+                
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                        <ul class="form-error">{% for error in form.name.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.university.id_for_label }}">{{ form.university.label }}</label>
+                    {{ form.university }}
+                    {% if form.university.errors %}
+                        <ul class="form-error">{% for error in form.university.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.address.id_for_label }}">{{ form.address.label }}</label>
+                    {{ form.address }}
+                    {% if form.address.errors %}
+                        <ul class="form-error">{% for error in form.address.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card-panel" style="margin-top: 0; padding: 2rem;">
+                <h3 class="panel-title" style="border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem; margin-bottom: 1.25rem;">Contact Details</h3>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.website.id_for_label }}">{{ form.website.label }}</label>
+                    {{ form.website }}
+                    {% if form.website.errors %}
+                        <ul class="form-error">{% for error in form.website.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <ul class="form-error">{% for error in form.email.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                    {{ form.phone }}
+                    {% if form.phone.errors %}
+                        <ul class="form-error">{% for error in form.phone.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Logo, Campus Images & Social Links -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            
+            <div class="card-panel" style="margin-top: 0; padding: 2rem;">
+                <h3 class="panel-title" style="border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem; margin-bottom: 1.25rem;">Media & Assets</h3>
+                
+                <!-- Logo Upload -->
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.logo.id_for_label }}">College Logo</label>
+                    {% if college.logo %}
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+                            <img src="{{ college.logo.url }}" alt="Logo" style="width: 50px; height: 50px; border-radius: var(--radius-sm); border: 1px solid var(--card-border); object-fit: cover;">
+                            <span style="font-size: 0.85rem; color: var(--text-secondary);">Current logo uploaded. Choose a new file to change.</span>
+                        </div>
+                    {% endif %}
+                    {{ form.logo }}
+                    {% if form.logo.errors %}
+                        <ul class="form-error">{% for error in form.logo.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </div>
+
+                <!-- Campus Images Upload -->
+                <div class="form-group" style="margin-top: 1.5rem;">
+                    <label class="form-label" for="{{ form.campus_images.id_for_label }}">{{ form.campus_images.label }}</label>
+                    {{ form.campus_images }}
+                    <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">You can select multiple photos at once.</span>
+                    {% if form.campus_images.errors %}
+                        <ul class="form-error">{% for error in form.campus_images.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </div>
+
+                <!-- Existing Images Deletion Grid -->
+                {% if form.delete_images %}
+                    <div style="margin-top: 1.5rem; border-top: 1px solid var(--card-border); padding-top: 1.25rem;">
+                        <p class="form-label">{{ form.delete_images.label }}</p>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 1rem; margin-top: 0.75rem;">
+                            {% for value, img in form.delete_images.field.choices %}
+                                <div style="position: relative; border-radius: var(--radius-md); border: 1px solid var(--card-border); background: rgba(0,0,0,0.3); overflow: hidden; height: 75px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+                                    <img src="{{ img.image.url }}" alt="Campus Image Thumbnail" style="width: 100%; height: 100%; object-fit: cover;">
+                                    <div style="position: absolute; top: 4px; right: 4px; background: rgba(10, 11, 16, 0.85); border-radius: 4px; padding: 2px; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--card-border);">
+                                        <input type="checkbox" name="delete_images" value="{{ value }}" style="cursor: pointer; width: 14px; height: 14px; accent-color: var(--primary);">
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+            </div>
+
+            <div class="card-panel" style="margin-top: 0; padding: 2rem;">
+                <h3 class="panel-title" style="border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem; margin-bottom: 1.25rem;">Social Handles</h3>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.linkedin.id_for_label }}">{{ form.linkedin.label }}</label>
+                    {{ form.linkedin }}
+                    {% if form.linkedin.errors %}
+                        <ul class="form-error">{% for error in form.linkedin.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.twitter.id_for_label }}">{{ form.twitter.label }}</label>
+                    {{ form.twitter }}
+                    {% if form.twitter.errors %}
+                        <ul class="form-error">{% for error in form.twitter.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.instagram.id_for_label }}">{{ form.instagram.label }}</label>
+                    {{ form.instagram }}
+                    {% if form.instagram.errors %}
+                        <ul class="form-error">{% for error in form.instagram.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Submit Button Card -->
+            <button type="submit" class="btn btn-primary btn-block" style="padding: 1rem 1.5rem; font-size: 1.05rem;">Save Changes</button>
+
+        </div>
+
+    </form>
+
+</div>
+{% endblock %}
